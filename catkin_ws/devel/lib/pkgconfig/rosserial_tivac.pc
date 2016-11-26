@@ -1,0 +1,8 @@
+prefix=/home/saurabh/catkin_ws/devel
+
+Name: rosserial_tivac
+Description: Description of rosserial_tivac
+Version: 0.7.4
+Cflags: 
+Libs: -L/home/saurabh/catkin_ws/devel/lib 
+Requires: 

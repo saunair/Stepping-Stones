@@ -1,0 +1,13 @@
+Header header
+int32 f1
+int32 f2
+float64 qx
+float64 qy
+float64 qz
+float64 qw
+float64 ax
+float64 ay
+float64 az
+float64 rp
+float64 ry
+float64 rr
