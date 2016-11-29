@@ -167,6 +167,90 @@ _motor_generate_messages_check_deps_Num/fast:
 .PHONY : _motor_generate_messages_check_deps_Num/fast
 
 # Convenience name for target.
+motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/rule
+.PHONY : motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/rule
+
+# Convenience name for target.
+_motor_generate_messages_check_deps_yaml_values: motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/rule
+.PHONY : _motor_generate_messages_check_deps_yaml_values
+
+# fast build rule for target.
+_motor_generate_messages_check_deps_yaml_values/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/build
+.PHONY : _motor_generate_messages_check_deps_yaml_values/fast
+
+# Convenience name for target.
+motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/rule
+.PHONY : motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/rule
+
+# Convenience name for target.
+_motor_generate_messages_check_deps_zero_point: motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/rule
+.PHONY : _motor_generate_messages_check_deps_zero_point
+
+# fast build rule for target.
+_motor_generate_messages_check_deps_zero_point/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/build
+.PHONY : _motor_generate_messages_check_deps_zero_point/fast
+
+# Convenience name for target.
+motor/CMakeFiles/_run_tests_motor.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/_run_tests_motor.dir/rule
+.PHONY : motor/CMakeFiles/_run_tests_motor.dir/rule
+
+# Convenience name for target.
+_run_tests_motor: motor/CMakeFiles/_run_tests_motor.dir/rule
+.PHONY : _run_tests_motor
+
+# fast build rule for target.
+_run_tests_motor/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/_run_tests_motor.dir/build.make motor/CMakeFiles/_run_tests_motor.dir/build
+.PHONY : _run_tests_motor/fast
+
+# Convenience name for target.
+motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/rule
+.PHONY : motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/rule
+
+# Convenience name for target.
+_run_tests_motor_roslaunch-check: motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/rule
+.PHONY : _run_tests_motor_roslaunch-check
+
+# fast build rule for target.
+_run_tests_motor_roslaunch-check/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/build.make motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/build
+.PHONY : _run_tests_motor_roslaunch-check/fast
+
+# Convenience name for target.
+motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/rule
+.PHONY : motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/rule
+
+# Convenience name for target.
+_run_tests_motor_roslaunch-check_launch: motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/rule
+.PHONY : _run_tests_motor_roslaunch-check_launch
+
+# fast build rule for target.
+_run_tests_motor_roslaunch-check_launch/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/build.make motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/build
+.PHONY : _run_tests_motor_roslaunch-check_launch/fast
+
+# Convenience name for target.
+motor/CMakeFiles/clean_test_results_motor.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/clean_test_results_motor.dir/rule
+.PHONY : motor/CMakeFiles/clean_test_results_motor.dir/rule
+
+# Convenience name for target.
+clean_test_results_motor: motor/CMakeFiles/clean_test_results_motor.dir/rule
+.PHONY : clean_test_results_motor
+
+# fast build rule for target.
+clean_test_results_motor/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/clean_test_results_motor.dir/build.make motor/CMakeFiles/clean_test_results_motor.dir/build
+.PHONY : clean_test_results_motor/fast
+
+# Convenience name for target.
 motor/CMakeFiles/motor_gencpp.dir/rule:
 	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/motor_gencpp.dir/rule
 .PHONY : motor/CMakeFiles/motor_gencpp.dir/rule
@@ -265,130 +349,46 @@ motor_genpy/fast:
 .PHONY : motor_genpy/fast
 
 # Convenience name for target.
-motor/CMakeFiles/roscpp_generate_messages_cpp.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
-.PHONY : motor/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
+motor/CMakeFiles/run_tests_motor.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/run_tests_motor.dir/rule
+.PHONY : motor/CMakeFiles/run_tests_motor.dir/rule
 
 # Convenience name for target.
-roscpp_generate_messages_cpp: motor/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
-.PHONY : roscpp_generate_messages_cpp
+run_tests_motor: motor/CMakeFiles/run_tests_motor.dir/rule
+.PHONY : run_tests_motor
 
 # fast build rule for target.
-roscpp_generate_messages_cpp/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make motor/CMakeFiles/roscpp_generate_messages_cpp.dir/build
-.PHONY : roscpp_generate_messages_cpp/fast
+run_tests_motor/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/run_tests_motor.dir/build.make motor/CMakeFiles/run_tests_motor.dir/build
+.PHONY : run_tests_motor/fast
 
 # Convenience name for target.
-motor/CMakeFiles/roscpp_generate_messages_lisp.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
-.PHONY : motor/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
+motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/rule
+.PHONY : motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/rule
 
 # Convenience name for target.
-roscpp_generate_messages_lisp: motor/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
-.PHONY : roscpp_generate_messages_lisp
+run_tests_motor_roslaunch-check: motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/rule
+.PHONY : run_tests_motor_roslaunch-check
 
 # fast build rule for target.
-roscpp_generate_messages_lisp/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make motor/CMakeFiles/roscpp_generate_messages_lisp.dir/build
-.PHONY : roscpp_generate_messages_lisp/fast
+run_tests_motor_roslaunch-check/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/build.make motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/build
+.PHONY : run_tests_motor_roslaunch-check/fast
 
 # Convenience name for target.
-motor/CMakeFiles/roscpp_generate_messages_py.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/roscpp_generate_messages_py.dir/rule
-.PHONY : motor/CMakeFiles/roscpp_generate_messages_py.dir/rule
+motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/rule
+.PHONY : motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/rule
 
 # Convenience name for target.
-roscpp_generate_messages_py: motor/CMakeFiles/roscpp_generate_messages_py.dir/rule
-.PHONY : roscpp_generate_messages_py
+run_tests_motor_roslaunch-check_launch: motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/rule
+.PHONY : run_tests_motor_roslaunch-check_launch
 
 # fast build rule for target.
-roscpp_generate_messages_py/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/roscpp_generate_messages_py.dir/build.make motor/CMakeFiles/roscpp_generate_messages_py.dir/build
-.PHONY : roscpp_generate_messages_py/fast
-
-# Convenience name for target.
-motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
-.PHONY : motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_cpp: motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
-.PHONY : rosgraph_msgs_generate_messages_cpp
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_cpp/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
-.PHONY : rosgraph_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
-.PHONY : motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_lisp: motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
-.PHONY : rosgraph_msgs_generate_messages_lisp
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_lisp/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
-.PHONY : rosgraph_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
-.PHONY : motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_py: motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
-.PHONY : rosgraph_msgs_generate_messages_py
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_py/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
-.PHONY : rosgraph_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-.PHONY : motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_cpp: motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-.PHONY : std_msgs_generate_messages_cpp
-
-# fast build rule for target.
-std_msgs_generate_messages_cpp/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
-.PHONY : std_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
-.PHONY : motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_lisp: motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
-.PHONY : std_msgs_generate_messages_lisp
-
-# fast build rule for target.
-std_msgs_generate_messages_lisp/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
-.PHONY : std_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-motor/CMakeFiles/std_msgs_generate_messages_py.dir/rule:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-.PHONY : motor/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_py: motor/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-.PHONY : std_msgs_generate_messages_py
-
-# fast build rule for target.
-std_msgs_generate_messages_py/fast:
-	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/std_msgs_generate_messages_py.dir/build.make motor/CMakeFiles/std_msgs_generate_messages_py.dir/build
-.PHONY : std_msgs_generate_messages_py/fast
+run_tests_motor_roslaunch-check_launch/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/build.make motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/build
+.PHONY : run_tests_motor_roslaunch-check_launch/fast
 
 # Help Target
 help:
@@ -397,6 +397,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... _motor_generate_messages_check_deps_Num"
+	@echo "... _motor_generate_messages_check_deps_yaml_values"
+	@echo "... _motor_generate_messages_check_deps_zero_point"
+	@echo "... _run_tests_motor"
+	@echo "... _run_tests_motor_roslaunch-check"
+	@echo "... _run_tests_motor_roslaunch-check_launch"
+	@echo "... clean_test_results_motor"
 	@echo "... edit_cache"
 	@echo "... install"
 	@echo "... install/local"
@@ -410,15 +416,9 @@ help:
 	@echo "... motor_genlisp"
 	@echo "... motor_genpy"
 	@echo "... rebuild_cache"
-	@echo "... roscpp_generate_messages_cpp"
-	@echo "... roscpp_generate_messages_lisp"
-	@echo "... roscpp_generate_messages_py"
-	@echo "... rosgraph_msgs_generate_messages_cpp"
-	@echo "... rosgraph_msgs_generate_messages_lisp"
-	@echo "... rosgraph_msgs_generate_messages_py"
-	@echo "... std_msgs_generate_messages_cpp"
-	@echo "... std_msgs_generate_messages_lisp"
-	@echo "... std_msgs_generate_messages_py"
+	@echo "... run_tests_motor"
+	@echo "... run_tests_motor_roslaunch-check"
+	@echo "... run_tests_motor_roslaunch-check_launch"
 	@echo "... test"
 .PHONY : help
 

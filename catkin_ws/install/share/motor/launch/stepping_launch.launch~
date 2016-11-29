@@ -1,0 +1,8 @@
+<launch>
+
+<rosparam command="load" file="$(find motor)/config/calibration_values.yaml" />
+
+<node pkg="motor" type="kinect_zero.py" name="kinect_zero" output="screen"/>
+<node pkg="motor" type="stepping_stones.py" name="stepping_stones" output="screen"/>
+
+</launch>

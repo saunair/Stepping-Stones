@@ -1,7 +1,7 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
 messages_str = "/home/saurabh/catkin_ws/src/motor/msg/Num.msg"
-services_str = ""
+services_str = "/home/saurabh/catkin_ws/src/motor/srv/zero_point.srv;/home/saurabh/catkin_ws/src/motor/srv/yaml_values.srv"
 pkg_name = "motor"
 dependencies_str = "std_msgs"
 langs = "gencpp;genlisp;genpy"

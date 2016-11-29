@@ -1,0 +1,10 @@
+<launch>
+
+<node pkg="motor" type="calibration_arduino.py" name="motor_node" output="screen"/>
+
+
+
+<rosparam command="load" file="$(find motor)/config/calibration_values.yaml" />
+
+
+</launch>

@@ -1,0 +1,15 @@
+(cl:defpackage motor-srv
+  (:use )
+  (:export
+   "YAML_VALUES"
+   "<YAML_VALUES-REQUEST>"
+   "YAML_VALUES-REQUEST"
+   "<YAML_VALUES-RESPONSE>"
+   "YAML_VALUES-RESPONSE"
+   "ZERO_POINT"
+   "<ZERO_POINT-REQUEST>"
+   "ZERO_POINT-REQUEST"
+   "<ZERO_POINT-RESPONSE>"
+   "ZERO_POINT-RESPONSE"
+  ))
+

@@ -49,6 +49,8 @@ CMAKE_BINARY_DIR = /home/saurabh/catkin_ws/build
 include motor/CMakeFiles/motor_generate_messages_cpp.dir/progress.make
 
 motor/CMakeFiles/motor_generate_messages_cpp: /home/saurabh/catkin_ws/devel/include/motor/Num.h
+motor/CMakeFiles/motor_generate_messages_cpp: /home/saurabh/catkin_ws/devel/include/motor/zero_point.h
+motor/CMakeFiles/motor_generate_messages_cpp: /home/saurabh/catkin_ws/devel/include/motor/yaml_values.h
 
 /home/saurabh/catkin_ws/devel/include/motor/Num.h: /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py
 /home/saurabh/catkin_ws/devel/include/motor/Num.h: /home/saurabh/catkin_ws/src/motor/msg/Num.msg
@@ -58,8 +60,26 @@ motor/CMakeFiles/motor_generate_messages_cpp: /home/saurabh/catkin_ws/devel/incl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating C++ code from motor/Num.msg"
 	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/saurabh/catkin_ws/src/motor/msg/Num.msg -Imotor:/home/saurabh/catkin_ws/src/motor/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p motor -o /home/saurabh/catkin_ws/devel/include/motor -e /opt/ros/indigo/share/gencpp/cmake/..
 
+/home/saurabh/catkin_ws/devel/include/motor/zero_point.h: /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py
+/home/saurabh/catkin_ws/devel/include/motor/zero_point.h: /home/saurabh/catkin_ws/src/motor/srv/zero_point.srv
+/home/saurabh/catkin_ws/devel/include/motor/zero_point.h: /opt/ros/indigo/share/gencpp/cmake/../msg.h.template
+/home/saurabh/catkin_ws/devel/include/motor/zero_point.h: /opt/ros/indigo/share/gencpp/cmake/../srv.h.template
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating C++ code from motor/zero_point.srv"
+	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/saurabh/catkin_ws/src/motor/srv/zero_point.srv -Imotor:/home/saurabh/catkin_ws/src/motor/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p motor -o /home/saurabh/catkin_ws/devel/include/motor -e /opt/ros/indigo/share/gencpp/cmake/..
+
+/home/saurabh/catkin_ws/devel/include/motor/yaml_values.h: /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py
+/home/saurabh/catkin_ws/devel/include/motor/yaml_values.h: /home/saurabh/catkin_ws/src/motor/srv/yaml_values.srv
+/home/saurabh/catkin_ws/devel/include/motor/yaml_values.h: /opt/ros/indigo/share/gencpp/cmake/../msg.h.template
+/home/saurabh/catkin_ws/devel/include/motor/yaml_values.h: /opt/ros/indigo/share/gencpp/cmake/../srv.h.template
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating C++ code from motor/yaml_values.srv"
+	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/saurabh/catkin_ws/src/motor/srv/yaml_values.srv -Imotor:/home/saurabh/catkin_ws/src/motor/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p motor -o /home/saurabh/catkin_ws/devel/include/motor -e /opt/ros/indigo/share/gencpp/cmake/..
+
 motor_generate_messages_cpp: motor/CMakeFiles/motor_generate_messages_cpp
 motor_generate_messages_cpp: /home/saurabh/catkin_ws/devel/include/motor/Num.h
+motor_generate_messages_cpp: /home/saurabh/catkin_ws/devel/include/motor/zero_point.h
+motor_generate_messages_cpp: /home/saurabh/catkin_ws/devel/include/motor/yaml_values.h
 motor_generate_messages_cpp: motor/CMakeFiles/motor_generate_messages_cpp.dir/build.make
 .PHONY : motor_generate_messages_cpp
 

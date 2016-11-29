@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  roslaunch
 )
 
 
@@ -53,11 +54,11 @@ add_message_files(
  )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+    FILES
+    zero_point.srv
+    yaml_values.srv
+ )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -123,6 +124,17 @@ include_directories(
 catkin_install_python(PROGRAMS src/motor_speed.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+catkin_install_python(PROGRAMS src/calibration_arduino.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+catkin_install_python(PROGRAMS src/kinect_zero.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+catkin_install_python(PROGRAMS src/stepping_stones.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+catkin_install_python(PROGRAMS src/yaml_serv.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 ## Declare a C++ library
 # add_library(motor
 #   src/${PROJECT_NAME}/motor.cpp
@@ -144,6 +156,10 @@ catkin_install_python(PROGRAMS src/motor_speed.py
 # target_link_libraries(motor_node
 #   ${catkin_LIBRARIES}
 # )
+
+
+roslaunch_add_file_check(launch)
+
 
 #############
 ## Install ##
@@ -175,11 +191,8 @@ catkin_install_python(PROGRAMS src/motor_speed.py
 
 catkin_package(CATKIN_DEPENDS message_runtime)
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(DIRECTORY launch
+      DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 #############
 ## Testing ##

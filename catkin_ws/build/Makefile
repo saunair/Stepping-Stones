@@ -1050,110 +1050,6 @@ serial-test-timer/fast:
 .PHONY : serial-test-timer/fast
 
 #=============================================================================
-# Target rules for targets named _motor_generate_messages_check_deps_Num
-
-# Build rule for target.
-_motor_generate_messages_check_deps_Num: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 _motor_generate_messages_check_deps_Num
-.PHONY : _motor_generate_messages_check_deps_Num
-
-# fast build rule for target.
-_motor_generate_messages_check_deps_Num/fast:
-	$(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_Num.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_Num.dir/build
-.PHONY : _motor_generate_messages_check_deps_Num/fast
-
-#=============================================================================
-# Target rules for targets named motor_gencpp
-
-# Build rule for target.
-motor_gencpp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_gencpp
-.PHONY : motor_gencpp
-
-# fast build rule for target.
-motor_gencpp/fast:
-	$(MAKE) -f motor/CMakeFiles/motor_gencpp.dir/build.make motor/CMakeFiles/motor_gencpp.dir/build
-.PHONY : motor_gencpp/fast
-
-#=============================================================================
-# Target rules for targets named motor_generate_messages
-
-# Build rule for target.
-motor_generate_messages: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages
-.PHONY : motor_generate_messages
-
-# fast build rule for target.
-motor_generate_messages/fast:
-	$(MAKE) -f motor/CMakeFiles/motor_generate_messages.dir/build.make motor/CMakeFiles/motor_generate_messages.dir/build
-.PHONY : motor_generate_messages/fast
-
-#=============================================================================
-# Target rules for targets named motor_generate_messages_cpp
-
-# Build rule for target.
-motor_generate_messages_cpp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages_cpp
-.PHONY : motor_generate_messages_cpp
-
-# fast build rule for target.
-motor_generate_messages_cpp/fast:
-	$(MAKE) -f motor/CMakeFiles/motor_generate_messages_cpp.dir/build.make motor/CMakeFiles/motor_generate_messages_cpp.dir/build
-.PHONY : motor_generate_messages_cpp/fast
-
-#=============================================================================
-# Target rules for targets named motor_generate_messages_lisp
-
-# Build rule for target.
-motor_generate_messages_lisp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages_lisp
-.PHONY : motor_generate_messages_lisp
-
-# fast build rule for target.
-motor_generate_messages_lisp/fast:
-	$(MAKE) -f motor/CMakeFiles/motor_generate_messages_lisp.dir/build.make motor/CMakeFiles/motor_generate_messages_lisp.dir/build
-.PHONY : motor_generate_messages_lisp/fast
-
-#=============================================================================
-# Target rules for targets named motor_generate_messages_py
-
-# Build rule for target.
-motor_generate_messages_py: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages_py
-.PHONY : motor_generate_messages_py
-
-# fast build rule for target.
-motor_generate_messages_py/fast:
-	$(MAKE) -f motor/CMakeFiles/motor_generate_messages_py.dir/build.make motor/CMakeFiles/motor_generate_messages_py.dir/build
-.PHONY : motor_generate_messages_py/fast
-
-#=============================================================================
-# Target rules for targets named motor_genlisp
-
-# Build rule for target.
-motor_genlisp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_genlisp
-.PHONY : motor_genlisp
-
-# fast build rule for target.
-motor_genlisp/fast:
-	$(MAKE) -f motor/CMakeFiles/motor_genlisp.dir/build.make motor/CMakeFiles/motor_genlisp.dir/build
-.PHONY : motor_genlisp/fast
-
-#=============================================================================
-# Target rules for targets named motor_genpy
-
-# Build rule for target.
-motor_genpy: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_genpy
-.PHONY : motor_genpy
-
-# fast build rule for target.
-motor_genpy/fast:
-	$(MAKE) -f motor/CMakeFiles/motor_genpy.dir/build.make motor/CMakeFiles/motor_genpy.dir/build
-.PHONY : motor_genpy/fast
-
-#=============================================================================
 # Target rules for targets named roscpp_generate_messages_cpp
 
 # Build rule for target.
@@ -1163,7 +1059,7 @@ roscpp_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_cpp/fast:
-	$(MAKE) -f motor/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make motor/CMakeFiles/roscpp_generate_messages_cpp.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make mrsd_ros_part2/CMakeFiles/roscpp_generate_messages_cpp.dir/build
 .PHONY : roscpp_generate_messages_cpp/fast
 
 #=============================================================================
@@ -1176,7 +1072,7 @@ roscpp_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_lisp/fast:
-	$(MAKE) -f motor/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make motor/CMakeFiles/roscpp_generate_messages_lisp.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make mrsd_ros_part2/CMakeFiles/roscpp_generate_messages_lisp.dir/build
 .PHONY : roscpp_generate_messages_lisp/fast
 
 #=============================================================================
@@ -1189,7 +1085,7 @@ roscpp_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_py/fast:
-	$(MAKE) -f motor/CMakeFiles/roscpp_generate_messages_py.dir/build.make motor/CMakeFiles/roscpp_generate_messages_py.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/roscpp_generate_messages_py.dir/build.make mrsd_ros_part2/CMakeFiles/roscpp_generate_messages_py.dir/build
 .PHONY : roscpp_generate_messages_py/fast
 
 #=============================================================================
@@ -1202,7 +1098,7 @@ rosgraph_msgs_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_cpp/fast:
-	$(MAKE) -f motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make motor/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make mrsd_ros_part2/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
 .PHONY : rosgraph_msgs_generate_messages_cpp/fast
 
 #=============================================================================
@@ -1215,7 +1111,7 @@ rosgraph_msgs_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_lisp/fast:
-	$(MAKE) -f motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make motor/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make mrsd_ros_part2/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
 .PHONY : rosgraph_msgs_generate_messages_lisp/fast
 
 #=============================================================================
@@ -1228,7 +1124,7 @@ rosgraph_msgs_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_py/fast:
-	$(MAKE) -f motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make motor/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make mrsd_ros_part2/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
 .PHONY : rosgraph_msgs_generate_messages_py/fast
 
 #=============================================================================
@@ -1241,7 +1137,7 @@ std_msgs_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_cpp/fast:
-	$(MAKE) -f motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make motor/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make mrsd_ros_part2/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
 .PHONY : std_msgs_generate_messages_cpp/fast
 
 #=============================================================================
@@ -1254,7 +1150,7 @@ std_msgs_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_lisp/fast:
-	$(MAKE) -f motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make motor/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make mrsd_ros_part2/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
 .PHONY : std_msgs_generate_messages_lisp/fast
 
 #=============================================================================
@@ -1267,7 +1163,7 @@ std_msgs_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_py/fast:
-	$(MAKE) -f motor/CMakeFiles/std_msgs_generate_messages_py.dir/build.make motor/CMakeFiles/std_msgs_generate_messages_py.dir/build
+	$(MAKE) -f mrsd_ros_part2/CMakeFiles/std_msgs_generate_messages_py.dir/build.make mrsd_ros_part2/CMakeFiles/std_msgs_generate_messages_py.dir/build
 .PHONY : std_msgs_generate_messages_py/fast
 
 #=============================================================================
@@ -1490,6 +1386,227 @@ sensor_msgs_generate_messages_py: cmake_check_build_system
 sensor_msgs_generate_messages_py/fast:
 	$(MAKE) -f apriltags/CMakeFiles/sensor_msgs_generate_messages_py.dir/build.make apriltags/CMakeFiles/sensor_msgs_generate_messages_py.dir/build
 .PHONY : sensor_msgs_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named _motor_generate_messages_check_deps_Num
+
+# Build rule for target.
+_motor_generate_messages_check_deps_Num: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _motor_generate_messages_check_deps_Num
+.PHONY : _motor_generate_messages_check_deps_Num
+
+# fast build rule for target.
+_motor_generate_messages_check_deps_Num/fast:
+	$(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_Num.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_Num.dir/build
+.PHONY : _motor_generate_messages_check_deps_Num/fast
+
+#=============================================================================
+# Target rules for targets named _motor_generate_messages_check_deps_yaml_values
+
+# Build rule for target.
+_motor_generate_messages_check_deps_yaml_values: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _motor_generate_messages_check_deps_yaml_values
+.PHONY : _motor_generate_messages_check_deps_yaml_values
+
+# fast build rule for target.
+_motor_generate_messages_check_deps_yaml_values/fast:
+	$(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/build
+.PHONY : _motor_generate_messages_check_deps_yaml_values/fast
+
+#=============================================================================
+# Target rules for targets named _motor_generate_messages_check_deps_zero_point
+
+# Build rule for target.
+_motor_generate_messages_check_deps_zero_point: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _motor_generate_messages_check_deps_zero_point
+.PHONY : _motor_generate_messages_check_deps_zero_point
+
+# fast build rule for target.
+_motor_generate_messages_check_deps_zero_point/fast:
+	$(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point.dir/build
+.PHONY : _motor_generate_messages_check_deps_zero_point/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_motor
+
+# Build rule for target.
+_run_tests_motor: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _run_tests_motor
+.PHONY : _run_tests_motor
+
+# fast build rule for target.
+_run_tests_motor/fast:
+	$(MAKE) -f motor/CMakeFiles/_run_tests_motor.dir/build.make motor/CMakeFiles/_run_tests_motor.dir/build
+.PHONY : _run_tests_motor/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_motor_roslaunch-check
+
+# Build rule for target.
+_run_tests_motor_roslaunch-check: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _run_tests_motor_roslaunch-check
+.PHONY : _run_tests_motor_roslaunch-check
+
+# fast build rule for target.
+_run_tests_motor_roslaunch-check/fast:
+	$(MAKE) -f motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/build.make motor/CMakeFiles/_run_tests_motor_roslaunch-check.dir/build
+.PHONY : _run_tests_motor_roslaunch-check/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_motor_roslaunch-check_launch
+
+# Build rule for target.
+_run_tests_motor_roslaunch-check_launch: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _run_tests_motor_roslaunch-check_launch
+.PHONY : _run_tests_motor_roslaunch-check_launch
+
+# fast build rule for target.
+_run_tests_motor_roslaunch-check_launch/fast:
+	$(MAKE) -f motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/build.make motor/CMakeFiles/_run_tests_motor_roslaunch-check_launch.dir/build
+.PHONY : _run_tests_motor_roslaunch-check_launch/fast
+
+#=============================================================================
+# Target rules for targets named clean_test_results_motor
+
+# Build rule for target.
+clean_test_results_motor: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 clean_test_results_motor
+.PHONY : clean_test_results_motor
+
+# fast build rule for target.
+clean_test_results_motor/fast:
+	$(MAKE) -f motor/CMakeFiles/clean_test_results_motor.dir/build.make motor/CMakeFiles/clean_test_results_motor.dir/build
+.PHONY : clean_test_results_motor/fast
+
+#=============================================================================
+# Target rules for targets named motor_gencpp
+
+# Build rule for target.
+motor_gencpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_gencpp
+.PHONY : motor_gencpp
+
+# fast build rule for target.
+motor_gencpp/fast:
+	$(MAKE) -f motor/CMakeFiles/motor_gencpp.dir/build.make motor/CMakeFiles/motor_gencpp.dir/build
+.PHONY : motor_gencpp/fast
+
+#=============================================================================
+# Target rules for targets named motor_generate_messages
+
+# Build rule for target.
+motor_generate_messages: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages
+.PHONY : motor_generate_messages
+
+# fast build rule for target.
+motor_generate_messages/fast:
+	$(MAKE) -f motor/CMakeFiles/motor_generate_messages.dir/build.make motor/CMakeFiles/motor_generate_messages.dir/build
+.PHONY : motor_generate_messages/fast
+
+#=============================================================================
+# Target rules for targets named motor_generate_messages_cpp
+
+# Build rule for target.
+motor_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages_cpp
+.PHONY : motor_generate_messages_cpp
+
+# fast build rule for target.
+motor_generate_messages_cpp/fast:
+	$(MAKE) -f motor/CMakeFiles/motor_generate_messages_cpp.dir/build.make motor/CMakeFiles/motor_generate_messages_cpp.dir/build
+.PHONY : motor_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named motor_generate_messages_lisp
+
+# Build rule for target.
+motor_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages_lisp
+.PHONY : motor_generate_messages_lisp
+
+# fast build rule for target.
+motor_generate_messages_lisp/fast:
+	$(MAKE) -f motor/CMakeFiles/motor_generate_messages_lisp.dir/build.make motor/CMakeFiles/motor_generate_messages_lisp.dir/build
+.PHONY : motor_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named motor_generate_messages_py
+
+# Build rule for target.
+motor_generate_messages_py: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_generate_messages_py
+.PHONY : motor_generate_messages_py
+
+# fast build rule for target.
+motor_generate_messages_py/fast:
+	$(MAKE) -f motor/CMakeFiles/motor_generate_messages_py.dir/build.make motor/CMakeFiles/motor_generate_messages_py.dir/build
+.PHONY : motor_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named motor_genlisp
+
+# Build rule for target.
+motor_genlisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_genlisp
+.PHONY : motor_genlisp
+
+# fast build rule for target.
+motor_genlisp/fast:
+	$(MAKE) -f motor/CMakeFiles/motor_genlisp.dir/build.make motor/CMakeFiles/motor_genlisp.dir/build
+.PHONY : motor_genlisp/fast
+
+#=============================================================================
+# Target rules for targets named motor_genpy
+
+# Build rule for target.
+motor_genpy: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_genpy
+.PHONY : motor_genpy
+
+# fast build rule for target.
+motor_genpy/fast:
+	$(MAKE) -f motor/CMakeFiles/motor_genpy.dir/build.make motor/CMakeFiles/motor_genpy.dir/build
+.PHONY : motor_genpy/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_motor
+
+# Build rule for target.
+run_tests_motor: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 run_tests_motor
+.PHONY : run_tests_motor
+
+# fast build rule for target.
+run_tests_motor/fast:
+	$(MAKE) -f motor/CMakeFiles/run_tests_motor.dir/build.make motor/CMakeFiles/run_tests_motor.dir/build
+.PHONY : run_tests_motor/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_motor_roslaunch-check
+
+# Build rule for target.
+run_tests_motor_roslaunch-check: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 run_tests_motor_roslaunch-check
+.PHONY : run_tests_motor_roslaunch-check
+
+# fast build rule for target.
+run_tests_motor_roslaunch-check/fast:
+	$(MAKE) -f motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/build.make motor/CMakeFiles/run_tests_motor_roslaunch-check.dir/build
+.PHONY : run_tests_motor_roslaunch-check/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_motor_roslaunch-check_launch
+
+# Build rule for target.
+run_tests_motor_roslaunch-check_launch: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 run_tests_motor_roslaunch-check_launch
+.PHONY : run_tests_motor_roslaunch-check_launch
+
+# fast build rule for target.
+run_tests_motor_roslaunch-check_launch/fast:
+	$(MAKE) -f motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/build.make motor/CMakeFiles/run_tests_motor_roslaunch-check_launch.dir/build
+.PHONY : run_tests_motor_roslaunch-check_launch/fast
 
 #=============================================================================
 # Target rules for targets named _run_tests_openni_launch
@@ -2730,14 +2847,6 @@ help:
 	@echo "... run_tests_serial_gtest_serial-test-timer"
 	@echo "... serial-test"
 	@echo "... serial-test-timer"
-	@echo "... _motor_generate_messages_check_deps_Num"
-	@echo "... motor_gencpp"
-	@echo "... motor_generate_messages"
-	@echo "... motor_generate_messages_cpp"
-	@echo "... motor_generate_messages_lisp"
-	@echo "... motor_generate_messages_py"
-	@echo "... motor_genlisp"
-	@echo "... motor_genpy"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_py"
@@ -2764,6 +2873,23 @@ help:
 	@echo "... sensor_msgs_generate_messages_cpp"
 	@echo "... sensor_msgs_generate_messages_lisp"
 	@echo "... sensor_msgs_generate_messages_py"
+	@echo "... _motor_generate_messages_check_deps_Num"
+	@echo "... _motor_generate_messages_check_deps_yaml_values"
+	@echo "... _motor_generate_messages_check_deps_zero_point"
+	@echo "... _run_tests_motor"
+	@echo "... _run_tests_motor_roslaunch-check"
+	@echo "... _run_tests_motor_roslaunch-check_launch"
+	@echo "... clean_test_results_motor"
+	@echo "... motor_gencpp"
+	@echo "... motor_generate_messages"
+	@echo "... motor_generate_messages_cpp"
+	@echo "... motor_generate_messages_lisp"
+	@echo "... motor_generate_messages_py"
+	@echo "... motor_genlisp"
+	@echo "... motor_genpy"
+	@echo "... run_tests_motor"
+	@echo "... run_tests_motor_roslaunch-check"
+	@echo "... run_tests_motor_roslaunch-check_launch"
 	@echo "... _run_tests_openni_launch"
 	@echo "... _run_tests_openni_launch_roslaunch-check"
 	@echo "... _run_tests_openni_launch_roslaunch-check_launch"
