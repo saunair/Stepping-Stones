@@ -59,9 +59,9 @@ def left_values(data):
 
     if w!=-1:
         if count_left<=400:
-            left_gain_f1.append(data.f1/w)
-            left_gain_f2.append(data.f2/w)
-            left_gain_f3.append(data.f3/w)
+            left_gain_f1.append((data.f1 - left_bias_f1)/w)
+            left_gain_f2.append((data.f2 - left_bias_f2)/w)
+            left_gain_f3.append((data.f3 - left_bias.f3)/w)
             count_left+=1
     
         elif count_left==401:
@@ -95,9 +95,9 @@ def right_values(data):
     
     if w!=-1:
         if count_right<=400:
-            right_gain_f1.append(data.f1/w)
-            right_gain_f2.append(data.f2/w)
-            right_gain_f3.append(data.f3/w)
+            right_gain_f1.append((data.f1 - right_bias_f1)/w)
+            right_gain_f2.append((data.f2 - right_bias_f2)/w)
+            right_gain_f3.append((data.f3 - right_bias_f3)/w)
 
         elif count_right==401:
             right_gain_f1 = float(sum(right_gain_f1))/len(right_gain_f1)

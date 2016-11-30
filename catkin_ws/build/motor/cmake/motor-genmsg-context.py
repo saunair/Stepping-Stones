@@ -1,6 +1,6 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
-messages_str = "/home/saurabh/catkin_ws/src/motor/msg/Num.msg"
+messages_str = "/home/saurabh/catkin_ws/src/motor/msg/Num.msg;/home/saurabh/catkin_ws/src/motor/msg/states.msg"
 services_str = "/home/saurabh/catkin_ws/src/motor/srv/zero_point.srv;/home/saurabh/catkin_ws/src/motor/srv/yaml_values.srv"
 pkg_name = "motor"
 dependencies_str = "std_msgs"

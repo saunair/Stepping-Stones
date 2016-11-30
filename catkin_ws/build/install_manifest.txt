@@ -262,12 +262,14 @@
 /home/saurabh/catkin_ws/install/lib/apriltags/apriltags
 /home/saurabh/catkin_ws/install/lib/libapriltags.so
 /home/saurabh/catkin_ws/install/share/motor/msg/Num.msg
+/home/saurabh/catkin_ws/install/share/motor/msg/states.msg
 /home/saurabh/catkin_ws/install/share/motor/srv/zero_point.srv
 /home/saurabh/catkin_ws/install/share/motor/srv/yaml_values.srv
 /home/saurabh/catkin_ws/install/share/motor/cmake/motor-msg-paths.cmake
 /home/saurabh/catkin_ws/install/include/motor/yaml_values.h
 /home/saurabh/catkin_ws/install/include/motor/zero_pointResponse.h
 /home/saurabh/catkin_ws/install/include/motor/Num.h
+/home/saurabh/catkin_ws/install/include/motor/states.h
 /home/saurabh/catkin_ws/install/include/motor/yaml_valuesRequest.h
 /home/saurabh/catkin_ws/install/include/motor/zero_pointRequest.h
 /home/saurabh/catkin_ws/install/include/motor/yaml_valuesResponse.h
@@ -278,7 +280,9 @@
 /home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/srv/yaml_values.lisp
 /home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/srv/_package_yaml_values.lisp
 /home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/srv/zero_point.lisp
+/home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/msg/_package_states.lisp
 /home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/msg/motor-msg.asd
+/home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/msg/states.lisp
 /home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/msg/_package.lisp
 /home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/msg/_package_Num.lisp
 /home/saurabh/catkin_ws/install/share/common-lisp/ros/motor/msg/Num.lisp
@@ -291,9 +295,11 @@
 /home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/srv/_zero_point.pyc
 /home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/srv/__init__.pyc
 /home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/msg/_Num.pyc
+/home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/msg/_states.pyc
 /home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/msg/__init__.py
 /home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/msg/__init__.pyc
 /home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/msg/_Num.py
+/home/saurabh/catkin_ws/install/lib/python2.7/dist-packages/motor/msg/_states.py
 /home/saurabh/catkin_ws/install/lib/pkgconfig/motor.pc
 /home/saurabh/catkin_ws/install/share/motor/cmake/motor-msg-extras.cmake
 /home/saurabh/catkin_ws/install/share/motor/cmake/motorConfig.cmake
@@ -304,6 +310,7 @@
 /home/saurabh/catkin_ws/install/lib/motor/kinect_zero.py
 /home/saurabh/catkin_ws/install/lib/motor/stepping_stones.py
 /home/saurabh/catkin_ws/install/lib/motor/yaml_serv.py
+/home/saurabh/catkin_ws/install/lib/motor/take_user_input.py
 /home/saurabh/catkin_ws/install/lib/pkgconfig/motor.pc
 /home/saurabh/catkin_ws/install/share/motor/cmake/motor-msg-extras.cmake
 /home/saurabh/catkin_ws/install/share/motor/cmake/motorConfig.cmake

@@ -1,5 +1,6 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/motor_generate_messages_lisp"
+  "/home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/msg/states.lisp"
   "/home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/msg/Num.lisp"
   "/home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/srv/zero_point.lisp"
   "/home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/srv/yaml_values.lisp"

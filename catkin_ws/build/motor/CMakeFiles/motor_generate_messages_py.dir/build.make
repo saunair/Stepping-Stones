@@ -48,48 +48,59 @@ CMAKE_BINARY_DIR = /home/saurabh/catkin_ws/build
 # Include the progress variables for this target.
 include motor/CMakeFiles/motor_generate_messages_py.dir/progress.make
 
+motor/CMakeFiles/motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py
 motor/CMakeFiles/motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py
 motor/CMakeFiles/motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py
 motor/CMakeFiles/motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py
 motor/CMakeFiles/motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/__init__.py
 motor/CMakeFiles/motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/__init__.py
 
+/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py: /home/saurabh/catkin_ws/src/motor/msg/states.msg
+/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py: /opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_1)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG motor/states"
+	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/saurabh/catkin_ws/src/motor/msg/states.msg -Imotor:/home/saurabh/catkin_ws/src/motor/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p motor -o /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg
+
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py: /home/saurabh/catkin_ws/src/motor/msg/Num.msg
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py: /opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG motor/Num"
 	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/saurabh/catkin_ws/src/motor/msg/Num.msg -Imotor:/home/saurabh/catkin_ws/src/motor/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p motor -o /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg
 
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py: /home/saurabh/catkin_ws/src/motor/srv/zero_point.srv
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_3)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python code from SRV motor/zero_point"
 	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py /home/saurabh/catkin_ws/src/motor/srv/zero_point.srv -Imotor:/home/saurabh/catkin_ws/src/motor/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p motor -o /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv
 
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py: /home/saurabh/catkin_ws/src/motor/srv/yaml_values.srv
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_4)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python code from SRV motor/yaml_values"
 	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py /home/saurabh/catkin_ws/src/motor/srv/yaml_values.srv -Imotor:/home/saurabh/catkin_ws/src/motor/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p motor -o /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv
 
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/__init__.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_5)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python msg __init__.py for motor"
 	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py -o /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg --initpy
 
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/__init__.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py
 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/__init__.py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_5)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/saurabh/catkin_ws/build/CMakeFiles $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python srv __init__.py for motor"
 	cd /home/saurabh/catkin_ws/build/motor && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py -o /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv --initpy
 
 motor_generate_messages_py: motor/CMakeFiles/motor_generate_messages_py
+motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py
 motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py
 motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py
 motor_generate_messages_py: /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py

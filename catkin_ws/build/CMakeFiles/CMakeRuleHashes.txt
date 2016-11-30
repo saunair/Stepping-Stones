@@ -3,6 +3,7 @@
 782b037696ab935c5116058db336ddd6 /home/saurabh/catkin_ws/devel/include/apriltags/AprilTagDetections.h
 0e1fb30a59dce202e1e8d660fddc261b /home/saurabh/catkin_ws/devel/include/imu_filter_madgwick/ImuFilterMadgwickConfig.h
 051506f1c8116aa911f71b0d3a49f38f /home/saurabh/catkin_ws/devel/include/motor/Num.h
+4b80848d5c3e94d56f8da7caad908f8e /home/saurabh/catkin_ws/devel/include/motor/states.h
 d20dbf8946fba8fccafd45fd7c8bf793 /home/saurabh/catkin_ws/devel/include/motor/yaml_values.h
 b3f058e7d292b9bfeac0e6054b040acd /home/saurabh/catkin_ws/devel/include/motor/zero_point.h
 d30a05caedfaa6cc4dc9c129c6a694c4 /home/saurabh/catkin_ws/devel/include/openni_camera/OpenNIConfig.h
@@ -20,6 +21,7 @@ be6bf4d6df822104adee7d0e6cf10c00 /home/saurabh/catkin_ws/devel/include/rosserial
 480b9adb8d1d165d5ecca1291f623f92 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/apriltags/msg/__init__.py
 7d9da456c4f5338a305e75f0490b1e2b /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py
 132c5e44a329317652599c74f25cb6a8 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/__init__.py
+bf608df300a5a91521ccf3bc246cee51 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py
 de444188f3e48e95c037eafd398682f2 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/__init__.py
 c5278ff6560f177c48bebd1f13632cc8 /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py
 039fbfe8c4b19a59e544af3891a43efd /home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py
@@ -41,6 +43,7 @@ fa56a02f36146bc4b09e420fa65d1637 /home/saurabh/catkin_ws/devel/lib/python2.7/dis
 f2ce5db8caf4fa436e00e51d6e492929 /home/saurabh/catkin_ws/devel/share/common-lisp/ros/apriltags/msg/AprilTagDetection.lisp
 057ea0b710ba42d7aeb42abd5e479145 /home/saurabh/catkin_ws/devel/share/common-lisp/ros/apriltags/msg/AprilTagDetections.lisp
 47e4d2fdb949fb42f50b1ec825ae76de /home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/msg/Num.lisp
+a7f4851aa09e503b861552239287e634 /home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/msg/states.lisp
 a38ee852cc3ac0843f2907229da6c1ba /home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/srv/yaml_values.lisp
 5b91e61f99d603bcf9e7fd937992c510 /home/saurabh/catkin_ws/devel/share/common-lisp/ros/motor/srv/zero_point.lisp
 285ae678adc0d7b98845e5b755a8cb32 /home/saurabh/catkin_ws/devel/share/common-lisp/ros/rosserial_arduino/msg/Adc.lisp
@@ -110,6 +113,7 @@ ffd8c9248e9ef57365998d2d08ea3626 imu_tools/rviz_imu_plugin/CMakeFiles/visualizat
 ffd8c9248e9ef57365998d2d08ea3626 imu_tools/rviz_imu_plugin/CMakeFiles/visualization_msgs_generate_messages_lisp
 ffd8c9248e9ef57365998d2d08ea3626 imu_tools/rviz_imu_plugin/CMakeFiles/visualization_msgs_generate_messages_py
 9dac835beedb2f929bb362f77499f1e8 motor/CMakeFiles/_motor_generate_messages_check_deps_Num
+4a40338b0638c54dc7ed7b6cb893545b motor/CMakeFiles/_motor_generate_messages_check_deps_states
 9a8dc9ef74b7f8dc92a58bb37d818d0c motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values
 e3be50592bf3330c2bb0b65aaecc605e motor/CMakeFiles/_motor_generate_messages_check_deps_zero_point
 cc2f8e4073021b1bb807bf13ea55002a motor/CMakeFiles/_run_tests_motor

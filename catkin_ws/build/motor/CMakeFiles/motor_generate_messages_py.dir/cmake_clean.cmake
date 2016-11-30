@@ -1,5 +1,6 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/motor_generate_messages_py"
+  "/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_states.py"
   "/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/msg/_Num.py"
   "/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_zero_point.py"
   "/home/saurabh/catkin_ws/devel/lib/python2.7/dist-packages/motor/srv/_yaml_values.py"

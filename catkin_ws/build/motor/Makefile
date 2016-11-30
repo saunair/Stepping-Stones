@@ -167,6 +167,20 @@ _motor_generate_messages_check_deps_Num/fast:
 .PHONY : _motor_generate_messages_check_deps_Num/fast
 
 # Convenience name for target.
+motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/rule:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/rule
+.PHONY : motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/rule
+
+# Convenience name for target.
+_motor_generate_messages_check_deps_states: motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/rule
+.PHONY : _motor_generate_messages_check_deps_states
+
+# fast build rule for target.
+_motor_generate_messages_check_deps_states/fast:
+	cd /home/saurabh/catkin_ws/build && $(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/build
+.PHONY : _motor_generate_messages_check_deps_states/fast
+
+# Convenience name for target.
 motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/rule:
 	cd /home/saurabh/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/rule
 .PHONY : motor/CMakeFiles/_motor_generate_messages_check_deps_yaml_values.dir/rule
@@ -397,6 +411,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... _motor_generate_messages_check_deps_Num"
+	@echo "... _motor_generate_messages_check_deps_states"
 	@echo "... _motor_generate_messages_check_deps_yaml_values"
 	@echo "... _motor_generate_messages_check_deps_zero_point"
 	@echo "... _run_tests_motor"

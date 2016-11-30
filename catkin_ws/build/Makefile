@@ -1401,6 +1401,19 @@ _motor_generate_messages_check_deps_Num/fast:
 .PHONY : _motor_generate_messages_check_deps_Num/fast
 
 #=============================================================================
+# Target rules for targets named _motor_generate_messages_check_deps_states
+
+# Build rule for target.
+_motor_generate_messages_check_deps_states: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _motor_generate_messages_check_deps_states
+.PHONY : _motor_generate_messages_check_deps_states
+
+# fast build rule for target.
+_motor_generate_messages_check_deps_states/fast:
+	$(MAKE) -f motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/build.make motor/CMakeFiles/_motor_generate_messages_check_deps_states.dir/build
+.PHONY : _motor_generate_messages_check_deps_states/fast
+
+#=============================================================================
 # Target rules for targets named _motor_generate_messages_check_deps_yaml_values
 
 # Build rule for target.
@@ -2874,6 +2887,7 @@ help:
 	@echo "... sensor_msgs_generate_messages_lisp"
 	@echo "... sensor_msgs_generate_messages_py"
 	@echo "... _motor_generate_messages_check_deps_Num"
+	@echo "... _motor_generate_messages_check_deps_states"
 	@echo "... _motor_generate_messages_check_deps_yaml_values"
 	@echo "... _motor_generate_messages_check_deps_zero_point"
 	@echo "... _run_tests_motor"

@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    Num.msg
+   states.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -131,6 +132,13 @@ catkin_install_python(PROGRAMS src/kinect_zero.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 catkin_install_python(PROGRAMS src/stepping_stones.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+catkin_install_python(PROGRAMS src/yaml_serv.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+
+catkin_install_python(PROGRAMS src/take_user.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Declare a C++ library
