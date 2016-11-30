@@ -26,12 +26,12 @@ ros::NodeHandle  nh;
 
 motor::Num total_sensor;
 
-ros::Publisher sense("sense", &total_sensor);
+ros::Publisher sense1("sense1", &total_sensor);
 
 void setup()
 {
   nh.initNode();
-  nh.advertise(sense);    
+  nh.advertise(sense1);    
   nh.getHardware()->setBaud(115200);
   
   Serial1.begin(115200);
@@ -74,7 +74,7 @@ void loop()
 
 
 
-        sense.publish(&total_sensor);
+        sense1.publish(&total_sensor);
           
 
 
