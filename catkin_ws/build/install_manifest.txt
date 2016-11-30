@@ -309,6 +309,7 @@
 /home/saurabh/catkin_ws/install/share/motor/cmake/motorConfig.cmake
 /home/saurabh/catkin_ws/install/share/motor/cmake/motorConfig-version.cmake
 /home/saurabh/catkin_ws/install/share/motor/package.xml
+/home/saurabh/catkin_ws/install/share/motor/launch/chech.txt
 /home/saurabh/catkin_ws/install/share/motor/launch/calibration_stepping.launch~
 /home/saurabh/catkin_ws/install/share/motor/launch/calibration_stepping.launch
 /home/saurabh/catkin_ws/install/share/motor/launch/stepping_launch.launch~

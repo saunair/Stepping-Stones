@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import time
 from motor.srv import *
 import rospy
 import tf
@@ -32,7 +32,6 @@ def zero_point_server():
         try:
             (trans1,rot1) = listener_trans.lookupTransform('openni_depth_frame', '/left_hip_1', rospy.Time(0))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-            print "faili"
             continue
     
         try:
@@ -45,6 +44,7 @@ def zero_point_server():
                 z_x.append((trans2[0] + trans1[0])/2)
                 z_y.append((trans2[1] + trans1[1])/2)
                 z_z.append((trans2[2] + trans1[2])/2)
+                print "here"
                 count+=1
         except:
             pass
@@ -73,4 +73,5 @@ def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
 
 if __name__ == "__main__":
+    time.sleep(20)
     zero_point_server()

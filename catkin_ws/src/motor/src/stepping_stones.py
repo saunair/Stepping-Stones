@@ -35,7 +35,6 @@ def talker():
     pub.publish(50)
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)
-    print "not here bro" 
     #delay
     #time.sleep(5)
     rate = rospy.Rate(30.0)
@@ -70,18 +69,18 @@ def talker():
         	rate.sleep()
 	
 	hello_str = "%d" % val
-        rospy.loginfo(hello_str)
+        print hello_str
         rate.sleep()
 
 if __name__ == '__main__':
     try:
         z_x, z_y, z_z = ask_zero_point()
-        print "ghadiali chutia"
+        print "acquired zero point"
     except rospy.ROSInterruptException:
-        rospy.loginfo("Sorry didn't acquire the zero position")
+        print "Sorry didn't acquire the zero position"
         pass
     except:
-        rospy.loginfo("Sorry didn't acquire the zero position")
+        print "Sorry didn't acquire the zero position, going with default"
         z_x = 3.45787 
         z_y = 0.0881804
         z_z = 0.21108
