@@ -4,8 +4,12 @@ from motor.msg import states
 
 
 def keyboard_input():
-    state = input("Please input the state")
-    set_point = input("please input the set_point")
+    try:
+        state = input("Please input the state")
+        set_point = input("please input the set_point")
+    except:
+        state = 0
+        set_point = 0
     return state, set_point
 
 def state_publisher():

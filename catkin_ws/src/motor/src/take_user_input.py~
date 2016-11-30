@@ -5,7 +5,7 @@ from motor.msg import states
 
 def keyboard_input():
     state = input("Please input the state")
-    set_poiint = input("please input the set_point")
+    set_point = input("please input the set_point")
     return state, set_point
 
 def state_publisher():
