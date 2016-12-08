@@ -213,10 +213,10 @@ void loop(){
       wheelVelocityAvg[2] = wheelVelocityAvg[2] + (wheelVelocityArray[2][sample] / float(SAMPLE_NUM));
     }
 
-    if(LEFT_SKATE == 1) {
+    /*if(LEFT_SKATE == 1) {
       wheelVelocityAvg[1] = -1*wheelVelocityAvg[1];
       wheelVelocityAvg[2] = -1*wheelVelocityAvg[2];
-    }
+    }*/
   }
   
   if((currentTimeStamp - lastCtrlTimeStamp) >= CTRL_PERIOD_MS) {
@@ -304,7 +304,7 @@ void loop(){
 
       //Apply acceleration  limit
       velocityTarget = target;
-      //if(LEFT_SKATE == 1) velocityTarget = -1*velocityTarget;
+      if(LEFT_SKATE == 1) velocityTarget = -1*velocityTarget;
       
       velocityTargetLimPrev = velocityTargetLim;
       velocityTargetLim = constrain(velocityTarget,velocityTargetLimPrev-ACCEL_LIMIT*(CTRL_PERIOD_MS/1000.0),
@@ -351,7 +351,8 @@ void loop(){
      nh.spinOnce();   
   }
 
-  myData.data = wheelVelocityAvg[1];
+  //myData.data = wheelVelocityAvg[1];
+  myData.data = velocityTarget;
  
 
  
