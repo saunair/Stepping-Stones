@@ -57,7 +57,7 @@ def send_controls():
     rospy.init_node('stepping_stones', anonymous=True)
     listener_trans = tf.TransformListener() 
     i = 0
-    rate = rospy.Rate(30) # 30hz
+    rate = rospy.Rate(15) # 30hz
     pub.publish(send_control)
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)
@@ -80,7 +80,7 @@ def send_controls():
             try:
                 (trans2,rot2) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "problem"
+                #print "problem"
                 #continue
                 pass
     

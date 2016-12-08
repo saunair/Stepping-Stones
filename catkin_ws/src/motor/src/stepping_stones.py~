@@ -27,9 +27,12 @@ z_z=0.211088
 #change the message values to be sent to the arduino
 def change_state(data):
     global send_control
-    send_control.state = data.state
-    send_control.set_point = data.set_point
-    
+    try:
+        send_control.state = data.state
+        send_control.set_point = data.set_point
+    except:
+        send_control.state = 0
+        send_control.set_point = 0
 
 #ask for the zero point from the kinect
 def ask_zero_point():
@@ -54,7 +57,7 @@ def send_controls():
     rospy.init_node('stepping_stones', anonymous=True)
     listener_trans = tf.TransformListener() 
     i = 0
-    rate = rospy.Rate(30) # 30hz
+    rate = rospy.Rate(15) # 30hz
     pub.publish(send_control)
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)
@@ -77,7 +80,7 @@ def send_controls():
             try:
                 (trans2,rot2) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                print "problem"
+                #print "problem"
                 #continue
                 pass
     
