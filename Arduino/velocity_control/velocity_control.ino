@@ -17,11 +17,12 @@
 #define P_I_GAIN 0
 #define P_D_GAIN 0.4
 
+//#define V_P_GAIN 0.01
 #define V_P_GAIN 0.01
 #define V_I_GAIN 0
 #define V_D_GAIN 0
 
-#define ACCEL_LIMIT 125000
+#define ACCEL_LIMIT 100.0
 
 #define PERIOD_MS 20.0
 
@@ -57,6 +58,7 @@ float skateVelocity = 0;
 float skatePositionPrev = 0;
 float velocityTarget = 0;
 float velocityTargetLim = 0;
+float velocityTargetLimPrev = 0;
 float velocityError = 0;
 float velocityErrorSum = 0;
 float velocityErrorDiff = 0;
@@ -152,8 +154,7 @@ void loop(){
       Serial.print(skatePosition, DEC);
       Serial.print(" , Command:");
       Serial.print(speedCommand, DEC);
-  
-      
+    
       if(speedCommand == 0) {
         setSpeed(1,0);
         setSpeed(2,0);
@@ -187,11 +188,10 @@ void loop(){
 
       //Apply acceleration  limit
       velocityTarget = target;
-     velocityTargetLim = constrain(velocityTarget,skateVelocity-ACCEL_LIMIT*(PERIOD_MS/1000.0),
-          skateVelocity+ACCEL_LIMIT*(PERIOD_MS/1000.0));
+      velocityTargetLimPrev = velocityTargetLim;
+      velocityTargetLim = constrain(velocityTarget,velocityTargetLimPrev-ACCEL_LIMIT*(PERIOD_MS/1000.0),
+          velocityTargetLimPrev+ACCEL_LIMIT*(PERIOD_MS/1000.0));
 
-
-      //velocityTargetLim = velocityTarget;  
       velocityErrorPrev = velocityError;
       velocityError = velocityTargetLim - skateVelocity;
       velocityErrorSum = velocityErrorSum + velocityError;
@@ -199,27 +199,32 @@ void loop(){
       speedCommand = V_P_GAIN*velocityError + V_I_GAIN*velocityErrorSum + V_D_GAIN*velocityErrorDiff;
       speedCommand = constrain(speedCommand,-90,90);
 
-
-      Serial.print("target_velocity_constrai: ");
-      Serial.print(velocityTargetLim, DEC);
       Serial.print("E1 Idx:");
       Serial.print(encCount1, DEC);
       Serial.print(", E2 Idx:");
       Serial.print(encCount2, DEC);
       Serial.print(" , Vel:");
       Serial.print(skateVelocity, DEC);
+      Serial.print(" , TgtLim:");
+      Serial.print(velocityTargetLim, DEC);
       Serial.print(" , Command:");
       Serial.print(speedCommand, DEC);
 
-      setSpeed(1,speedCommand);
-      setSpeed(2,speedCommand);
-    } 
-    Serial.println("");   
+      if(RIGHT_SKATE) {
+        setSpeed(1,speedCommand);
+        setSpeed(2,speedCommand);
+      }
+
+      if(LEFT_SKATE) {
+        setSpeed(1,-speedCommand);
+        setSpeed(2,-speedCommand);
+      }
+      Serial.println(""); 
+    }    
   }
   
-  if (Serial.available()) {
+  if (Serial.available() >= 4) {
     target = Serial.parseFloat();
-    //Serial.println("Reset to zero");
   }
 }
 

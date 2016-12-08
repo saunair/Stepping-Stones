@@ -51,7 +51,7 @@ ros::NodeHandle  nh;
 
 motor::Num total_sensor;
 
-ros::Publisher right("right", &total_sensor);
+ros::Publisher left("left", &total_sensor);
 
 ros::ServiceClient<motor::yaml_values::Request, motor::yaml_values::Response> client("yaml_send");
 
@@ -138,7 +138,7 @@ void setup() {
   // ROS Stuff
 
   nh.initNode();
-  nh.advertise(right);    
+  nh.advertise(left);    
   nh.getHardware()->setBaud(115200);
   nh.serviceClient(client);
   nh.advertise(chatter);
@@ -231,7 +231,7 @@ void loop(){
         total_sensor.qw = imu.quatw;
 
 
-        right.publish(&total_sensor);
+        left.publish(&total_sensor);
            
     }
   }
@@ -349,8 +349,8 @@ void loop(){
 //      Serial.print(" , Command:");
 //      Serial.print(speedCommand, DEC);
 
-      setSpeed(1,speedCommand);
-      setSpeed(2,speedCommand);
+      setSpeed(1,-1*speedCommand);
+      setSpeed(2,-1*speedCommand);
     } 
 //    Serial.println("");   
   }

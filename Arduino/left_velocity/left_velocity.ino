@@ -1,64 +1,5 @@
-// ROS Stuff
-
-#define SERIAL_BUFFER_SIZE 256
-//#include <Wire.h>
-#include <ros.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Float64.h>
-#include <sensor_msgs/Temperature.h>
-#include <UM.h>
-#include <ros/time.h>
-//#include <tf/transform_broadcaster.h>
-#include <sensor_msgs/Imu.h>
-#include <motor/Num.h>
-#include <motor/states.h>
-
-#include <motor/yaml_values.h>
-int global_state, global_set_point;
-
-float velocityTargetLimPrev = 0;
-std_msgs::Float64 myData;
-ros::Publisher chatter("c", &myData);
-
-void servo_cb( const motor::states& cmd_msg){
-
-  //servo.write(cmd_msg.data*180.0/100.0); //set servo angle, should be from 0-180 
-  //force_msg.data = cmd_msg.data*180.0/100.0;
-  //pub_force.publish(&force_msg);
-  //servo.write(0);
-  //servo.write(cmd_msg.data);
-  //if(cmd_msg.data == 30) {
-    global_state = cmd_msg.state;
-    global_set_point = cmd_msg.set_point;
-    
-   // digitalWrite(13, HIGH-digitalRead(13));  //toggle led  
- // }
-
-}
-
-ros::Subscriber<motor::states> sub("servo", servo_cb);
-    
-//Connect the RX pin on the UM7 to TX1 (pin 18) on the DUE
-//Connect the TX pin on the UM7 to RX1 (pin 19) on the DUE
-
-UM imu;
-
-float left_bias_f1, left_bias_f2, left_bias_f3, right_bias_f1, right_bias_f2, right_bias_f3, left_gain_f1, left_gain_f2, left_gain_f3, right_gain_f1, right_gain_f2, right_gain_f3;
-
-ros::NodeHandle  nh;
-
-//Set up the ros node and publisher
-
-motor::Num total_sensor;
-
-ros::Publisher right("right", &total_sensor);
-
-ros::ServiceClient<motor::yaml_values::Request, motor::yaml_values::Response> client("yaml_send");
-
-// ROS Stuff ends
-
-#define LEFT_SKATE 0
-#define RIGHT_SKATE 1
+#define LEFT_SKATE 1
+#define RIGHT_SKATE 0
 
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
@@ -76,7 +17,7 @@ ros::ServiceClient<motor::yaml_values::Request, motor::yaml_values::Response> cl
 #define P_I_GAIN 0
 #define P_D_GAIN 0.4
 
-#define V_P_GAIN 0.01
+#define V_P_GAIN 0.05
 #define V_I_GAIN 0
 #define V_D_GAIN 0
 
@@ -131,39 +72,7 @@ long currentTimeStamp = 0;
 Servo esc1; //Front
 Servo esc2; //Back
 
-
-
 void setup() {
-  
-  // ROS Stuff
-
-  nh.initNode();
-  nh.advertise(right);    
-  nh.getHardware()->setBaud(115200);
-  nh.serviceClient(client);
-  nh.advertise(chatter);
-  Serial1.begin(115200);
-  nh.subscribe(sub);
-  delay(5000);
-
-  motor::yaml_values::Request req;
-  motor::yaml_values::Response resp;
-  client.call(req, resp);
-  left_bias_f1 = resp.left_bias_f1;
-  left_bias_f2 = resp.left_bias_f2;
-  left_bias_f3 = resp.left_bias_f3;
-  left_gain_f1 = resp.left_gain_f1;
-  left_gain_f2 = resp.left_gain_f2;
-  left_gain_f3 = resp.left_gain_f3;
-
-  right_bias_f1 = resp.right_bias_f1;
-  right_bias_f2 = resp.right_bias_f2;
-  right_bias_f3 = resp.right_bias_f3;
-  right_gain_f1 = resp.right_gain_f1;
-  right_gain_f2 = resp.right_gain_f2;
-  right_gain_f3 = resp.right_gain_f3;
-
-  // ROS Stuff ends
 
   //Set Up Front Skate
   pinMode(ENC1_CHA_PIN, INPUT); 
@@ -188,68 +97,19 @@ void setup() {
 
   //pinMode(50, OUTPUT);
 
- // Serial.begin(115200);
-  //Serial.println("Standby...prepping alcubierre drive");
+  Serial.begin(115200);
+  Serial.println("Standby...prepping alcubierre drive");
   delay(8000);
-  //Serial.println("Ready to roll!");
+  Serial.println("Ready to roll!");
 }
 
-// ROS stuff
-long publisher_timer = 0;
-// ROS sutff ends
-
 void loop(){ 
-
-  // ROS Stuff
-
-  if (Serial1.available() > 0) {
-     
-      if (imu.encode(Serial1.read())) {
-         
-        
-        total_sensor.header.stamp = nh.now();
-        
-
-        total_sensor.f1 = analogRead(A0);
-        total_sensor.f2 = analogRead(A1);
-        total_sensor.f3 = analogRead(A2);
-      
-        
-        total_sensor.ax = imu.accel_x;
-        total_sensor.ay = imu.accel_y;
-        total_sensor.az = imu.accel_z;
-        
-       
-        total_sensor.rp = imu.gyro_x; 
-        total_sensor.ry = imu.gyro_y;
-        total_sensor.rr = imu.gyro_z;
-
-
-        total_sensor.qx = imu.quatx;
-        total_sensor.qy =imu.quaty;
-        total_sensor.qz =imu.quatz;
-        total_sensor.qw = imu.quatw;
-
-
-        right.publish(&total_sensor);
-           
-    }
-  }
-   
- 
-
-  // ROS Stuff ends
-  
   currentTimeStamp = millis();
-
   
   if((currentTimeStamp - lastTimeStamp) >= PERIOD_MS) {
     //digitalWrite(50,!digitalRead(50));
     lastTimeStamp = currentTimeStamp;
-    
-     
-    chatter.publish( &myData );
-    target = global_set_point;
+
     //If the target velocity is 0 and the velocity is low enough, switch to position control
     if((target == 0) && (abs(skateVelocity) < 50) && (system_state == Velocity_Mode)) {
       system_state = Position_Mode;
@@ -264,7 +124,7 @@ void loop(){
       system_state = Velocity_Mode;
       encCount1 = 0;
       encCount2 = 0;
-      positionErrorSum = 0; 
+      positionErrorSum = 0;
       velocityErrorSum = 0;
     }
 
@@ -284,14 +144,14 @@ void loop(){
       speedCommand = P_P_GAIN*positionError + P_I_GAIN*positionErrorSum + P_D_GAIN*positionErrorDiff;
       speedCommand = constrain(speedCommand,-90,90);
   
-//      Serial.print("E1 Idx:");
-//      Serial.print(encCount1, DEC);
-//      Serial.print(", E2 Idx:");
-//      Serial.print(encCount2, DEC);
-//      Serial.print(" , Posn:");
-//      Serial.print(skatePosition, DEC);
-//      Serial.print(" , Command:");
-//      Serial.print(speedCommand, DEC);
+      Serial.print("E1 Idx:");
+      Serial.print(encCount1, DEC);
+      Serial.print(", E2 Idx:");
+      Serial.print(encCount2, DEC);
+      Serial.print(" , Posn:");
+      Serial.print(skatePosition, DEC);
+      Serial.print(" , Command:");
+      Serial.print(speedCommand, DEC);
   
       
       if(speedCommand == 0) {
@@ -318,18 +178,20 @@ void loop(){
           setSpeed(1,speedCommand);       
         }
       }
-     // Serial.println("");
+      Serial.println("");
     }
 
     //Velocity Control
     if(system_state == Velocity_Mode) {
       skateVelocity = (skatePosition - skatePositionPrev)/(PERIOD_MS/1000.0);
 
+      //Apply acceleration  limit
       velocityTarget = target;
-      velocityTargetLimPrev = velocityTargetLim;
-      velocityTargetLim = constrain(velocityTarget,velocityTargetLimPrev-ACCEL_LIMIT*(PERIOD_MS/1000.0),
-          velocityTargetLimPrev+ACCEL_LIMIT*(PERIOD_MS/1000.0));
+     velocityTargetLim = constrain(velocityTarget,skateVelocity-ACCEL_LIMIT*(PERIOD_MS/1000.0),
+          skateVelocity+ACCEL_LIMIT*(PERIOD_MS/1000.0));
 
+
+      //velocityTargetLim = velocityTarget;  
       velocityErrorPrev = velocityError;
       velocityError = velocityTargetLim - skateVelocity;
       velocityErrorSum = velocityErrorSum + velocityError;
@@ -337,30 +199,28 @@ void loop(){
       speedCommand = V_P_GAIN*velocityError + V_I_GAIN*velocityErrorSum + V_D_GAIN*velocityErrorDiff;
       speedCommand = constrain(speedCommand,-90,90);
 
-//
-//      Serial.print("target_velocity_constrai: ");
-//      Serial.print(velocityTargetLim, DEC);
-//      Serial.print("E1 Idx:");
-//      Serial.print(encCount1, DEC);
-//      Serial.print(", E2 Idx:");
-//      Serial.print(encCount2, DEC);
-//      Serial.print(" , Vel:");
-//      Serial.print(skateVelocity, DEC);
-//      Serial.print(" , Command:");
-//      Serial.print(speedCommand, DEC);
 
-      setSpeed(1,speedCommand);
-      setSpeed(2,speedCommand);
+      Serial.print("target_velocity_constrai: ");
+      Serial.print(velocityTargetLim, DEC);
+      Serial.print("E1 Idx:");
+      Serial.print(encCount1, DEC);
+      Serial.print(", E2 Idx:");
+      Serial.print(encCount2, DEC);
+      Serial.print(" , Vel:");
+      Serial.print(skateVelocity, DEC);
+      Serial.print(" , Command:");
+      Serial.print(speedCommand, DEC);
+
+      setSpeed(1,-1*speedCommand);
+      setSpeed(2,-1*speedCommand);
     } 
-//    Serial.println("");   
+    Serial.println("");   
   }
-   myData.data = target;
-    nh.spinOnce();
   
-//  if (Serial.available()) {
-//    target = Serial.parseFloat();
-//    //Serial.println("Reset to zero");
-//  }
+  if (Serial.available()) {
+    target = Serial.parseFloat();
+    //Serial.println("Reset to zero");
+  }
 }
 
 
@@ -405,13 +265,13 @@ void setSpeed(int escNum,float _speed)
   switch(escNum) {
     case 1:
       esc1.write(angle);
-    //  Serial.print(" , ESC1:");
-    //  Serial.print(_speed, DEC);
+      Serial.print(" , ESC1:");
+      Serial.print(_speed, DEC);
       break;
     case 2:
       esc2.write(angle);
-    //  Serial.print(" , ESC2:");
-    //  Serial.print(_speed, DEC);
+      Serial.print(" , ESC2:");
+      Serial.print(_speed, DEC);
       break;
     default:
       break;
