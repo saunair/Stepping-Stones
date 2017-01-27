@@ -13,7 +13,16 @@ config_file = '/home/saurabh/catkin_ws/src/motor/config/calibration_values.yaml'
 
 count_left = 0
 count_right = 0
+sensor_no = -1
 
+#Will have to change over time 
+#macro values
+MAX_BIAS_F1 = 20
+MAX_BIAS_F2 = 20
+MAX_BIAS_F3 = 20
+
+
+#set to values for checks during the code
 w = -1
 left_bias_f1 = -1
 left_bias_f2 = -1
@@ -23,6 +32,20 @@ right_bias_f1 = -1
 right_bias_f2 = -1
 right_bias_f3 = -1
 
+
+#set to values for checks during the code
+def restart_routine():    
+    global count_left, left_gain_f1, left_gain_f2, left_gain_f3, left_bias_f1, left_bias_f2, left_bias_f3, w
+    w = -1
+    left_bias_f1 = -1
+    left_bias_f2 = -1
+    left_bias_f3 = -1
+
+    right_bias_f1 = -1
+    right_bias_f2 = -1
+    right_bias_f3 = -1
+
+#this might raise an issue later as we are appending values; This will lead to having continuity issues
 left_gain_f1 = []
 left_gain_f2 = []
 left_gain_f3 = []
@@ -53,11 +76,24 @@ def left_values(data):
         left_bias_f1/=200
         left_bias_f2/=200
         left_bias_f3/=200
-        w = input("input weight here")
-        count_left+=1
+        #put a check for the bias changes/values
+        if left_bias_f1 < MAX_BIAS_F1:
+            print "Left F1 load not corrected"
+        if left_bias_f2 < MAX_BIAS_F2:
+            print "Left F2 load not corrected"
+        if left_bias_f3 < MAX_BIAS_F3:
+            print "Left F3 load not corrected"
+        
+        if left_bias_f1 < MAX_BIAS_F1 and left_bias_f2 < MAX_BIAS_F2 and left_bias_f3 < MAX_BIAS_F3:
+            w = input("input weight here")
+            sensor_no = input("enter left skate sensor numberfor gain calibration")
+            count_left+=1
+        else:
+            restart_routine()
         #rospy.sleep(100.0)
 
     if w!=-1:
+    #keep appending for another 200 values
         if count_left<=400:
             left_gain_f1.append(2*(data.f1 - left_bias_f1)/w)
             left_gain_f2.append(2*(data.f2 - left_bias_f2)/w)
@@ -75,25 +111,40 @@ def left_values(data):
 def right_values(data):
     global count_right
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.f1)
-    count_right+=1
 
     if count_right==0:
         right_bias_f1 = 0
         right_bias_f2 = 0
         right_bias_f3 = 0
+        count_right+=1
     
     if count_right<=200:
         right_bias_f1 += data.f1
         right_bias_f2 += data.f2
         right_bias_f3 += data.f3
+        count_right+=1
 
     elif count_right==201:
         right_bias_f1/=200
         right_bias_f2/=200
         right_bias_f3/=200
-        w = input("input weight here")
+        #put a check for the bias changes/values
+        if right_bias_f1 < MAX_BIAS_F1:
+            print "Right F1 load not corrected"
+        if right_bias_f2 < MAX_BIAS_F2:
+            print "Right F2 load not corrected"
+        if right_bias_f3 < MAX_BIAS_F3:
+            print "Right F3 load not corrected"
+        
+        if right_bias_f1 < MAX_BIAS_F1 and  right_bias_f2 < MAX_BIAS_F2 and right_bias_f3 < MAX_BIAS_F3:
+            w = input("input weight here")
+            count_right+=1
+            sensor_no = input("enter right skate sensor number for gain calibration")
+        else:
+            restart_routine()
     
     if w!=-1:
+    #keep appending for another 200 values
         if count_right<=400:
             right_gain_f1.append(2*(data.f1 - right_bias_f1)/w)
             right_gain_f2.append(2*(data.f2 - right_bias_f2)/w)
@@ -121,15 +172,28 @@ def bias():
 def data_write():
     d = {}
     global config_file, right_bias_f1, right_bias_f2, right_bias_f3, right_gain_f1,right_gain_f2,right_gain_f3, left_bias_f1, left_bias_f2, left_bias_f3, left_gain_f1,left_gain_f2,left_gain_f3
-    print "chrck", rospy.get_param("left_gain_f3")
+    print "check", rospy.get_param("left_gain_f3")
 
     if right_bias_f1 != -1: 
         d["right_bias_f1"] = right_bias_f1
         d["right_bias_f2"] = right_bias_f2
         d["right_bias_f3"] = right_bias_f3
-        d["right_gain_f1"] = right_gain_f1
-        d["right_gain_f2"] = right_gain_f2
-        d["right_gain_f3"] = right_gain_f3
+        if sensor_no==1:
+            d["right_gain_f1"] = right_gain_f1
+            print right_gain_f1, "right_gain_f1"
+            d["right_gain_f2"] = rospy.get_param("right_gain_f2")
+            d["right_gain_f3"] = rospy.get_param("right_gain_f3")
+        elif sensor_no==2:
+            d["right_gain_f2"] = right_gain_f2
+            print right_gain_f2, "right_gain_f2"
+            d["right_gain_f1"] = rospy.get_param("right_gain_f1")
+            d["right_gain_f3"] = rospy.get_param("right_gain_f3")
+        elif sensor_no==3:
+            d["right_gain_f3"] = right_gain_f3
+            print right_gain_f3, "right_gain_f3"
+            d["right_gain_f2"] = rospy.get_param("right_gain_f2")
+            d["right_gain_f1"] = rospy.get_param("right_gain_f1")
+        
     else:
         d["right_bias_f1"] = rospy.get_param("right_bias_f1")
         d["right_bias_f2"] = rospy.get_param("right_bias_f2")
@@ -139,13 +203,28 @@ def data_write():
         d["right_gain_f3"] = rospy.get_param("right_gain_f3")
     
     if left_bias_f1 != -1: 
-        left_gain_f2 =1000
+        #left_gain_f2 =1000
+        
         d["left_bias_f1"] = left_bias_f1
         d["left_bias_f2"] = left_bias_f2
         d["left_bias_f3"] = left_bias_f3
-        d["left_gain_f1"] = left_gain_f1
-        d["left_gain_f2"] = left_gain_f2
-        d["left_gain_f3"] = left_gain_f3
+        if sensor_number==1:
+            d["left_gain_f1"] = left_gain_f1
+            print left_gain_f1, "left_gain_f1"
+            d["left_gain_f2"] = rospy.get_param("left_gain_f2")
+            d["left_gain_f3"] = rospy.get_param("left_gain_f3")
+        
+        elif sensor_number==2:
+            d["left_gain_f2"] = left_gain_f2
+            print left_gain_f2, "left_gain_f2"
+            d["left_gain_f1"] = rospy.get_param("left_gain_f1")
+            d["left_gain_f3"] = rospy.get_param("left_gain_f3")
+        
+        elif sensor_number==3:
+            d["left_gain_f3"] = left_gain_f3
+            print right_gain_f3, "right_gain_f3"
+            d["left_gain_f1"] = rospy.get_param("left_gain_f1")
+            d["left_gain_f2"] = rospy.get_param("left_gain_f2")
     else:
         d["left_bias_f1"] = rospy.get_param("left_bias_f1")
         d["left_bias_f2"] = rospy.get_param("left_bias_f2")
@@ -183,7 +262,8 @@ def data_write():
    # rospy.dump_params(config_file, "right_gain_f2", verbose=False)
    # rospy.dump_params(config_file, "right_gain_f3", verbose=False)
     print left_gain_f2
-    print rospy.get_param("left_gain_f2")
+    print rospy.get_param("Written the values in YAML!!!!")
+    def restart_routine():    
 
 if __name__ == '__main__':                           
     bias()
