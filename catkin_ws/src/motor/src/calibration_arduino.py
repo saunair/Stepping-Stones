@@ -90,6 +90,7 @@ def left_values(data):
             count_left+=1
         else:
             restart_routine()
+            count_left = 0
         #rospy.sleep(100.0)
 
     if w!=-1:
@@ -141,6 +142,7 @@ def right_values(data):
             count_right+=1
             sensor_no = input("enter right skate sensor number for gain calibration")
         else:
+            count_right = 0
             restart_routine()
     
     if w!=-1:
