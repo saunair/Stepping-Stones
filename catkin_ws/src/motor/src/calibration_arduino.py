@@ -287,7 +287,7 @@ def data_write(sensor_no):
     # rospy.dump_params(config_file, "right_gain_f2", verbose=False)
     # rospy.dump_params(config_file, "right_gain_f3", verbose=False)
     print "Written the values in YAML!!!!"
-    a = input("confirm")
+    a = raw_input("confirm")
     restart_routine()
 
 if __name__ == '__main__':                           
