@@ -1,6 +1,6 @@
 //Revision 1/26/2017 - 1:05am
-#define LEFT_SKATE 1
-#define RIGHT_SKATE 0
+#define LEFT_SKATE 0
+#define RIGHT_SKATE 1
 
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
