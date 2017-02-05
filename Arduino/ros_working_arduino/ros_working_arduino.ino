@@ -1,6 +1,6 @@
-//Revision 12/7/2016 - 11:05pm
-#define LEFT_SKATE 1
-#define RIGHT_SKATE 0
+//Revision 1/26/2017 - 1:05am
+#define LEFT_SKATE 0
+#define RIGHT_SKATE 1
 
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
@@ -202,8 +202,8 @@ void loop(){
       wheelVelocityArray[1][sample] = wheelVelocityArray[1][sample-1];
       wheelVelocityArray[2][sample] = wheelVelocityArray[2][sample-1];
     }  
-    wheelVelocityArray[1][0] = (wheelPositionAvg[1] - wheelPositionAvgPrev[1])/(CTRL_PERIOD_MS/1000.0);
-    wheelVelocityArray[2][0] = (wheelPositionAvg[2] - wheelPositionAvgPrev[2])/(CTRL_PERIOD_MS/1000.0);
+    wheelVelocityArray[1][0] = (wheelPositionAvg[1] - wheelPositionAvgPrev[1])/(SAMP_PERIOD_MS/1000.0);
+    wheelVelocityArray[2][0] = (wheelPositionAvg[2] - wheelPositionAvgPrev[2])/(SAMP_PERIOD_MS/1000.0);
 
     //Update velocity moving average  
     wheelVelocityAvg[1] = 0;
