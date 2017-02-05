@@ -1,1 +1,0 @@
-/usr/bin/c++       CMakeFiles/openni_tracker_test.dir/src/openni_tracker_test.cpp.o  -o /home/saurabh/catkin_ws/devel/lib/openni_tracker/openni_tracker_test  -L/opt/ros/indigo/lib -rdynamic 
