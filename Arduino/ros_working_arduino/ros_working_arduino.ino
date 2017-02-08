@@ -351,8 +351,8 @@ void loop(){
      nh.spinOnce();   
   }
 
-  //myData.data = wheelVelocityAvg[1];
-  myData.data = velocityTarget;
+  myData.data = wheelVelocityAvg[1];
+  //myData.data = velocityTarget;
  
 
  

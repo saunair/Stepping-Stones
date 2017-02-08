@@ -41,6 +41,8 @@ namespace motor
       _ry_type ry;
       typedef float _rr_type;
       _rr_type rr;
+      typedef float _velocity_type;
+      _velocity_type velocity;
 
     Num():
       header(),
@@ -56,7 +58,8 @@ namespace motor
       az(0),
       rp(0),
       ry(0),
-      rr(0)
+      rr(0),
+      velocity(0)
     {
     }
 
@@ -104,6 +107,7 @@ namespace motor
       offset += serializeAvrFloat64(outbuffer + offset, this->rp);
       offset += serializeAvrFloat64(outbuffer + offset, this->ry);
       offset += serializeAvrFloat64(outbuffer + offset, this->rr);
+      offset += serializeAvrFloat64(outbuffer + offset, this->velocity);
       return offset;
     }
 
@@ -154,11 +158,12 @@ namespace motor
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->rp));
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->ry));
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->rr));
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->velocity));
      return offset;
     }
 
     const char * getType(){ return "motor/Num"; };
-    const char * getMD5(){ return "3c819e3d7118a7e8382129f8ffeccd87"; };
+    const char * getMD5(){ return "698919ae4a60131b474544120910adee"; };
 
   };
 

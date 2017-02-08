@@ -12,3 +12,4 @@ float64 az
 float64 rp
 float64 ry
 float64 rr
+float64 velocity
