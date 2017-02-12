@@ -7,8 +7,8 @@
 <node pkg="motor" type="kinect_zero.py" name="kinect_zero" output="screen"/>
 <node pkg="motor" type="stepping_stones.py" name="stepping_stones" output="screen"/>
 <node pkg="motor" type="yaml_serv.py" name="yaml_serv" output="screen"/>
-<node pkg="rosserial_python" type="serial_node.py" name="serial_node1" output="screen" args="_port:=/dev/ttyACM0 _baud:=115200"/>
-<node pkg="rosserial_python" type="serial_node2.py" name="serial_node2" output="screen" args="_port:=/dev/ttyACM1 _baud:=115200"/>
-<include file="$(find openni_launch)/launch/openni.launch"/>
+<node pkg="rosserial_python" type="serial_node.py" name="serial_node1" output="screen" args="_port:=/dev/ttyACM0 _baud:=921600"/>
+<node pkg="rosserial_python" type="serial_node2.py" name="serial_node2" output="screen" args="_port:=/dev/ttyACM1 _baud:=921600"/>
+<!-- <include file="$(find openni_launch)/launch/openni.launch"/> -->
 <node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" output="screen"/>
 </launch>

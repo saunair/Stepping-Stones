@@ -28,8 +28,7 @@ def zero_point_server():
     
     listener_trans = tf.TransformListener() 
     #rate = rospy.Rate(10.0)
-    #waiting for transform!!!!
-    listener_trans.waitForTransform("/openni_depth_frame", "/left_hip_1", rospy.Time(), rospy.Duration(4000.0))
+    listener_trans.waitForTransform("/openni_depth_frame", "/left_hip_1", rospy.Time(), rospy.Duration(40000.0))
     while count<11:
 
         try:
@@ -72,5 +71,5 @@ def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
 
 if __name__ == "__main__":
-    time.sleep(20)
+    #time.sleep(20)
     zero_point_server()

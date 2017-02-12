@@ -11,9 +11,16 @@ import tf
 
 import roslib; roslib.load_manifest('motor')
 
+
+
+
+
 #state values
+user_input = states()
 send_control = states()
 calibration = 0
+user_input.state = calibration
+user_input.set_point = 0
 position_control = 1
 velocity_control = 2
 
@@ -24,7 +31,7 @@ velocity_control = 2
 velocity_threshold = 200
 
 #time threshold
-time_threshold = 10
+time_threshold = 20
 
 send_control.state = calibration
 send_control.set_point = 0
@@ -33,6 +40,20 @@ send_control.set_point = 0
 z_x= 3.45787 
 z_y=0.0881804
 z_z=0.211088
+
+
+#Kinect-based controller values
+kp = 50 # mm/s / m
+
+def process_input(data):
+    global user_input
+    try:
+        user_input.state = data.state
+        user_input.set_point = data.set_point
+    except:
+        user_input.state = 0
+        user_input.set_point = 0
+        #print user_input.set_point
 
 
 def stop_system_right(right):
@@ -63,24 +84,19 @@ def check_timeout(current_time):
         print current_time, previous_left_time
         send_control.set_point = 0
         print "One of the skates has timed out"
-       
-#change the message values to be sent to the arduino
-def change_state(data):
-    global send_control
-    try:
-        send_control.state = data.state
-        send_control.set_point = data.set_point
-    except:
-        send_control.state = 0
+    #fault detected
+    if not(skate_fault):
         send_control.set_point = 0
+        print "fault detected"
 
 #ask for the zero point from the kinect
 def ask_zero_point():
-    #wait for 20 secs and then continue
-    rospy.wait_for_service('zero_point', 2)
+    #not waiting for 2 secs!!
+    rospy.wait_for_service('zero_point')
     try:
         resp1 = rospy.ServiceProxy('zero_point', zero_point)
-        resp1 = resp1(1)
+        #not passing one anymore to  move on from empty
+        resp1 = resp1()
         print "zero_point =" ,resp1
         return resp1.zero_x, resp1.zero_y, resp1.zero_z
         #return resp1
@@ -109,13 +125,13 @@ def send_controls():
     #rate = rospy.Rate(30.0)
     
     #subscribe to user inputs
-    rospy.Subscriber("user_inputs", states, change_state)
+    rospy.Subscriber("user_inputs", states, process_input)
     rospy.Subscriber("right", Num, stop_system_right)
     rospy.Subscriber("left", Num, stop_system_left)
     
     while not rospy.is_shutdown():
         
-        if send_control.state==velocity_control:
+        if user_input.state==velocity_control:
             try:
                 (trans1,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
@@ -135,17 +151,25 @@ def send_controls():
                 x_current = ((trans2[0] + trans1[0])/2)
                 y_current = ((trans2[1] + trans1[1])/2)
                 z_current = ((trans2[2] + trans1[2])/2)
+                                                  
+                x_error = z_x - x_current
+                #print x_error
+                if user_input.set_point > 100:
+                    send_control.set_point = user_input.set_point + kp*x_error
+                else:
+                    send_control.set_point = user_input.set_point
             except:
+                send_control.set_point = user_input.set_point
                 pass
-
+        
         send_control.header.stamp = rospy.Time.now()	
         
-        check_timeout(rospy.get_time())
+        #check_timeout(rospy.get_time())
         
         pub.publish(send_control)
 	#print "in loop"
 	#hello_str = "state = %d; set_point" % (send_control.state, send_control.set_point)
-        print send_control.state, send_control.set_point
+        #print send_control.state, send_control.set_point
         rate.sleep()
 
 if __name__ == '__main__':
