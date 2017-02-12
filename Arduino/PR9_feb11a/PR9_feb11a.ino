@@ -111,8 +111,8 @@ Servo esc2; //Back
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float64.h>
 #include <ros/time.h>
-#include <motor/skate_feedback.h>
-#include <motor/skate_command.h>
+#include <morpheus_skates/skate_feedback.h>
+#include <morpheus_skates/skate_command.h>
 
 
 //kept the ros master timout to 3 seconds
@@ -125,10 +125,10 @@ byte skate_fault = 0;
 
 
 //Sensor data type and publisher declaration
-motor::skate_feedback sensor_data;
+morpheus_skates::skate_feedback sensor_data;
 ros::Publisher chatter("left", &sensor_data);
 
-void servo_cb( const motor::skate_command& cmd_msg){
+void servo_cb( const morpheus_skates::skate_command& cmd_msg){
   //global_state = cmd_msg.state;
   
   global_set_point = cmd_msg.command_target*(skate_fault==0);
@@ -140,7 +140,7 @@ void servo_cb( const motor::skate_command& cmd_msg){
   chatter.publish( &sensor_data );
 }
 
-ros::Subscriber<motor::skate_command> sub("servo", servo_cb);
+ros::Subscriber<morpheus_skates::skate_command> sub("servo", servo_cb);
 ros::NodeHandle  nh;
 
 void check_reset_system() 

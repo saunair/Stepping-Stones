@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(motor)
+project(morpheus_skates)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -51,7 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    skate_feedback.msg
-   state_command.msg
+   skate_command.msg
  )
 
 ## Generate services in the 'srv' folder

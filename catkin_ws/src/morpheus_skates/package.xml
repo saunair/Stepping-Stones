@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>motor</name>
+  <name>morpheus_skates</name>
   <version>0.0.0</version>
-  <description>The motor package</description>
+  <description>The whole package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

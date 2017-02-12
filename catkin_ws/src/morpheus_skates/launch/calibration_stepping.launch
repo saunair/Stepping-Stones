@@ -1,0 +1,10 @@
+<launch>
+
+<node pkg="morpheus_skates" type="calibration_arduino.py" name="calibration_node" output="screen"/>
+
+
+
+<rosparam command="load" file="$(find morpheus_skates)/config/calibration_values.yaml" />
+
+
+</launch>
