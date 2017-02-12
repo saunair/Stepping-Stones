@@ -1,8 +1,0 @@
-prefix=/home/saurabh/catkin_ws/devel
-
-Name: mrsd_ros_part2
-Description: Description of mrsd_ros_part2
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/saurabh/catkin_ws/devel/lib 
-Requires: 

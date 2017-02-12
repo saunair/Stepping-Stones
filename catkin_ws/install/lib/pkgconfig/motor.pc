@@ -1,8 +1,0 @@
-prefix=/home/saurabh/catkin_ws/install
-
-Name: motor
-Description: Description of motor
-Version: 0.0.0
-Cflags: -I/home/saurabh/catkin_ws/install/include
-Libs: -L/home/saurabh/catkin_ws/install/lib 
-Requires: message_runtime

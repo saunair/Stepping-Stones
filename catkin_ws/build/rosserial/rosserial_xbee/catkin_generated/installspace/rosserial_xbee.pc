@@ -1,8 +1,0 @@
-prefix=/home/saurabh/catkin_ws/install
-
-Name: rosserial_xbee
-Description: Description of rosserial_xbee
-Version: 0.7.4
-Cflags: 
-Libs: -L/home/saurabh/catkin_ws/install/lib 
-Requires: 

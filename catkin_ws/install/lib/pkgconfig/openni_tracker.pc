@@ -1,8 +1,0 @@
-prefix=/home/saurabh/catkin_ws/install
-
-Name: openni_tracker
-Description: Description of openni_tracker
-Version: 0.2.0
-Cflags: 
-Libs: -L/home/saurabh/catkin_ws/install/lib 
-Requires: 
