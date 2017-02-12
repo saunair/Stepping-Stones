@@ -369,7 +369,7 @@ void loop(){
 
   sensor_data.velocity = wheelVelocityAvg[1];
   //sensor_data.velocity = master_time.toSec();
-  check_reset_system();
+ // check_reset_system();
   //myData.data = velocityTarget;
  
 

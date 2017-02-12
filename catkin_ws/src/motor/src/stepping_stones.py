@@ -4,7 +4,7 @@ import rospy
 import time
 from std_msgs.msg import UInt16
 from motor.msg import states
-from motor.msg import Num
+from motor.msg import skate_feedback
 import numpy
 from motor.srv import *
 import tf
@@ -19,8 +19,8 @@ skate_fault = 0
 user_input = states()
 send_control = states()
 calibration = 0
-user_input.state = calibration
-user_input.set_point = 0
+user_input.calibration_enable = 0
+user_input.command_target = 0
 position_control = 1
 velocity_control = 2
 
@@ -28,13 +28,13 @@ velocity_control = 2
 #previous_right_time = rospy.Time.now()
 
 #velocity threshold! please decide!
-velocity_threshold = 200
+velocity_threshold = 300
 
 #time threshold
 time_threshold = 20
 
-send_control.state = calibration
-send_control.set_point = 0
+send_control.calibration_enable = calibration
+send_control.command_target = 0
 
 #default zero points
 z_x= 3.45787 
@@ -48,33 +48,33 @@ kp = 50 # mm/s / m
 def process_input(data):
     global user_input
     try:
-        user_input.state = data.state
-        user_input.set_point = data.set_point
+        user_input.calibration_enable = data.calibration_enable
+        user_input.command_target = data.command_target
     except:
-        user_input.state = 0
-        user_input.set_point = 0
+        user_input.calibration_enable = 0
+        user_input.command_target = 0
         #print user_input.set_point
 
 
 def stop_system_right(right):
     global send_control, velocity_threshold, previous_right_time,skate_fault
-    if not((right.velocity - send_control) < velocity_threshold):
-        send_control.state = 0        
-        send_control.set_point = 0
+    if not((right.velocity_filt_rear - send_control.command_target) < velocity_threshold):
+        send_control.calibration_enable = 0        
+        send_control.command_target = 0
         print "Power is out on the Right!"
-    skate_fault = right.flag
+    skate_fault = right.skate_fault
     #previous_right_time = right.header.stamp 
     #previous_right_time = rospy.get_time()
 
 def stop_system_left(left):
     global send_control, velocity_threshold, previous_left_time,skate_fault
-    if not((left.velocity - send_control.set_point) < velocity_threshold):
-        send_control.state = 0
-        send_control.set_point = 0
+    if not((left.velocity_filt_rear - send_control.command_target) < velocity_threshold):
+        send_control.calibration_enable = 0
+        send_control.command_target = 0
         print "Power is out on the left!"
     #previous_left_time = left.header.stamp 
      
-    skate_fault = left.flag 
+    skate_fault = left.skate_fault
     #previous_left_time = rospy.Time.now()
     previous_left_time = rospy.get_time()
 
@@ -84,11 +84,11 @@ def check_timeout(current_time):
     if ((current_time - previous_left_time)>time_threshold ):
             #and (current_time - previous_right_time)>time_threshold):
         print current_time, previous_left_time
-        send_control.set_point = 0
+        send_control.command_target = 0
         print "One of the skates has timed out"
     #fault detected
     if not(skate_fault):
-        send_control.set_point = 0
+        send_control.command_target = 0
         print "fault detected"
 
 #ask for the zero point from the kinect
@@ -133,7 +133,7 @@ def send_controls():
     
     while not rospy.is_shutdown():
         
-        if user_input.state==velocity_control:
+        if user_input.calibration_enable==velocity_control:
             try:
                 (trans1,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
@@ -156,12 +156,12 @@ def send_controls():
                                                   
                 x_error = z_x - x_current
                 #print x_error
-                if user_input.set_point > 100:
-                    send_control.set_point = user_input.set_point + kp*x_error
+                if user_input.command_target > 100:
+                    send_control.command_target = user_input.command_target + kp*x_error
                 else:
-                    send_control.set_point = user_input.set_point
+                    send_control.command_target = user_input.command_target
             except:
-                send_control.set_point = user_input.set_point
+                send_control.command_target = user_input.command_target
                 pass
         
         send_control.header.stamp = rospy.Time.now()	

@@ -12,8 +12,6 @@ UM::UM() : state(STATE_ZERO){}		// Default constructor
 int quatA = 0, quatB = 0, quatC = 0, quatD = 0;
 
 
-
-
 typedef union {
  byte array[4];
  float value;

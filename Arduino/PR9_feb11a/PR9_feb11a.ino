@@ -111,8 +111,8 @@ Servo esc2; //Back
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float64.h>
 #include <ros/time.h>
-#include <motor/Num.h>
-#include <motor/states.h>
+#include <motor/skate_feedback.h>
+#include <motor/skate_command.h>
 
 
 //kept the ros master timout to 3 seconds
@@ -125,13 +125,13 @@ byte skate_fault = 0;
 
 
 //Sensor data type and publisher declaration
-motor::Num sensor_data;
+motor::skate_feedback sensor_data;
 ros::Publisher chatter("left", &sensor_data);
 
-void servo_cb( const motor::states& cmd_msg){
+void servo_cb( const motor::skate_command& cmd_msg){
   //global_state = cmd_msg.state;
   
-  global_set_point = cmd_msg.set_point*(skate_fault==0);
+  global_set_point = cmd_msg.command_target*(skate_fault==0);
  // global_set_point = cmd_msg.set_point;
   //get time of the message from ROS master
   //master_time = cmd_msg.header.stamp;
@@ -140,7 +140,7 @@ void servo_cb( const motor::states& cmd_msg){
   chatter.publish( &sensor_data );
 }
 
-ros::Subscriber<motor::states> sub("servo", servo_cb);
+ros::Subscriber<motor::skate_command> sub("servo", servo_cb);
 ros::NodeHandle  nh;
 
 void check_reset_system() 
@@ -398,17 +398,18 @@ void loop(){
       setSpeed(2,speedCommand[2]); 
       
     } 
-     sensor_data.qx = positionError[1];
-     sensor_data.qy = positionError[2];
-     sensor_data.qz = velocityErrorSum[1];
-     sensor_data.qw = velocityErrorSum[2];
+     //sensor_data.qx = positionError[1];
+     //sensor_data.qy = positionError[2];
+     //sensor_data.qz = velocityErrorSum[1];
+     //sensor_data.qw = velocityErrorSum[2];
      
-     sensor_data.flag = skate_fault;
+     sensor_data.skate_fault = skate_fault;
+     sensor_data.velocity_filt_rear = wheelVelocityAvg[1];
+     sensor_data.velocity_filt_front = wheelVelocityAvg[2];
      check_reset_system();
      nh.spinOnce();   
   }
 
-  sensor_data.velocity = wheelVelocityAvg[1];
   
   //sensor_data.velocity = master_time.toSec();
  
