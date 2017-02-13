@@ -3,13 +3,13 @@
 import rospy
 import time
 from std_msgs.msg import UInt16
-from motor.msg import states
-from motor.msg import skate_feedback
+from morpheus_skates.msg import skate_command
+from morpheus_skates.msg import skate_feedback
 import numpy
-from motor.srv import *
+from morpheus_skates.srv import *
 import tf
 
-import roslib; roslib.load_manifest('motor')
+import roslib; roslib.load_manifest('morpheus_skates')
 
 
 left_skate_fault = 0
@@ -17,8 +17,8 @@ right_skate_fault = 0;
 
 
 #state values
-user_input = states()
-send_control = states()
+user_input = skate_command()
+send_control = skate_command()
 calibration = 0
 user_input.calibration_enable = 0
 user_input.command_target = 0
@@ -112,7 +112,7 @@ def send_controls():
   
     global send_control, previous_left_time, previous_right_time
     global z_x, z_y, z_z
-    pub = rospy.Publisher('servo', states, queue_size=100)
+    pub = rospy.Publisher('servo', skate_command, queue_size=100)
     
     rospy.init_node('stepping_stones', anonymous=True)
     previous_left_time  = rospy.get_time()
@@ -128,9 +128,9 @@ def send_controls():
     #rate = rospy.Rate(30.0)
     
     #subscribe to user inputs
-    rospy.Subscriber("user_inputs", states, process_input)
-    rospy.Subscriber("right", Num, stop_system_right)
-    rospy.Subscriber("left", Num, stop_system_left)
+    rospy.Subscriber("user_inputs", skate_command, process_input)
+    rospy.Subscriber("right", skate_feedback, stop_system_right)
+    rospy.Subscriber("left", skate_feedback, stop_system_left)
     
     while not rospy.is_shutdown():
         
