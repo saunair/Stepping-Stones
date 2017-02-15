@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from motor.msg import states
+from morpheus_skates.msg import skate_command
 
 
 def keyboard_input():
@@ -13,14 +13,14 @@ def keyboard_input():
     return state, set_point
 
 def state_publisher():
-    pub = rospy.Publisher('user_inputs', states, queue_size=10)
+    pub = rospy.Publisher('user_inputs', skate_command, queue_size=10)
     rospy.init_node('user_input', anonymous=True)
     rate = rospy.Rate(100) # 100hz
-    message = states()
+    message = skate_command()
     while not rospy.is_shutdown():
         state, value = keyboard_input()
-        message.state = state
-        message.set_point = value
+        message.calibration_enable = state
+        message.command_target = value
         #rospy.loginfo(message)
         pub.publish(message)
         rate.sleep()

@@ -134,7 +134,7 @@ def send_controls():
     
     while not rospy.is_shutdown():
         
-        if user_input.calibration_enable==velocity_control:
+        if not(user_input.calibration_enable):
             try:
                 (trans1,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
