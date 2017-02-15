@@ -1,0 +1,4 @@
+<launch>
+<node ns="arduino_zero" name="nero_arduino_zero" pkg="rosserial_python" type="serial_node.py" args="path_to_dev_file" output="screen" />
+<node ns="arduino_duemilanove" name="nero_arduino_duemilanove" pkg="rosserial_python" type="serial_node.py" args="path_to_other_dev_file" output="screen" />
+</launch>
