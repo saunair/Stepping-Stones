@@ -58,22 +58,13 @@ def process_input(data):
 
 
 def stop_system_right(right):
-    global send_control, velocity_threshold, previous_right_time, right_skate_fault
-    if not((right.velocity_filt_rear - send_control.command_target) < velocity_threshold):
-        send_control.calibration_enable = 0        
-        send_control.command_target = 0
-        print "Power is out on the Right!"
+    global send_control, previous_right_time, right_skate_fault
     right_skate_fault = right.skate_fault
     #previous_right_time = right.header.stamp 
     #previous_right_time = rospy.get_time()
 
 def stop_system_left(left):
-    global send_control, velocity_threshold, previous_left_time, left_skate_fault
-    if not((left.velocity_filt_rear - send_control.command_target) < velocity_threshold):
-        send_control.calibration_enable = 0
-        send_control.command_target = 0
-        print "Power is out on the left!"
-    #previous_left_time = left.header.stamp 
+    global send_control, previous_left_time, left_skate_fault
      
     left_skate_fault = left.skate_fault
     #previous_left_time = rospy.Time.now()
@@ -105,6 +96,22 @@ def ask_zero_point():
         #return resp1
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
+
+
+def run_normalization_routine():
+   
+    rospy.wait_for_service('sensors_normalized')
+    try:
+        response = rospy.ServiceProxy('sensors_normalized', sensors_normalized)
+        #not passing one anymore to  move on from empty
+        response = response()
+        print "total_weight", response.total_weight
+        return resp1.total_weight
+        #return resp1
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
+
 
 
 #main higher level control code

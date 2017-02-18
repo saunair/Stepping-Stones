@@ -68,8 +68,6 @@ def zero_point_server():
     #stop the node maybe ?
     rospy.on_shutdown(myhook)
 
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
 
 if __name__ == "__main__":
     time.sleep(20)

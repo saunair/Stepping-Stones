@@ -4,291 +4,199 @@ import rospy
 import time
 from std_msgs.msg import UInt16
 import yaml
-from motor.msg import Num
+from morpheus_skates.msg import skate_feedback
 import os
 
 #config_file = '~/catkin_ws/src/motor/config/calibration_values.yaml'
 
 config_file = '/home/saurabh/catkin_ws/src/motor/config/calibration_values.yaml'
 
-count_left = 0
-count_right = 0
-sensor_no = -1
+class skate(object):
 
-#Will have to change over time 
-#macro values
-MAX_BIAS_F1 = 150
-MAX_BIAS_F2 = 20
-MAX_BIAS_F3 = 20
+    def __init__(self, name):
+	self.name = name
+	
 
+        ########### set appropriate values ########
+	self.MAX_BIAS_F1 = 150
+        self.MAX_BIAS_F2 = 20
+        self.MAX_BIAS_F3 = 20
+    	
+	########### initialize variables ##########
+	self.w = -1
+    	self.bias_front_outer = -1
+        self.bias_front_inner = -1
+    	self.bias_rear = -1
+        self.gain_front_outer = []
+        self.gain_front_inner = []
+        self.gain_rear = []
+        self.count = 0
+        self.sensor_no = -1
 
-#set to values for checks during the code
-w = -1
-left_bias_f1 = -1
-left_bias_f2 = -1
-left_bias_f3 = -1
+    ###### restart routine for new sensors ############ 
+    def restart_routine():    
+    	self.w = -1
+    	self.bias_front_outer = -1
+        self.bias_front_inner = -1
+    	self.bias_rear = -1
+        self.gain_front_outer = []
+        self.gain_front_inner = []
+        self.gain_rear = []
+        self.count = 0
+        self.sensor_no = -1
 
-right_bias_f1 = -1
-right_bias_f2 = -1
-right_bias_f3 = -1
+    def values(data):
+       rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.force_front_outer)
 
+       if self.count==0:
+           self.bias_front_outer = 0
+           self.bias_front_inner = 0
+           self.bias_rear        = 0
+   	   self.count           += 1
+   
+       if self.count<=200:
+           self.bias_front_outer += data.force_front_outer
+   	   self.bias_front_inner += data.force_front_inner
+   	   self.bias_rear 	 += data.force_rear
+   	   self.count            += 1
 
-#set to values for checks during the code
-def restart_routine():    
-    global count_left, left_gain_f1, left_gain_f2, left_gain_f3, left_bias_f1, left_bias_f2, left_bias_f3, w
-    w = -1
-    left_bias_f1 = -1
-    left_bias_f2 = -1
-    left_bias_f3 = -1
-
-
-    right_bias_f1 = -1
-    right_bias_f2 = -1
-    right_bias_f3 = -1
-    left_gain_f1 = []
-    left_gain_f2 = []
-    left_gain_f3 = []
-
-    right_gain_f1 = []
-    right_gain_f2 = []
-    right_gain_f3 = []
-    count_left = 0
-    count_right = 0
-    sensor_no = -1
-
-#this might raise an issue later as we are appending values; This will lead to having continuity issues
-left_gain_f1 = []
-left_gain_f2 = []
-left_gain_f3 = []
-
-right_gain_f1 = []
-right_gain_f2 = []
-right_gain_f3 = []
-
-def left_values(data):
-    
-    global count_left, left_gain_f1, left_gain_f2, left_gain_f3, left_bias_f1, left_bias_f2, left_bias_f3, w, MAX_BIAS_F1, MAX_BIAS_F2, MAX_BIAS_F3
-    #print os.path.exists(config_file), "here" 
-    #rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.f1)
-    
-    if count_left==0:
-        left_bias_f1 = 0
-        left_bias_f2 = 0
-        left_bias_f3 = 0
-        count_left+=1
-
-    if count_left<=200:
-        left_bias_f1 += data.f1
-        left_bias_f2 += data.f2
-        left_bias_f3 += data.f3
-        count_left+=1
-
-    elif count_left==201:
-        left_bias_f1/=200
-        left_bias_f2/=200
-        left_bias_f3/=200
-        #put a check for the bias changes/values
-        if left_bias_f1 > MAX_BIAS_F1:
-            print "Left F1 load not corrected"
-        if left_bias_f2 > MAX_BIAS_F2:
-            print "Left F2 load not corrected"
-        if left_bias_f3 > MAX_BIAS_F3:
-            print "Left F3 load not corrected"
-        
-        #if left_bias_f1 < MAX_BIAS_F1 and left_bias_f2 < MAX_BIAS_F2 and left_bias_f3 < MAX_BIAS_F3:
-        #    w = input("input weight here")
-        #    sensor_no = input("enter left skate sensor number for gain calibration")
-        #    count_left+=1 '''
-        #removed for the other sensors for the time being
-        if left_bias_f2 < MAX_BIAS_F2 and left_bias_f1 < MAX_BIAS_F1:
-            w = input("input weight here")
-            sensor_no = input("enter left skate sensor number for gain calibration")
-            count_left+=1
-        else:
-            restart_routine()
-            count_left = 0
-        #rospy.sleep(10.0)
+       elif self.count==201:
+   	   self.bias_front_outer/=200
+   	   self.bias_front_inner/=200
+   	   self.bias_rear/=200
+   	   #put a check for the bias changes/values
+       
+           if self.bias_front_outer > self.MAX_BIAS_F1:
+       	   	print "Front outer load not corrected"
+           if self.bias_front_inner > self.MAX_BIAS_F2:
+       	       print "Front inner load not corrected"
+           if self.bias_rear > self.MAX_BIAS_F3:
+       	       print "Rear load not corrected"
+   
+           if self.bias_front_outer < self.MAX_BIAS_F1 and  self.bias_front_inner < self.MAX_BIAS_F2 and self.bias_rear < self.MAX_BIAS_F3:
+       	       self.w = input("input weight here")
+       	       self.count += 1
+   	       ####### add the skate name in the input
+       	       self.sensor_number = input("enter skate sensor number for gain calibration")
+           else:
+       	       self.count = 0
+       	       self.restart_routine()
+   
+       if self.w!=-1:
+           #keep appending for another n values
+           if self.count>=1200 and self.count<1400:
+       	   	self.gain_front_outer.append(2*(data.force_front_outer - right_bias_front_outer)/self.w)
+           	self.gain_front_inner.append(2*(data.force_front_inner - right_bias_front_inner)/self.w)
+       	   	self.gain_rear.append(2*(data.force_rear - self.bias_rear)/self.w)
+		self.count += 1
+           
+           ###### end of routine for this sensor number##########
+	   elif self.count==1400:
+            	self.w = -1
+       	   	self.gain_front_outer = float(sum(self.gain_front_outer))/len(self.gain_front_outer)
+       		self.gain_front_inner = float(sum(self.gain_front_inner))/len(self.gain_front_inner)
+       		self.gain_rear = float(sum(self.gain_rear))/len(self.gain_rear)
+       		data_write(self.sensor_number)  
+           	self.count = 0
+            	self.restart_routine() 
+	    
+	    ###### ignore these values for sync!!!! ######### 
+	   elif self.count<1200:
+                self.count_ += 1
 
 
 
-    if w!=-1:
-    #keep appending for another 200 values
-        
-        if count_left>=1200 and count_left<1400:
-            print float(data.f1 - left_bias_f1)/w, data.f1, left_bias_f1, w
-            left_gain_f1.append(float(data.f1 - left_bias_f1)/w)
-            left_gain_f2.append(float(data.f2 - left_bias_f2)/w)
-            left_gain_f3.append(float(data.f3 - left_bias_f3)/w)
-            count_left+=1
-    
-        elif count_left==1400:
-            w = -1
-            left_gain_f1 = float(sum(left_gain_f1))/len(left_gain_f1)
-            left_gain_f2 = float(sum(left_gain_f2))/len(left_gain_f2)
-            left_gain_f3 = float(sum(left_gain_f3))/len(left_gain_f3)
-            data_write(1)
-            count_left = 0
-            restart_routine()
-        elif count_left<1200:
-            count_left+=1
-
-def right_values(data):
-    global count_right
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.f1)
-
-    if count_right==0:
-        right_bias_f1 = 0
-        right_bias_f2 = 0
-        right_bias_f3 = 0
-        count_right+=1
-    
-    if count_right<=200:
-        right_bias_f1 += data.f1
-        right_bias_f2 += data.f2
-        right_bias_f3 += data.f3
-        count_right+=1
-
-    elif count_right==201:
-        right_bias_f1/=200
-        right_bias_f2/=200
-        right_bias_f3/=200
-        #put a check for the bias changes/values
-        if right_bias_f1 > MAX_BIAS_F1:
-            print "Right F1 load not corrected"
-        if right_bias_f2 > MAX_BIAS_F2:
-            print "Right F2 load not corrected"
-        if right_bias_f3 > MAX_BIAS_F3:
-            print "Right F3 load not corrected"
-        
-        if right_bias_f1 < MAX_BIAS_F1 and  right_bias_f2 < MAX_BIAS_F2 and right_bias_f3 < MAX_BIAS_F3:
-            w = input("input weight here")
-            count_right+=1
-            sensor_number = input("enter right skate sensor number for gain calibration")
-        else:
-            count_right = 0
-            restart_routine()
-    
-    if w!=-1:
-    #keep appending for another 200 values
-        if count_right<=400:
-            right_gain_f1.append(2*(data.f1 - right_bias_f1)/w)
-            right_gain_f2.append(2*(data.f2 - right_bias_f2)/w)
-            right_gain_f3.append(2*(data.f3 - right_bias_f3)/w)
-
-        elif count_right==401:
-            right_gain_f1 = float(sum(right_gain_f1))/len(right_gain_f1)
-            right_gain_f2 = float(sum(right_gain_f2))/len(right_gain_f2)
-            right_gain_f3 = float(sum(right_gain_f3))/len(right_gain_f3)
-            data_write(sensor_number)   
-
-def bias():
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # node are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
+def start(left_skate_start, right_skate_start):
     rospy.init_node('bias', anonymous=True)
-    rospy.Subscriber("left", Num, left_values)
-    rospy.Subscriber("right", Num, right_values)
+    rospy.Subscriber("left" , skate_feedback, left_skate_start.values)
+    rospy.Subscriber("right", skate_feedback, right_skate_start.values)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
-def data_write(sensor_no):
+def data_write(right, left):
     d = {}
-    global config_file, right_bias_f1, right_bias_f2, right_bias_f3, right_gain_f1,right_gain_f2,right_gain_f3, left_bias_f1, left_bias_f2, left_bias_f3, left_gain_f1,left_gain_f2,left_gain_f3
-    print "check", rospy.get_param("left_gain_f3")
+    print "check", rospy.get_param("left_gain_rear")
 
-    if right_bias_f1 != -1: 
-        d["right_bias_f1"] = right_bias_f1
-        d["right_bias_f2"] = right_bias_f2
-        d["right_bias_f3"] = right_bias_f3
-        if sensor_no==1:
-            d["right_gain_f1"] = right_gain_f1
-            print right_gain_f1, "right_gain_f1"
-            d["right_gain_f2"] = rospy.get_param("right_gain_f2")
-            d["right_gain_f3"] = rospy.get_param("right_gain_f3")
-        elif sensor_no==2:
-            d["right_gain_f2"] = right_gain_f2
-            print right_gain_f2, "right_gain_f2"
-            d["right_gain_f1"] = rospy.get_param("right_gain_f1")
-            d["right_gain_f3"] = rospy.get_param("right_gain_f3")
-        elif sensor_no==3:
-            d["right_gain_f3"] = right_gain_f3
-            print right_gain_f3, "right_gain_f3"
-            d["right_gain_f2"] = rospy.get_param("right_gain_f2")
-            d["right_gain_f1"] = rospy.get_param("right_gain_f1")
+    if right.bias_front_outer != -1: 
+        d["right_bias_front_outer"] = right.bias_front_outer
+        d["right_bias_front_inner"] = right.bias_front_inner
+        d["right_bias_rear"] 	    = right.bias_rear
+        if right.sensor_no==1:
+            d["right_gain_front_outer"] = right.gain_front_outer
+            print right.gain_front_outer, "right_gain_front_outer"
+            d["right_gain_front_inner"] = rospy.get_param("right_gain_front_inner")
+            d["right_gain_rear"] = rospy.get_param("right_gain_rear")
+        elif right.sensor_no==2:
+            d["right_gain_front_inner"] = right.gain_front_inner
+            print right.gain_front_inner, "right_gain_front_inner"
+            d["right_gain_front_inner"] = rospy.get_param("right_gain_front_inner")
+            d["right_gain_rear"] = rospy.get_param("right_gain_rear")
+        elif right.sensor_no==3:
+            d["right_gain_rear"] = right.gain_rear
+            print right.gain_rear, "right_gain_rear"
+            d["right_gain_front_outer"] = rospy.get_param("right_gain_front_outer")
+            d["right_gain_front_inner"] = rospy.get_param("right_gain_front_inner")
         
     else:
-        d["right_bias_f1"] = rospy.get_param("right_bias_f1")
-        d["right_bias_f2"] = rospy.get_param("right_bias_f2")
-        d["right_bias_f3"] = rospy.get_param("right_bias_f3")
-        d["right_gain_f1"] = rospy.get_param("right_gain_f1")
-        d["right_gain_f2"] = rospy.get_param("right_gain_f2")
-        d["right_gain_f3"] = rospy.get_param("right_gain_f3")
+        d["right_bias_front_outer"] = rospy.get_param("right_bias_front_outer")
+        d["right_bias_front_inner"] = rospy.get_param("right_bias_front_inner")
+        d["right_bias_rear"] = rospy.get_param("right_bias_rear")
+        d["right_gain_front_outer"] = rospy.get_param("right_gain_front_outer")
+        d["right_gain_front_inner"] = rospy.get_param("right_gain_front_inner")
+        d["right_gain_rear"] = rospy.get_param("right_gain_rear")
     
-    if left_bias_f1 != -1: 
-        #left_gain_f2 =1000
+    if left.bias_front_outer != -1: 
+        d["left_bias_front_outer"] = left.bias_front_outer
+        d["left_bias_front_inner"] = left.bias_front_inner
+        d["left_bias_rear"]        = left.bias_rear
+        if left.sensor_no==1:
+            d["left_gain_front_outer"] = left.gain_front_outer
+            print left.gain_front_outer, "left_gain_front_outer"
+            d["left_gain_front_inner"] = rospy.get_param("left_gain_inner")
+            d["left_gain_rear"] = rospy.get_param("left_gain_rear")
         
-        d["left_bias_f1"] = left_bias_f1
-        d["left_bias_f2"] = left_bias_f2
-        d["left_bias_f3"] = left_bias_f3
-        if sensor_no==1:
-            d["left_gain_f1"] = left_gain_f1
-            print left_gain_f1, "left_gain_f1"
-            d["left_gain_f2"] = rospy.get_param("left_gain_f2")
-            d["left_gain_f3"] = rospy.get_param("left_gain_f3")
+        elif left.sensor_no==2:
+            d["left_gain_front_inner"] = left.gain_front_inner
+            print left_gain_front_inner, "left_gain_front_inner"
+            d["left_gain_front_outer"] = rospy.get_param("left_gain_front_outer")
+            d["left_gain_rear"] = rospy.get_param("left_gain_rear")
         
-        elif sensor_no==2:
-            d["left_gain_f2"] = left_gain_f2
-            print left_gain_f2, "left_gain_f2"
-            d["left_gain_f1"] = rospy.get_param("left_gain_f1")
-            d["left_gain_f3"] = rospy.get_param("left_gain_f3")
-        
-        elif sensor_no==3:
-            d["left_gain_f3"] = left_gain_f3
-            print right_gain_f3, "right_gain_f3"
-            d["left_gain_f1"] = rospy.get_param("left_gain_f1")
-            d["left_gain_f2"] = rospy.get_param("left_gain_f2")
+        elif left.sensor_no==3:
+            d["left_gain_rear"] = left.gain_rear
+            print left.gain_rear, "left_gain_rear"
+            d["left_gain_front_outer"] = rospy.get_param("left_gain_front_outer")
+            d["left_gain_front_inner"] = rospy.get_param("left_gain_front_inner")
     else:
-        d["left_bias_f1"] = rospy.get_param("left_bias_f1")
-        d["left_bias_f2"] = rospy.get_param("left_bias_f2")
-        d["left_bias_f3"] = rospy.get_param("left_bias_f3")
-        d["left_gain_f1"] = rospy.get_param("left_gain_f1")
-        d["left_gain_f2"] = rospy.get_param("left_gain_f2")
-        d["left_gain_f3"] = rospy.get_param("left_gain_f3")
+        d["left_bias_front_outer"] = rospy.get_param("left_bias_front_outer")
+        d["left_bias_front_inner"] = rospy.get_param("left_bias_front_inner")
+        d["left_bias_rear"] = rospy.get_param("left_bias_rear")
+        d["left_gain_front_outer"] = rospy.get_param("left_gain_front_outer")
+        d["left_gain_front_inner"] = rospy.get_param("left_gain_front_inner")
+        d["left_gain_rear"] = rospy.get_param("left_gain_rear")
    
-    rospy.set_param("left_bias_f1",d["left_bias_f1"])
-    rospy.set_param("left_bias_f2",d["left_bias_f2"])
-    rospy.set_param("left_bias_f3",d["left_bias_f3"]) 
-    rospy.set_param("left_gain_f1",d["left_gain_f1"])
-    rospy.set_param("left_gain_f2",d["left_gain_f2"])
-    rospy.set_param("left_gain_f3",d["left_gain_f3"])
-    rospy.set_param("right_bias_f1",d["right_bias_f1"])
-    rospy.set_param("right_bias_f2",d["right_bias_f2"])
-    rospy.set_param("right_bias_f3",d["right_bias_f3"])
-    rospy.set_param("right_gain_f1",d["right_gain_f1"])
-    rospy.set_param("right_gain_f2",d["right_gain_f2"])
-    rospy.set_param("right_gain_f3",d["right_gain_f3"])
+    rospy.set_param("left_bias_front_outer",d["left_bias_front_outer"])
+    rospy.set_param("left_bias_front_inner",d["left_bias_front_inner"])
+    rospy.set_param("left_bias_rear",d["left_bias_rear"]) 
+    rospy.set_param("left_gain_front_outer",d["left_gain_front_outer"])
+    rospy.set_param("left_gain_front_inner",d["left_gain_front_inner"])
+    rospy.set_param("left_gain_rear",d["left_gain_rear"])
+    rospy.set_param("right_bias_front_outer",d["right_bias_front_outer"])
+    rospy.set_param("right_bias_front_inner",d["right_bias_front_inner"])
+    rospy.set_param("right_bias_rear",d["right_bias_rear"])
+    rospy.set_param("right_gain_front_outer",d["right_gain_front_outer"])
+    rospy.set_param("right_gain_front_inner",d["right_gain_front_inner"])
+    rospy.set_param("right_gain_rear",d["right_gain_rear"])
    
 
     stream = file(config_file, 'w')
     yaml.dump(d, stream)
-    #rospy.dump_params(config_file, "left_bias_f1", verbose=False)
-    #rospy.dump_params(config_file, "left_bias_f2", verbose=False)
-    #rospy.dump_params(config_file, "left_bias_f3", verbose=False)
-    #rospy.dump_params(config_file, "left_gain_f1", verbose=False)
-    # rospy.dump_params(config_file, "left_gain_f2", verbose=False)
-    # rospy.dump_params(config_file, "left_gain_f3", verbose=False)
-    # rospy.dump_params(config_file, "right_bias_f1", verbose=False)
-    # rospy.dump_params(config_file, "right_bias_f2", verbose=False)
-    # rospy.dump_params(config_file, "right_bias_f3", verbose=False)
-    # rospy.dump_params(config_file, "right_gain_f1", verbose=False)
-    # rospy.dump_params(config_file, "right_gain_f2", verbose=False)
-    # rospy.dump_params(config_file, "right_gain_f3", verbose=False)
     print "Written the values in YAML!!!!"
     a = raw_input("confirm")
-    restart_routine()
+    left.restart_routine()
+    right.restart_routine()
 
 if __name__ == '__main__':                           
-    bias()
+    right_skate = skate('right_skate')
+    left_skate =  skate('left_skate')
+    start(left_skate, right_skate)
