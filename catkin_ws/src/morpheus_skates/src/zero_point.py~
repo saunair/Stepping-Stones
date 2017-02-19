@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+
+from motor.srv import *
+import rospy
+
+listener_trans = tf.TransformListener() 
+z_x = []
+z_y = []
+z_z = []
+count = 0
+
+
+def handle_zero_point(req):
+    global 
+    #print "Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b))
+    return zero_pointResponse([z_x, z_y, z_z])
+
+def zero_point_server():
+    global listener_trans
+    rospy.init_node('zero_point_server')
+    
+    try:
+        (trans1,rot1) = listener_trans.lookupTransform('openni_depth_frame', '/left_hip_1', rospy.Time(0))
+    except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+        continue
+    
+    try:
+        (trans2,rot2) = listener_trans.lookupTransform('openni_depth_frame', '/right_hip_1', rospy.Time(0))
+    except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+        continue
+    
+    if count<10:
+        z_x.append((trans2.x + trans1.x)/2)
+        z_y.append((trans2.y + trans1.y)/2)
+        z_z.append((trans2.z + trans1.z)/2)
+        count+=1
+    
+    if count==10:
+        z_x = float(sum(z_x))/len(z_x)
+        z_y = float(sum(z_y))/len(z_y)
+        z_z = float(sum(z_z))/len(z_z)
+
+    print "Sending zero point"
+    s = rospy.Service('zero_point', zero_point, handle_zero_point)
+    rospy.spin()
+
+
+
+def callback(data):
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+
+def listener():
+    rospy.init_node('zero_point_calculator', anonymous=True)
+
+
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
+
+
+
+
+if __name__ == "__main__":
+    zero_point_server()
+
+
