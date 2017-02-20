@@ -28,7 +28,7 @@ class Drive {
     int encChaPin;
     int encChbPin;
     int escPin;
-    static int sampleWindow;
+    int sampleWindow;
     int samplePeriodMs;
     volatile long encCount;
     boolean A_set;
@@ -38,6 +38,7 @@ class Drive {
     float wheelPositionAvgPrev;
     float wheelVelocityArray[MAX_SAMPLES];
     float wheelVelocityAvg;
+    Servo esc;
 };
 
 #endif

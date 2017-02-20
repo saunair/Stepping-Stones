@@ -21,7 +21,6 @@ Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin,int sampleNum,int samplePeriod)
   pinMode(encChbPin, INPUT);
   pinMode(escPin, OUTPUT);
 
-  Servo esc;
   esc.attach(escPin,1000,2000);
   setCommand(0);
 }

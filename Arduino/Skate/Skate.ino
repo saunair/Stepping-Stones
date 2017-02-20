@@ -1,4 +1,4 @@
-//Revision 2/18/2017
+//Revision 2/20/2017
 #define LEFT_SKATE 0
 #define RIGHT_SKATE 1
 
@@ -27,9 +27,10 @@
 #include <ros/time.h>
 #include <morpheus_skates/skate_feedback.h>
 #include <morpheus_skates/skate_command.h>
+#include "Control.h"
+#include "Drive.h"
 
 bool init_motors = 0;
-
 float target = 0;
 
 long currentTimeStamp = 0;
@@ -41,12 +42,31 @@ int global_set_point;
 float master_time;
 byte skate_fault = 0;
 
+float posnGainsFront[] = {2,0,0};
+float posnGainsRear[] = {1,0,0};
+float velGainsFront[] = {0,0.001,0};
+float velGainsRear[] = {0,0.001,0};
+
+
+void servo_cb(const morpheus_skates::skate_command&);
+void check_reset_system();
+void doEncoderFrontChA();
+void doEncoderFrontChB();
+void doEncoderRearChA();
+void doEncoderRearChB();
+
+
 //Sensor data type and publisher declaration
 morpheus_skates::skate_feedback sensor_data;
 ros::Publisher chatter("left", &sensor_data);
 ros::Subscriber<morpheus_skates::skate_command> sub("servo", servo_cb);
 ros::NodeHandle nh;
 
+Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN,SAMPLE_NUM,SAMP_PERIOD_MS); 
+Control frontControl(posnGainsFront,velGainsFront,LEFT_SKATE==true,CTRL_PERIOD_MS);
+
+Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN,SAMPLE_NUM,SAMP_PERIOD_MS);
+Control rearControl(posnGainsRear,velGainsRear,RIGHT_SKATE==true,CTRL_PERIOD_MS);
 
 void setup() {
   //ROS Setup
@@ -61,16 +81,12 @@ void setup() {
   }
 
   //Set Up Front Skate
-  Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN,SAMPLE_NUM);    
-  attachInterrupt(digitalPinToInterrupt(ENC1_CHA_PIN), doEncoder(1), CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENC1_CHB_PIN), doEncoder(2), CHANGE);
-  Control frontControl([2,0,0],[0,0.001,0],LEFT_SKATE==true,CTRL_PERIOD_MS);
+  attachInterrupt(digitalPinToInterrupt(ENC1_CHA_PIN), doEncoderFrontChA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC1_CHB_PIN), doEncoderFrontChB, CHANGE);
 
   //Set Up Rear Skate
-  Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN,SAMPLE_NUM);
-  attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoder(3), CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoder(4), CHANGE);
-  Control rearControl([1,0,0],[0,0.001,0],RIGHT_SKATE==true,CTRL_PERIOD_MS);
+  attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoderRearChA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
 
   if(LEFT_SKATE == RIGHT_SKATE) {
     while(1);
@@ -93,7 +109,7 @@ void loop(){
 
     target = global_set_point;
 
-    if(RIGHT_SKATE == TRUE) {
+    if(RIGHT_SKATE == true) {
       frontDrive.setCommand(frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity()));
       rearDrive.setCommand(rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity()));
     }
@@ -106,15 +122,15 @@ void loop(){
     skate_fault |= frontControl.checkErrors() << 2; 
     sensor_data.skate_fault = skate_fault;
     
-    sensor_data.velocity_filt_rear = wheelVelocityAvg[1];
-    sensor_data.velocity_filt_front = wheelVelocityAvg[2];
+    sensor_data.velocity_filt_front = frontDrive.getVelocity();
+    sensor_data.velocity_filt_rear = rearDrive.getVelocity();
      
     check_reset_system();
     nh.spinOnce();   
   }
 }
 
-void servo_cb( const morpheus_skates::skate_command& cmd_msg){
+void servo_cb(const morpheus_skates::skate_command& cmd_msg){
   global_set_point = cmd_msg.command_target*(skate_fault==0);
   master_time = millis();
   init_motors = 1;
@@ -128,19 +144,18 @@ void check_reset_system()
   }
 }
 
-void doEncoder(int isrId){
-  switch(isrId) {
-    case 1:
-      frontDrive.serviceEncoder(1);
-      break;
-    case 2:
-      frontDrive.serviceEncoder(2);
-      break;
-    case 3:
-      rearDrive.serviceEncoder(1);
-      break;
-    case 4:
-      rearDrive.serviceEncoder(2);
-      break;
-  }
+void doEncoderFrontChA() {
+  frontDrive.serviceEncoder(1);
+}
+
+void doEncoderFrontChB() {
+  frontDrive.serviceEncoder(2);
+}
+
+void doEncoderRearChA() {
+  rearDrive.serviceEncoder(1);
+}
+
+void doEncoderRearChB() {
+  rearDrive.serviceEncoder(2);
 }

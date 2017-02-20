@@ -20,7 +20,7 @@ enum Mode
 
 class Control {
   public:
-    Control(float[3],float[3],bool,int);
+    Control(float *,float *,bool,int);
     float computeCommand(float,float,float);
     float computePositionCommand(float,float);
     float computeVelocityCommand(float,float);

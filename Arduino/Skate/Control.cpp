@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include "Control.h"
 
-Control::Control(float posnGains[3],float velGains[3],bool invert,int controlPeriod) {
+Control::Control(float *posnGains,float *velGains,bool invert,int controlPeriod) {
   posn_Kp = posnGains[0];
   posn_Ki = posnGains[1];
   posn_Kd = posnGains[2];
