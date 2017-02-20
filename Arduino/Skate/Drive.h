@@ -9,6 +9,7 @@
 #define PPR (CPR*4)
 #define SPEED_LIM_MIN -30.0
 #define SPEED_LIM_MAX 30.0
+#define MAX_SAMPLES 10 //Need a better way to allocate this memory
 
 #include "Arduino.h"
 #include <Servo.h>
@@ -27,15 +28,15 @@ class Drive {
     int encChaPin;
     int encChbPin;
     int escPin;
-    int sampleWindow;
+    static int sampleWindow;
     int samplePeriodMs;
     volatile long encCount;
     boolean A_set;
     boolean B_set;
-    float wheelPositionArray[sampleWindow];
+    float wheelPositionArray[MAX_SAMPLES];
     float wheelPositionAvg;
     float wheelPositionAvgPrev;
-    float wheelVelocityArray[sampleWindow];
+    float wheelVelocityArray[MAX_SAMPLES];
     float wheelVelocityAvg;
 };
 

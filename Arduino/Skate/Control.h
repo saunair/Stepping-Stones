@@ -20,7 +20,7 @@ enum Mode
 
 class Control {
   public:
-    Control(float[3],float[3],bool);
+    Control(float[3],float[3],bool,int);
     float computeCommand(float,float,float);
     float computePositionCommand(float,float);
     float computeVelocityCommand(float,float);
@@ -29,6 +29,7 @@ class Control {
   private:
     bool invertFlag;
     Mode controlMode;
+    int controlPeriodMs;
     
     float posn_Kp;
     float posn_Ki;

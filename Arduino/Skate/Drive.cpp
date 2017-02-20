@@ -15,7 +15,7 @@ Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin,int sampleNum,int samplePeriod)
 
   A_set = false;
   B_set = false;
-  resetState(0);
+  resetState();
 
   pinMode(encChaPin, INPUT); 
   pinMode(encChbPin, INPUT);
@@ -72,11 +72,13 @@ void Drive::updateState(){
 
 void Drive::resetState() {
   encCount = 0;
-  wheelPositionArray = {0};
   wheelPositionAvg = 0;
   wheelPositionAvgPrev = 0;
-  wheelVelocityArray = {0};
   wheelVelocityAvg = 0;  
+  for(int i = 0;i<MAX_SAMPLES;i++) {
+    wheelPositionArray[i] = 0;
+    wheelVelocityArray[i] = 0;
+  }
 }
 
 

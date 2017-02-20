@@ -64,13 +64,13 @@ void setup() {
   Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN,SAMPLE_NUM);    
   attachInterrupt(digitalPinToInterrupt(ENC1_CHA_PIN), doEncoder(1), CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC1_CHB_PIN), doEncoder(2), CHANGE);
-  Control frontControl([2,0,0],[0,0.001,0],LEFT_SKATE==TRUE);
+  Control frontControl([2,0,0],[0,0.001,0],LEFT_SKATE==true,CTRL_PERIOD_MS);
 
   //Set Up Rear Skate
   Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN,SAMPLE_NUM);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoder(3), CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoder(4), CHANGE);
-  Control rearControl([1,0,0],[0,0.001,0],RIGHT_SKATE==TRUE);
+  Control rearControl([1,0,0],[0,0.001,0],RIGHT_SKATE==true,CTRL_PERIOD_MS);
 
   if(LEFT_SKATE == RIGHT_SKATE) {
     while(1);
