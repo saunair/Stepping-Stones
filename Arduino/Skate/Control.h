@@ -26,6 +26,11 @@ class Control {
     float computeVelocityCommand(float,float);
     void resetIntegrators();
     int checkErrors();
+    int getMode();
+    bool checkModeTransition();
+    float getControllerTarget();
+    long lastControlTime;
+    long controlTimeDelta;
   private:
     bool invertFlag;
     Mode controlMode;
@@ -37,13 +42,13 @@ class Control {
     float vel_Kp;
     float vel_Ki;
     float vel_Kd;
-    
+
     float positionTarget;
     float positionError;
     float positionErrorSum;
     float positionErrorDiff;
     float positionErrorPrev;
-    
+
     float velocityTarget;
     float velocityTargetLim;
     float velocityTargetLimPrev;
@@ -53,6 +58,8 @@ class Control {
     float velocityErrorPrev;
 
     float motorCommand;
+
+    bool modeTransitionFlag;
 };
 
 #endif

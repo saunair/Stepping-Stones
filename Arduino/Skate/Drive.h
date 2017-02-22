@@ -17,12 +17,19 @@
 class Drive {
   public:
     Drive(int,int,int,int,int);
+    void initializeDrive();
     void serviceEncoder(int);
     void updateState();
     void resetState();
     float getPosition();
     float getVelocity();
     void setCommand(float);
+    int onTime;
+    Servo esc;
+    long updateTimeDelta;
+    long lastUpdateTime;
+    long commandTimeDelta;
+    long lastCommandTime;
 
   private:
     int encChaPin;
@@ -38,7 +45,7 @@ class Drive {
     float wheelPositionAvgPrev;
     float wheelVelocityArray[MAX_SAMPLES];
     float wheelVelocityAvg;
-    Servo esc;
+    int commandLim;
 };
 
 #endif

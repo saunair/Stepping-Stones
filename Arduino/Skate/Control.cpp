@@ -14,22 +14,29 @@ Control::Control(float *posnGains,float *velGains,bool invert,int controlPeriod)
   vel_Kd = velGains[2];
   invertFlag = invert;
   controlPeriodMs = controlPeriod;
+  modeTransitionFlag = false;
+  lastControlTime = millis();
 
   resetIntegrators();
 }
 
 
 float Control::computeCommand(float target,float wheelPosition,float wheelVelocity) {
+  controlTimeDelta = millis() - lastControlTime;
+  lastControlTime = millis();
+  
   //If the target velocity is 0 and the rate limited target velocity is low enough, switch to position control
   if((target == 0) && (abs(velocityTargetLim) < 5) && (controlMode == Velocity_Mode)) {
     controlMode = Position_Mode;
     resetIntegrators();
+    modeTransitionFlag = true;
   }
 
   //If the target velocity is not 0, switch to velocity control
   if((target != 0) && (controlMode == Position_Mode)) {
     controlMode = Velocity_Mode;
     resetIntegrators();
+    modeTransitionFlag = true; 
   }
 
   if(controlMode == Position_Mode) {
@@ -43,8 +50,9 @@ float Control::computeCommand(float target,float wheelPosition,float wheelVeloci
 
 
 float Control::computePositionCommand(float target,float wheelPosition) {
+  positionTarget = target;
   positionErrorPrev = positionError;
-  positionError = target - wheelPosition;
+  positionError = positionTarget - wheelPosition;
 
   if(invertFlag == false) {
     positionError = constrain(positionError,0,abs(positionError));
@@ -62,8 +70,7 @@ float Control::computePositionCommand(float target,float wheelPosition) {
 
 float Control::computeVelocityCommand(float target,float wheelVelocity) {
   //Apply acceleration  limit
-  velocityTarget = target;
-      
+  velocityTarget = target;      
   velocityTargetLimPrev = velocityTargetLim;
   velocityTargetLim = constrain(velocityTarget,velocityTargetLimPrev-ACCEL_LIMIT*(controlPeriodMs/1000.0),velocityTargetLimPrev+ACCEL_LIMIT*(controlPeriodMs/1000.0));
 
@@ -89,3 +96,25 @@ int Control::checkErrors() {
 
   return skate_fault;  
 }
+
+int Control::getMode() {
+  return (int)controlMode + 1;
+}
+
+bool Control::checkModeTransition() {
+  bool flagState;
+  flagState = modeTransitionFlag;
+  modeTransitionFlag = false;
+  return flagState;  
+}
+
+
+float Control::getControllerTarget() {
+  if(controlMode == Position_Mode){
+    return positionTarget;
+  }
+  else {
+    return velocityTargetLim;
+  }
+}
+

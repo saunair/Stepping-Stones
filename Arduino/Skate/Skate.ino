@@ -1,6 +1,6 @@
-//Revision 2/20/2017
-#define LEFT_SKATE 0
-#define RIGHT_SKATE 1
+//Revision 2/21/2017
+#define LEFT_SKATE 1
+#define RIGHT_SKATE 0
 
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
@@ -12,6 +12,7 @@
 
 #define CTRL_PERIOD_MS 4.0
 #define SAMP_PERIOD_MS 1.0
+#define PUB_PERIOD_MS 20.0
 
 #define SAMPLE_NUM (int)(2*(CTRL_PERIOD_MS/SAMP_PERIOD_MS))
 
@@ -36,16 +37,21 @@ float target = 0;
 long currentTimeStamp = 0;
 long lastCtrlTimeStamp = 0;
 long lastSampTimeStamp = 0;
+long lastPubTimeStamp = 0;
 
 int global_state;
 int global_set_point;
 float master_time;
 byte skate_fault = 0;
 
-float posnGainsFront[] = {2,0,0};
+//float posnGainsFront[] = {2,0,0};
+float posnGainsFront[] = {1,0,0};
 float posnGainsRear[] = {1,0,0};
 float velGainsFront[] = {0,0.001,0};
 float velGainsRear[] = {0,0.001,0};
+
+float frontVelCmd;
+float rearVelCmd;
 
 
 void servo_cb(const morpheus_skates::skate_command&);
@@ -71,7 +77,7 @@ Control rearControl(posnGainsRear,velGainsRear,RIGHT_SKATE==true,CTRL_PERIOD_MS)
 void setup() {
   //ROS Setup
   nh.initNode();   
-  nh.getHardware()->setBaud(115200);
+  nh.getHardware()->setBaud(921600);
   nh.advertise(chatter);
   nh.subscribe(sub);
 
@@ -83,10 +89,12 @@ void setup() {
   //Set Up Front Skate
   attachInterrupt(digitalPinToInterrupt(ENC1_CHA_PIN), doEncoderFrontChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC1_CHB_PIN), doEncoderFrontChB, CHANGE);
+  frontDrive.initializeDrive();
 
   //Set Up Rear Skate
   attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoderRearChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
+  rearDrive.initializeDrive();
 
   if(LEFT_SKATE == RIGHT_SKATE) {
     while(1);
@@ -109,32 +117,60 @@ void loop(){
 
     target = global_set_point;
 
-    if(RIGHT_SKATE == true) {
-      frontDrive.setCommand(frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity()));
-      rearDrive.setCommand(rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity()));
-    }
-    else {
-      frontDrive.setCommand(-1*frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity()));
-      rearDrive.setCommand(-1*rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity()));
-    }
+    frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
+    if(frontControl.checkModeTransition() == true) frontDrive.resetState();
+    frontDrive.setCommand(frontVelCmd);
 
+    rearVelCmd = rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity());
+    if(rearControl.checkModeTransition() == true) rearDrive.resetState();
+    rearDrive.setCommand(rearVelCmd);
+     
+    //check_reset_system();
+    //nh.spinOnce();   
+  }
+
+  if((currentTimeStamp - lastPubTimeStamp) >= PUB_PERIOD_MS) {
+    lastPubTimeStamp = currentTimeStamp;
+    
     skate_fault = rearControl.checkErrors();
     skate_fault |= frontControl.checkErrors() << 2; 
     sensor_data.skate_fault = skate_fault;
+ 
+    sensor_data.position_filt_front = frontDrive.getPosition();
+    sensor_data.position_filt_rear = rearDrive.getPosition();
     
     sensor_data.velocity_filt_front = frontDrive.getVelocity();
     sensor_data.velocity_filt_rear = rearDrive.getVelocity();
-     
-    check_reset_system();
-    nh.spinOnce();   
+
+    sensor_data.velocity_cmd_front = frontVelCmd;
+    sensor_data.velocity_cmd_rear = rearVelCmd; 
+
+    sensor_data.skate_mode = frontControl.getMode() + (rearControl.getMode()<<2);
+    
+    sensor_data.controller_target = frontControl.getControllerTarget(); //Need value for Rear Control
+
+    sensor_data.imu_accel_x = (float)frontControl.controlTimeDelta;
+    sensor_data.imu_accel_y = (float)rearControl.controlTimeDelta;
+    
+    sensor_data.imu_rate_y = (float)frontDrive.onTime;
+    sensor_data.imu_rate_z = (float)rearDrive.onTime;
+
+    sensor_data.imu_quat_x = (float)frontDrive.updateTimeDelta;
+    sensor_data.imu_quat_y = (float)frontDrive.commandTimeDelta;
+    sensor_data.imu_quat_z = (float)rearDrive.updateTimeDelta;
+    sensor_data.imu_quat_w = (float)rearDrive.commandTimeDelta;
+    
+
+    chatter.publish( &sensor_data );
+    nh.spinOnce();
   }
 }
 
 void servo_cb(const morpheus_skates::skate_command& cmd_msg){
-  global_set_point = cmd_msg.command_target*(skate_fault==0);
+  //global_set_point = cmd_msg.command_target*(skate_fault==0);
+  global_set_point = cmd_msg.command_target;
   master_time = millis();
   init_motors = 1;
-  chatter.publish( &sensor_data );
 }
 
 void check_reset_system() 

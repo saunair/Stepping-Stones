@@ -119,7 +119,7 @@ def send_controls():
     previous_right_time  = rospy.Time.now()
     listener_trans = tf.TransformListener() 
     i = 0
-    rate = rospy.Rate(15) # 15hz
+    rate = rospy.Rate(1) # 1hz
     pub.publish(send_control)
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)
@@ -176,17 +176,17 @@ def send_controls():
         rate.sleep()
 
 if __name__ == '__main__':
-    try:
-        z_x, z_y, z_z = ask_zero_point()
-        print "acquired zero point"
-    except rospy.ROSInterruptException:
-        print "Sorry didn't acquire the zero position"
-        pass
-    except:
-        print "Sorry didn't acquire the zero position, going with default"
-        z_x = 3.45787 
-        z_y = 0.0881804
-        z_z = 0.21108
+    #try:
+    #    z_x, z_y, z_z = ask_zero_point()
+    #    print "acquired zero point"
+    #except rospy.ROSInterruptException:
+    #    print "Sorry didn't acquire the zero position"
+    #    pass
+    #except:
+    #    print "Sorry didn't acquire the zero position, going with default"
+    #    z_x = 3.45787 
+    #    z_y = 0.0881804
+    #    z_z = 0.21108
 
     try:
         send_controls()

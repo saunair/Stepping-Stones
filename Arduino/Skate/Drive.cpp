@@ -12,17 +12,24 @@ Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin,int sampleNum,int samplePeriod)
   escPin = ESC_pin;
   sampleWindow = sampleNum;
   samplePeriodMs = samplePeriod;
+  onTime = 1500;
+  commandLim = 0;
 
   A_set = false;
   B_set = false;
   resetState();
 
+  lastUpdateTime = millis();
+  lastCommandTime = millis();
+}
+
+void Drive::initializeDrive() {
   pinMode(encChaPin, INPUT); 
   pinMode(encChbPin, INPUT);
   pinMode(escPin, OUTPUT);
 
   esc.attach(escPin,1000,2000);
-  setCommand(0);
+  setCommand(0);  
 }
 
 
@@ -41,6 +48,9 @@ void Drive::serviceEncoder(int chId) {
 
 
 void Drive::updateState(){
+  updateTimeDelta = millis() - lastUpdateTime;
+  lastUpdateTime = millis();
+  
   //Update position sample buffer for moving average
   for(int sample = (sampleWindow-1); sample > 0; sample--) {
     wheelPositionArray[sample] = wheelPositionArray[sample-1];
@@ -92,8 +102,11 @@ float Drive::getVelocity() {
 
     
 void Drive::setCommand(float command) {
-  int commandLim = constrain((int)command,SPEED_LIM_MIN,SPEED_LIM_MAX);
-  int onTime = 1500;
+  commandTimeDelta = millis() - lastCommandTime;
+  lastCommandTime = millis();
+  
+  commandLim = constrain((int)command,SPEED_LIM_MIN,SPEED_LIM_MAX);
+  onTime = 1500;
   
   if(commandLim > 0) {
     onTime = constrain(map(commandLim, 1, 100, 1520, 2000), 1520, 2000);
