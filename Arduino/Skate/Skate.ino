@@ -12,9 +12,8 @@
 
 #define CTRL_PERIOD_MS 4.0
 #define SAMP_PERIOD_MS 1.0
-#define PUB_PERIOD_MS 20.0
+#define PUB_PERIOD_MS 4.0
 
-#define SAMPLE_NUM (int)(2*(CTRL_PERIOD_MS/SAMP_PERIOD_MS))
 
 //ROS Definitions
 #define SERIAL_BUFFER_SIZE 256
@@ -47,11 +46,10 @@ int global_set_point;
 float master_time;
 byte skate_fault = 0;
 
-//float posnGainsFront[] = {2,0,0};
-float posnGainsFront[] = {1,0,0};
-float posnGainsRear[] = {1,0,0};
-float velGainsFront[] = {0,0.001,0};
-float velGainsRear[] = {0,0.001,0};
+float posnGainsFront[] = {0.3,0,0};
+float posnGainsRear[] = {0.3,0,0};
+float velGainsFront[] = {0,0.0003,0};
+float velGainsRear[] = {0,0.0003,0};
 
 float frontVelCmd;
 float rearVelCmd;
