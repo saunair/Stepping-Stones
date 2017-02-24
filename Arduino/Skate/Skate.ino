@@ -1,6 +1,10 @@
-//Revision 2/23/2017
+//Revision 2/24/2017
 #define LEFT_SKATE 1
 #define RIGHT_SKATE 0
+
+#define FRC_OUTER_CH 0
+#define FRC_INNER_CH 1
+#define FRC_REAR_CH 2
 
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
@@ -29,6 +33,7 @@
 #include <morpheus_skates/skate_command.h>
 #include "Control.h"
 #include "Drive.h"
+#include "Force.h"
 
 bool init_motors = 0;
 float target = 0;
@@ -54,8 +59,11 @@ float velGainsRear[] = {0,0.0003,0};
 float frontVelCmd;
 float rearVelCmd;
 
+bool checkAdcReady = false;
+
 
 void servo_cb(const morpheus_skates::skate_command&);
+void formPacket();
 void check_reset_system();
 void doEncoderFrontChA();
 void doEncoderFrontChB();
@@ -69,6 +77,8 @@ ros::Publisher chatter("left", &sensor_data);
 ros::Subscriber<morpheus_skates::skate_command> sub("servo", servo_cb);
 ros::NodeHandle nh;
 
+Force forceSensors(FRC_OUTER_CH,FRC_INNER_CH,FRC_REAR_CH);
+
 Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN); 
 Control frontControl(posnGainsFront,velGainsFront,LEFT_SKATE==true,CTRL_PERIOD_MS);
 
@@ -76,16 +86,25 @@ Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN);
 Control rearControl(posnGainsRear,velGainsRear,RIGHT_SKATE==true,CTRL_PERIOD_MS);
 
 void setup() {
+  if(LEFT_SKATE == RIGHT_SKATE) {
+    while(1);
+  }
+  
   //ROS Setup
   nh.initNode();   
   nh.getHardware()->setBaud(921600);
   nh.advertise(chatter);
   nh.subscribe(sub);
 
-  while(!init_motors)
+  /*while(!init_motors)
   {
       nh.spinOnce();
-  }
+  }*/
+
+  //Set up Force Sensing
+  ADCSRA = bit(ADEN); //turn ADC on
+  ADCSRA |= bit (ADPS0) |  bit (ADPS1) | bit (ADPS2);  // Prescaler of 128
+  ADMUX  =  bit (REFS0) | (0 & 0x07);    // AVcc and select input port
 
   //Set Up Front Skate
   attachInterrupt(digitalPinToInterrupt(ENC1_CHA_PIN), doEncoderFrontChA, CHANGE);
@@ -96,10 +115,6 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoderRearChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
   rearDrive.initializeDrive();
-
-  if(LEFT_SKATE == RIGHT_SKATE) {
-    while(1);
-  }
 }
 
 void loop(){ 
@@ -111,6 +126,7 @@ void loop(){
 
     frontDrive.updateState();
     rearDrive.updateState();
+    checkAdcReady = forceSensors.startCycle();
   }
   
   if((currentTimeStamp - lastCtrlTimeStamp) >= CTRL_PERIOD_MS) {
@@ -134,21 +150,32 @@ void loop(){
     lastPubTimeStamp = currentTimeStamp;
     
     skate_fault = rearControl.checkErrors();
-    skate_fault |= frontControl.checkErrors() << 2; 
-    sensor_data.skate_fault = skate_fault;
- 
-    sensor_data.position_filt_front = frontDrive.getPosition();
-    sensor_data.position_filt_rear = rearDrive.getPosition();
-    
-    sensor_data.velocity_filt_front = frontDrive.getVelocity();
-    sensor_data.velocity_filt_rear = rearDrive.getVelocity();
+    skate_fault |= frontControl.checkErrors() << 2;
 
-    sensor_data.velocity_cmd_front = frontVelCmd;
-    sensor_data.velocity_cmd_rear = rearVelCmd; 
-
-    sensor_data.skate_mode = frontControl.getMode() + (rearControl.getMode()<<2);
+    formPacket();
     
-    sensor_data.controller_target = frontControl.getControllerTarget(); //Need value for Rear Control
+    spinStartTimeStamp = micros();
+    chatter.publish( &sensor_data );
+    nh.spinOnce();
+    spinDeltaTime = micros() - spinStartTimeStamp;
+  }
+
+  if(checkAdcReady == true) {
+    checkAdcReady = forceSensors.checkReady();
+  }
+}
+
+void servo_cb(const morpheus_skates::skate_command& cmd_msg){
+  //global_set_point = cmd_msg.command_target*(skate_fault==0);
+  global_set_point = cmd_msg.command_target;
+  master_time = millis();
+  //init_motors = 1;
+}
+
+void formPacket() {
+    sensor_data.force_front_outer = forceSensors.getAdcOuter();
+    sensor_data.force_front_inner = forceSensors.getAdcInner();
+    sensor_data.force_rear = forceSensors.getAdcRear();
 
     sensor_data.imu_accel_x = (float)frontControl.controlTimeDelta;
     sensor_data.imu_accel_y = (float)rearControl.controlTimeDelta;
@@ -160,20 +187,21 @@ void loop(){
     sensor_data.imu_quat_x = (float)frontDrive.updateTimeDelta;
     sensor_data.imu_quat_y = (float)frontDrive.commandTimeDelta;
     sensor_data.imu_quat_z = (float)rearDrive.updateTimeDelta;
-    sensor_data.imu_quat_w = (float)rearDrive.commandTimeDelta;
-    
-    spinStartTimeStamp = micros();
-    chatter.publish( &sensor_data );
-    nh.spinOnce();
-    spinDeltaTime = micros() - spinStartTimeStamp;
-  }
-}
+    sensor_data.imu_quat_w = (float)rearDrive.commandTimeDelta;  
 
-void servo_cb(const morpheus_skates::skate_command& cmd_msg){
-  //global_set_point = cmd_msg.command_target*(skate_fault==0);
-  global_set_point = cmd_msg.command_target;
-  master_time = millis();
-  init_motors = 1;
+    sensor_data.velocity_cmd_rear = rearVelCmd; 
+    sensor_data.velocity_cmd_front = frontVelCmd;
+
+    sensor_data.skate_fault = skate_fault;
+    sensor_data.position_filt_rear = rearDrive.getPosition();
+    sensor_data.position_filt_front = frontDrive.getPosition();
+
+    sensor_data.velocity_filt_rear = rearDrive.getVelocity();    
+    sensor_data.velocity_filt_front = frontDrive.getVelocity();
+
+    sensor_data.controller_target = frontControl.getControllerTarget(); //Need value for Rear Control
+
+    sensor_data.skate_mode = frontControl.getMode() + (rearControl.getMode()<<2);
 }
 
 void check_reset_system() 
@@ -198,3 +226,8 @@ void doEncoderRearChA() {
 void doEncoderRearChB() {
   rearDrive.serviceEncoder(2);
 }
+
+ISR (ADC_vect) {
+  checkAdcReady = forceSensors.serviceSensors(ADC);  
+}
+

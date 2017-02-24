@@ -1,16 +1,12 @@
-/*#define ESC1_PIN 7 
-#define ENC1_CHA_PIN 21
-#define ENC1_CHB_PIN 20
+#define ESC_PIN 7 
+#define ENC_CHA_PIN 21
+#define ENC_CHB_PIN 20
 
-#define ENC2_CHA_PIN 2
-#define ENC2_CHB_PIN 3
-#define ESC2_PIN 9*/
+//#define ENC_CHA_PIN 2
+//#define ENC_CHB_PIN 3
+//#define ESC_PIN 9
 
-#define ENC_CHA_PIN 2
-#define ENC_CHB_PIN 3
-#define ESC_PIN 9
-
-#define SAMP_PERIOD_MS 1.0
+#define SAMP_PERIOD_MS 10.0
 
 #include <Servo.h>
 
@@ -51,11 +47,13 @@ void loop() {
   if(Serial.available()) {
     serialCmd = Serial.parseInt();
       if(serialCmd > 0) {
-        onTime = constrain(map(serialCmd, 1, 100, 1520, 2000), 1520, 2000);
+        //onTime = constrain(map(serialCmd, 1, 100, 1520, 2000), 1520, 2000);
+        onTime = map(serialCmd,0,100,1500,2000);
       }
       else {
         if(serialCmd < 0) {
-          onTime = constrain(map(serialCmd, -100, -1, 1000, 1480), 1000, 1480);
+          //onTime = constrain(map(serialCmd, -100, -1, 1000, 1480), 1000, 1480);
+          onTime = map(serialCmd,-100,0,1000,1500);
         }
     }
     esc.writeMicroseconds(onTime);
