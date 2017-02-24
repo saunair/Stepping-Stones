@@ -6,12 +6,10 @@
 #include "Drive.h"
 
 
-Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin,int sampleNum,int samplePeriod) {
+Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin) {
   encChaPin = ECA_pin;
   encChbPin = ECB_pin;
   escPin = ESC_pin;
-  sampleWindow = sampleNum;
-  samplePeriodMs = samplePeriod;
   onTime = 1500;
   commandLim = 0;
 
@@ -19,8 +17,8 @@ Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin,int sampleNum,int samplePeriod)
   B_set = false;
   resetState();
 
-  lastUpdateTime = millis();
-  lastCommandTime = millis();
+  lastUpdateTime = micros();
+  lastCommandTime = micros();
 }
 
 void Drive::initializeDrive() {
@@ -48,72 +46,51 @@ void Drive::serviceEncoder(int chId) {
 
 
 void Drive::updateState(){
-  updateTimeDelta = millis() - lastUpdateTime;
-  lastUpdateTime = millis();
+  updateTimeDelta = micros() - lastUpdateTime;
+  lastUpdateTime = micros();
+
+  float dt, wheelPositionEncoder, wheelPositionError;
+  dt = (float)updateTimeDelta/(1000000);
+  wheelPositionEncoder = (float(encCount) / PPR) * ONE_REV_DIST_MM;
   
-  //Update position sample buffer for moving average
-  for(int sample = (sampleWindow-1); sample > 0; sample--) {
-    wheelPositionArray[sample] = wheelPositionArray[sample-1];
-  }    
-  wheelPositionArray[0] = (float(encCount) / PPR) * ONE_REV_DIST_MM;
-
-  //Update position moving average
-  wheelPositionAvgPrev = wheelPositionAvg;
-    
-  wheelPositionAvg = 0;
-  for(int sample = 0; sample < sampleWindow; sample++) {
-    wheelPositionAvg = wheelPositionAvg + (wheelPositionArray[sample] / float(sampleWindow));
-  }
-
-  //Update velocity sample buffer for moving average
-  for(int sample = (sampleWindow-1); sample > 0; sample--) {
-    wheelVelocityArray[sample] = wheelVelocityArray[sample-1];
-  }  
-  wheelVelocityArray[0] = (wheelPositionAvg - wheelPositionAvgPrev)/(samplePeriodMs/1000.0);
-
-  //Update velocity moving average  
-  wheelVelocityAvg = 0;
-  for(int sample = 0; sample < sampleWindow; sample++) {
-    wheelVelocityAvg = wheelVelocityAvg + (wheelVelocityArray[sample] / float(sampleWindow));
-  }  
+  wheelPositionEstimate = wheelPositionEstimate + wheelVelocityEstimate*dt;
+  wheelPositionError = wheelPositionEncoder - wheelPositionEstimate;
+  wheelVelocityInteg = wheelVelocityInteg + wheelPositionError*KI*dt;
+  wheelVelocityEstimate = wheelPositionError*KP + wheelVelocityInteg;
 }
 
 
 void Drive::resetState() {
   encCount = 0;
-  wheelPositionAvg = 0;
-  wheelPositionAvgPrev = 0;
-  wheelVelocityAvg = 0;  
-  for(int i = 0;i<MAX_SAMPLES;i++) {
-    wheelPositionArray[i] = 0;
-    wheelVelocityArray[i] = 0;
-  }
+  wheelPositionEstimate = 0;
+  wheelVelocityInteg = 0;
+  wheelVelocityEstimate = 0; 
 }
 
 
 float Drive::getPosition() {
-  return wheelPositionAvg;
+  return wheelPositionEstimate;
 }
 
 
 float Drive::getVelocity() {
-  return wheelVelocityAvg;
+  return wheelVelocityEstimate;
 }
 
     
 void Drive::setCommand(float command) {
-  commandTimeDelta = millis() - lastCommandTime;
-  lastCommandTime = millis();
+  commandTimeDelta = micros() - lastCommandTime;
+  lastCommandTime = micros();
   
-  commandLim = constrain((int)command,SPEED_LIM_MIN,SPEED_LIM_MAX);
+  commandLim = constrain(command,-100,100);
   onTime = 1500;
   
   if(commandLim > 0) {
-    onTime = constrain(map(commandLim, 1, 100, 1520, 2000), 1520, 2000);
+    onTime = (int)map(commandLim, 0, 100, 1520, (2000-1520)*(SPEED_LIM_MAX/100)+1520);
   }
   else {
     if(commandLim < 0) {
-      onTime = constrain(map(commandLim, -100, -1, 1000, 1480), 1000, 1480);
+      onTime = (int)map(commandLim, -100, 0, (1480-1000)*(SPEED_LIM_MIN/100)+1480, 1480);
     }
   }
 

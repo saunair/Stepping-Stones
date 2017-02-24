@@ -1,4 +1,4 @@
-//Revision 2/21/2017
+//Revision 2/23/2017
 #define LEFT_SKATE 1
 #define RIGHT_SKATE 0
 
@@ -39,6 +39,9 @@ long lastCtrlTimeStamp = 0;
 long lastSampTimeStamp = 0;
 long lastPubTimeStamp = 0;
 
+long spinStartTimeStamp = 0;
+long spinDeltaTime = 0;
+
 int global_state;
 int global_set_point;
 float master_time;
@@ -68,10 +71,10 @@ ros::Publisher chatter("left", &sensor_data);
 ros::Subscriber<morpheus_skates::skate_command> sub("servo", servo_cb);
 ros::NodeHandle nh;
 
-Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN,SAMPLE_NUM,SAMP_PERIOD_MS); 
+Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN); 
 Control frontControl(posnGainsFront,velGainsFront,LEFT_SKATE==true,CTRL_PERIOD_MS);
 
-Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN,SAMPLE_NUM,SAMP_PERIOD_MS);
+Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN);
 Control rearControl(posnGainsRear,velGainsRear,RIGHT_SKATE==true,CTRL_PERIOD_MS);
 
 void setup() {
@@ -151,7 +154,8 @@ void loop(){
 
     sensor_data.imu_accel_x = (float)frontControl.controlTimeDelta;
     sensor_data.imu_accel_y = (float)rearControl.controlTimeDelta;
-    
+
+    sensor_data.imu_rate_x = (float)spinDeltaTime;
     sensor_data.imu_rate_y = (float)frontDrive.onTime;
     sensor_data.imu_rate_z = (float)rearDrive.onTime;
 
@@ -160,9 +164,10 @@ void loop(){
     sensor_data.imu_quat_z = (float)rearDrive.updateTimeDelta;
     sensor_data.imu_quat_w = (float)rearDrive.commandTimeDelta;
     
-
+    spinStartTimeStamp = micros();
     chatter.publish( &sensor_data );
     nh.spinOnce();
+    spinDeltaTime = micros() - spinStartTimeStamp;
   }
 }
 
