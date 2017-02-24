@@ -7,8 +7,11 @@
 #include "Arduino.h"
 
 class Force {
+  const int chOuter;
+  const int chInner;
+  const int chRear;
   public:
-    Force(int,int,int);
+    Force(int outer,int inner,int rear):chOuter(outer),chInner(inner),chRear(rear) {currentChannel = chOuter;}
     bool startCycle();
     bool checkReady();
     bool serviceSensors(int);
@@ -17,10 +20,6 @@ class Force {
     int getAdcRear();
 
   private:
-    int chOuter;
-    int chInner;
-    int chRear;
-
     int currentChannel;
 
     int adcOuter;

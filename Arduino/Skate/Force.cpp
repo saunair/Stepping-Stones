@@ -6,15 +6,9 @@
 #include "Force.h"
 
 
-Force::Force(int outer, int inner, int rear) {
-  chOuter = outer;
-  chInner = inner;
-  chRear = rear;
-  currentChannel = 0;
-}
-
 bool Force::startCycle() {
-  currentChannel = 0;
+  currentChannel = chOuter;
+  ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
   nextConversionTime = micros() + 100;
   return true;
 }
@@ -28,25 +22,28 @@ bool Force::checkReady() {
 }
 
 bool Force::serviceSensors(int adcVal) {
-  switch(currentChannel) {
-    case 0:
+  if(currentChannel == chOuter){
       adcOuter = adcVal;
-      currentChannel = 1;
+      currentChannel = chInner;
       ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
-      nextConversionTime = micros() + 100;
+      nextConversionTime = micros() + 200;
       return true;
-    case 1:
+  }
+  
+  if(currentChannel == chInner) {
       adcInner = adcVal;
-      currentChannel = 2;
+      currentChannel = chRear;
       ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
-      nextConversionTime = micros() + 100;
+      nextConversionTime = micros() + 200;
       return true;
-    case 2:
+  }
+
+  if(currentChannel == chRear) {
       adcRear = adcVal;
       return false;
-    default:
-      return false;
   }
+
+  return false;
 }
 
 int Force::getAdcOuter() {

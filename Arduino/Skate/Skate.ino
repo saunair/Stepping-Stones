@@ -1,4 +1,4 @@
-//Revision 2/24/2017
+//Revision 2/24/2017-2
 #define LEFT_SKATE 1
 #define RIGHT_SKATE 0
 
