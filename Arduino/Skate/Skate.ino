@@ -1,4 +1,4 @@
-//Revision 2/24/2017-2
+//Revision 2/24/2017-3
 #define LEFT_SKATE 1
 #define RIGHT_SKATE 0
 
@@ -34,6 +34,7 @@
 #include "Control.h"
 #include "Drive.h"
 #include "Force.h"
+#include <UM.h>
 
 bool init_motors = 0;
 float target = 0;
@@ -69,6 +70,7 @@ void doEncoderFrontChA();
 void doEncoderFrontChB();
 void doEncoderRearChA();
 void doEncoderRearChB();
+void serialEvent1();
 
 
 //Sensor data type and publisher declaration
@@ -85,6 +87,8 @@ Control frontControl(posnGainsFront,velGainsFront,LEFT_SKATE==true,CTRL_PERIOD_M
 Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN);
 Control rearControl(posnGainsRear,velGainsRear,RIGHT_SKATE==true,CTRL_PERIOD_MS);
 
+UM imu;
+
 void setup() {
   if(LEFT_SKATE == RIGHT_SKATE) {
     while(1);
@@ -95,11 +99,6 @@ void setup() {
   nh.getHardware()->setBaud(921600);
   nh.advertise(chatter);
   nh.subscribe(sub);
-
-  /*while(!init_motors)
-  {
-      nh.spinOnce();
-  }*/
 
   //Set up Force Sensing
   ADCSRA = bit(ADEN); //turn ADC on
@@ -115,6 +114,8 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoderRearChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
   rearDrive.initializeDrive();
+
+  Serial1.begin(921600);
 }
 
 void loop(){ 
@@ -229,5 +230,9 @@ void doEncoderRearChB() {
 
 ISR (ADC_vect) {
   checkAdcReady = forceSensors.serviceSensors(ADC);  
+}
+
+void serialEvent1() {
+  
 }
 
