@@ -64,7 +64,7 @@ bool checkAdcReady = false;
 
 byte requestIdx = 1;
 const byte quatRequest[] = {115,110,112,72,109,2,6};
-const byte accelRequest[] = {115,110,112,76,101,4,174};
+const byte accelRequest[] = {115,110,112,76,101,2,2};
 const byte rateRequest[] = {115,110,112,76,97,1,254};
 
 
