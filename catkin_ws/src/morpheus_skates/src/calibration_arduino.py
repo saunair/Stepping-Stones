@@ -37,9 +37,9 @@ class skate(object):
 	self.name = name
         
         ########### set appropriate values ########
-	self.MAX_preload_F1 = 2
-        self.MAX_preload_F2 = 2
-        self.MAX_preload_F3 = 2
+	self.MAX_preload_F1 = 100
+        self.MAX_preload_F2 = 100
+        self.MAX_preload_F3 = 100
     	
 	########### initialize variables ##########
 	self.w = -1
@@ -51,27 +51,26 @@ class skate(object):
         self.gain_rear = []
         self.count = 0
         self.sensor_no = -1
-    	self.preload_front_outer = -1
-        self.preload_front_inner = -1
-    	self.preload_rear = -1
-
+    	self.preload_front_outer = []
+        self.preload_front_inner = []
+    	self.preload_rear        = []
+	self.d = {}
     ###### restart routine for new sensors ############ 
-    def restart_routine():    
+    def restart_routine(self):    
     	self.w = -1
     	self.bias_front_outer = -1
         self.bias_front_inner = -1
     	self.bias_rear = -1
         self.gain_front_outer = []
         self.gain_front_inner = []
-        self.gain_rear = []
+        self.gain_rear        = []
         self.count = 0
         self.sensor_no = -1
-    	self.preload_front_outer = -1
-        self.preload_front_inner = -1
-    	self.preload_rear = -1
+    	self.preload_front_outer = []
+        self.preload_front_inner = []
+    	self.preload_rear =        []
 
-    def values(data):
-       rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.force_front_outer)
+    def values(self,data):
 
        if self.count==0:
            self.bias_front_outer = 0
@@ -98,38 +97,43 @@ class skate(object):
        	   self.sensor_number = input("enter skate sensor number for gain calibration")
    
        if self.w!=-1:
+	   ###### ignore these values for sync!!!! ######### 
+	   if self.count<1200:
+                self.count += 1
            #keep appending for another n values
-           if self.count>=1200 and self.count<1400:
-       	   	self.gain_front_outer.append(2*(data.force_front_outer - right_bias_front_outer)/self.w)
-           	self.gain_front_inner.append(2*(data.force_front_inner - right_bias_front_inner)/self.w)
+           elif self.count>=1200 and self.count<1400:
+       	   	self.gain_front_outer.append(2*(data.force_front_outer - self.bias_front_outer)/self.w)
+           	self.gain_front_inner.append(2*(data.force_front_inner - self.bias_front_inner)/self.w)
        	   	self.gain_rear.append(2*(data.force_rear - self.bias_rear)/self.w)
 		self.count += 1
            
-	   ###### ignore these values for sync!!!! ######### 
-	   elif self.count<1200:
-                self.count_ += 1
            ###### end of routine for this sensor number##########
 	   elif self.count==1400:
-            	self.w = -1
        	   	self.gain_front_outer = float(sum(self.gain_front_outer))/len(self.gain_front_outer)
        		self.gain_front_inner = float(sum(self.gain_front_inner))/len(self.gain_front_inner)
        		self.gain_rear = float(sum(self.gain_rear))/len(self.gain_rear)
-	    
+	   	self.count += 1 
 	   ###### ignore these values for sync!!!! ######### 
 	   elif self.count <1800 and self.count>1400:
-
-                self.count_ += 1
+    	        self.preload_front_outer = []
+        	self.preload_front_inner = []
+    		self.preload_rear =        []
+		self.count += 1
 	   
-	   elif self.count > 1800 and self.count < 2200:
+
+	   elif self.count == 1800:
     		g = input("press a key if ready to test mechanical preload")
-		self.preload_front_outer.append((data.force_front_outer - right_bias_front_outer)*self.gain_front_outer) 
-        	self.preload_front_inner.append((data.force_front_inner - right_bias_front_inner)*self.gain_front_inner)
-    		self.preload_rear.append(((data.force_read - right_bias_front_outer)/self.gain_read))
+                self.count += 1
+	   ############ mechanical preload code ################ 
+	   elif self.count > 1800 and self.count < 2200:
+		self.preload_front_outer.append((data.force_front_outer - self.bias_front_outer)*self.gain_front_outer) 
+        	self.preload_front_inner.append((data.force_front_inner - self.bias_front_inner)*self.gain_front_inner)
+    		self.preload_rear.append(((data.force_rear - self.bias_front_outer)/self.gain_rear))
                 self.count += 1 
            elif self.count == 2200:
-       	   	self.preload_front_outer = float(sum(self._front_outer))/len(self.preload_front_outer)
-       		self.preload_front_inner = float(sum(self._front_inner))/len(self.preload_front_inner)
-       		self.preload_rear = float(sum(self._rear))/len(self.preload_rear)
+       	   	self.preload_front_outer = float(sum(self.preload_front_outer))/len(self.preload_front_outer)
+       		self.preload_front_inner = float(sum(self.preload_front_inner))/len(self.preload_front_inner)
+       		self.preload_rear = float(sum(self.preload_rear))/len(self.preload_rear)
                 
            	if self.preload_front_outer > self.MAX_preload_F1:
        	   	    print "Front outer load not corrected"
@@ -139,67 +143,71 @@ class skate(object):
 		    self.count = 1401 
            	if self.preload_rear > self.MAX_preload_F3:
        	            print "Rear load not corrected"
-		    self.count = 1401 
+		    self.count = 1401
+
+		if (self.preload_front_outer < self.MAX_preload_F1 and self.preload_front_inner < self.MAX_preload_F2 and self.preload_rear < self.MAX_preload_F3): 
+		    self.count += 1
 
 	   elif self.count == 2201:
    		self.count = 0 
-                if self.preload_front_outer < self.MAX_preload_F1 and  self.preload_front_inner < self.MAX_preload_F2 and self.preload_rear < self.preload_BIAS_F3:
+                if self.preload_front_outer < self.MAX_preload_F1 and  self.preload_front_inner < self.MAX_preload_F2 and self.preload_rear < self.MAX_preload_F3:
        		    self.data_update(self.sensor_number)  
             	    self.restart_routine() 
 	        else:
        	            #### go back to preload routine
-	            self.count = 1401
+	            print "Wrong bias: Go though preloading routine again"
+		    self.count = 1401
        	            #self.restart_routine()
-           elif self.count > 2201:
-		self.restart_routine()
+           #elif self.count > 2201:
+		#self.restart_routine()
     ########### update the dictionary for this particular skate
-    def data_update(sensor_number):
+    def data_update(self, sensor_number):
 	
         bias_front_outer = self.name + "_bias_front_outer"
         bias_front_inner = self.name + "_bias_front_inner"
-        bias_rare        = self.name + "_bias_rare"
+        bias_rear        = self.name + "_bias_rare"
         
 	gain_front_outer = self.name + "_gain_front_outer"
         gain_front_inner = self.name + "_gain_front_inner"
-        gain_rare        = self.name + "_gain_rare"
+        gain_rear        = self.name + "_gain_rare"
 
 	preload_front_outer = self.name + "_preload_front_outer"
         preload_front_inner = self.name + "_preload_front_inner"
-        preload_rare        = self.name + "_preload_rare"
+        preload_rear        = self.name + "_preload_rare"
         
         if self.bias_front_outer != -1: 
-            d[bias_front_outer] = self.bias_front_outer
-            d[bias_front_inner] = self.bias_front_inner
-            d[bias_rear]        = self.bias_rear
+            self.d[bias_front_outer] = self.bias_front_outer
+            self.d[bias_front_inner] = self.bias_front_inner
+            self.d[bias_rear]        = self.bias_rear
             if self.sensor_no==1:
-                d[gain_front_outer] = self.gain_front_outer
-                d[gain_front_inner] = rospy.get_param(gain_front_inner)
-                d[gain_rare       ] = rospy.get_param(gain_rear)
+                self.d[gain_front_outer] = self.gain_front_outer
+                self.d[gain_front_inner] = rospy.get_param(gain_front_inner)
+                self.d[gain_rear       ] = rospy.get_param(gain_rear)
             
 	    elif self.sensor_no==2:
-                d[gain_front_inner] = self.gain_front_inner
-                d[gain_front_outer] = rospy.get_param(gain_front_outer)
-                d[gain_rear]        = rospy.get_param(gain_rear)
+                self.d[gain_front_inner] = self.gain_front_inner
+                self.d[gain_front_outer] = rospy.get_param(gain_front_outer)
+                self.d[gain_rear]        = rospy.get_param(gain_rear)
         
             elif self.sensor_no==3:
-                d[gain_rear]        = self.gain_rear
-                d[gain_front_outer] = rospy.get_param(gain_front_outer)
-                d[gain_front_inner] = rospy.get_param(gain_front_inner)
+                self.d[gain_rear]        = self.gain_rear
+                self.d[gain_front_outer] = rospy.get_param(gain_front_outer)
+                self.d[gain_front_inner] = rospy.get_param(gain_front_inner)
         else:
-            d[bias_front_outer] = rospy.get_param(bias_front_outer)
-            d[bias_front_inner] = rospy.get_param(bias_front_inner)
-            d[bias_rear]        = rospy.get_param(bias_rear)
-            d[gain_front_outer] = rospy.get_param(gain_front_outer)
-            d[gain_front_inner] = rospy.get_param(gain_front_inner)
-            d[gain_rear]        = rospy.get_param(gain_rear)
-
-        rospy.set_param(bias_front_outer,d[bias_front_outer])
-        rospy.set_param(bias_front_inner,d[bias_front_inner])
-        rospy.set_param(bias_rear,       d[bias_rear]) 
-        rospy.set_param(gain_front_outer,d[gain_front_outer])
-        rospy.set_param(gain_front_inner,d[left_gain_front_inner])
-        rospy.set_param(gain_rear,       d[left_gain_rear])
-       
+            self.d[bias_front_outer] = rospy.get_param(bias_front_outer)
+            self.d[bias_front_inner] = rospy.get_param(bias_front_inner)
+            self.d[bias_rear]        = rospy.get_param(bias_rear)
+            self.d[gain_front_outer] = rospy.get_param(gain_front_outer)
+            self.d[gain_front_inner] = rospy.get_param(gain_front_inner)
+            self.d[gain_rear]        = rospy.get_param(gain_rear)
+'''
+        rospy.set_param(bias_front_outer,self.d[bias_front_outer])
+        rospy.set_param(bias_front_inner,self.d[bias_front_inner])
+        rospy.set_param(bias_rear       ,       self.d[bias_rear]) 
+        rospy.set_param(gain_front_outer,self.d[gain_front_outer])
+        rospy.set_param(gain_front_inner,self.d[left_gain_front_inner])
+        rospy.set_param(gain_rear       ,       self.d[left_gain_rear])
+   '''    
         ##### call the function that dumps the dictionary into a yaml file which is our config file### 
 	write_into_file(d, self.name)
         
