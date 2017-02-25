@@ -1,4 +1,4 @@
-//Revision 2/24/2017-3
+//Revision 2/25/2017
 #define LEFT_SKATE 1
 #define RIGHT_SKATE 0
 
@@ -16,7 +16,7 @@
 
 #define CTRL_PERIOD_MS 4.0
 #define SAMP_PERIOD_MS 1.0
-#define PUB_PERIOD_MS 4.0
+//#define PUB_PERIOD_MS 4.0
 
 
 //ROS Definitions
@@ -34,9 +34,9 @@
 #include "Control.h"
 #include "Drive.h"
 #include "Force.h"
-#include <UM.h>
+#include "UM.h"
 
-bool init_motors = 0;
+//bool init_motors = 0;
 float target = 0;
 
 long currentTimeStamp = 0;
@@ -61,6 +61,11 @@ float frontVelCmd;
 float rearVelCmd;
 
 bool checkAdcReady = false;
+
+byte requestIdx = 1;
+const byte quatRequest[] = {115,110,112,72,109,2,6};
+const byte accelRequest[] = {115,110,112,76,101,4,174};
+const byte rateRequest[] = {115,110,112,76,97,1,254};
 
 
 void servo_cb(const morpheus_skates::skate_command&);
@@ -129,7 +134,8 @@ void loop(){
     rearDrive.updateState();
     checkAdcReady = forceSensors.startCycle();
   }
-  
+
+  //Control Loop
   if((currentTimeStamp - lastCtrlTimeStamp) >= CTRL_PERIOD_MS) {
     lastCtrlTimeStamp = currentTimeStamp;
 
@@ -144,21 +150,25 @@ void loop(){
     rearDrive.setCommand(rearVelCmd);
      
     //check_reset_system();
+    
     //nh.spinOnce();   
-  }
+  //}
 
-  if((currentTimeStamp - lastPubTimeStamp) >= PUB_PERIOD_MS) {
-    lastPubTimeStamp = currentTimeStamp;
+  //if((currentTimeStamp - lastPubTimeStamp) >= PUB_PERIOD_MS) {
+  //lastPubTimeStamp = currentTimeStamp;
     
     skate_fault = rearControl.checkErrors();
     skate_fault |= frontControl.checkErrors() << 2;
 
     formPacket();
+
+    requestIdx = 1;
+    Serial1.write(quatRequest,7);
     
-    spinStartTimeStamp = micros();
+    //spinStartTimeStamp = micros();
     chatter.publish( &sensor_data );
     nh.spinOnce();
-    spinDeltaTime = micros() - spinStartTimeStamp;
+    //spinDeltaTime = micros() - spinStartTimeStamp;
   }
 
   if(checkAdcReady == true) {
@@ -178,17 +188,18 @@ void formPacket() {
     sensor_data.force_front_inner = forceSensors.getAdcInner();
     sensor_data.force_rear = forceSensors.getAdcRear();
 
-    sensor_data.imu_accel_x = (float)frontControl.controlTimeDelta;
-    sensor_data.imu_accel_y = (float)rearControl.controlTimeDelta;
+    sensor_data.imu_accel_x = imu.accel_x;
+    sensor_data.imu_accel_y = imu.accel_y;
+    sensor_data.imu_accel_z = imu.accel_z;
 
-    sensor_data.imu_rate_x = (float)spinDeltaTime;
-    sensor_data.imu_rate_y = (float)frontDrive.onTime;
-    sensor_data.imu_rate_z = (float)rearDrive.onTime;
+    sensor_data.imu_rate_x = imu.gyro_x;
+    sensor_data.imu_rate_y = imu.gyro_y;
+    sensor_data.imu_rate_z = imu.gyro_z;
 
-    sensor_data.imu_quat_x = (float)frontDrive.updateTimeDelta;
-    sensor_data.imu_quat_y = (float)frontDrive.commandTimeDelta;
-    sensor_data.imu_quat_z = (float)rearDrive.updateTimeDelta;
-    sensor_data.imu_quat_w = (float)rearDrive.commandTimeDelta;  
+    sensor_data.imu_quat_x = imu.quatx;
+    sensor_data.imu_quat_y = imu.quaty;
+    sensor_data.imu_quat_z = imu.quatz;
+    sensor_data.imu_quat_w = imu.quatw;
 
     sensor_data.velocity_cmd_rear = rearVelCmd; 
     sensor_data.velocity_cmd_front = frontVelCmd;
@@ -233,6 +244,19 @@ ISR (ADC_vect) {
 }
 
 void serialEvent1() {
-  
+  bool returnVal;
+  while(Serial1.available()) {
+    returnVal = imu.encode(Serial1.read());
+  }
+  if(returnVal == true){
+    if(requestIdx == 1) {
+      requestIdx = 2;
+      Serial1.write(accelRequest,8);
+    }
+    if(requestIdx == 2) {
+      requestIdx = 3;
+      Serial1.write(rateRequest,8);
+    }
+  }
 }
 
