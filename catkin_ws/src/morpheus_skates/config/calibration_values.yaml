@@ -1,3 +1,6 @@
-{left_bias_front_outer: 111, left_bias_front_inner: 19, left_bias_rear: 49, left_gain_front_outer: 12.535, left_gain_front_inner: 1000,
-  left_gain_rear: 0.9748743718592965, right_bias_front_outer: 0, right_bias_front_inner: 0, right_bias_rear: 0,
-  right_gain_front_outer: 0, right_gain_front_inner: 0, right_gain_rear: 0}
+{left_bias_front_inner: 15, left_bias_front_outer: 15, left_bias_rear: 15, left_gain_front_inner: 0.00436489014415141,
+  left_gain_front_outer: 4.478120529655571, left_gain_rear: 0.6683417085427136, left_preload_front_inner: 0.0038616697265299203,
+  left_preload_front_outer: 36.4422490220343, right_bias_front_inner: 15, right_bias_front_outer: 23,
+  right_bias_rear: 19, right_gain_front_inner: 0.32160804020100503, right_gain_front_outer: 0.4020100502512563,
+  right_gain_rear: 0.025125628140703512, right_preload_front_inner: 2.3222901002506267,
+  right_preload_front_outer: 1.0161967418546396, right_preload_rear: -158.10275689222954}

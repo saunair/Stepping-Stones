@@ -58,13 +58,13 @@ def normalize_calculation(right_skate, left_skate):
                 print(exc)
 	#####use calibrated values for calculation########
 
-	left_skate_force_front_outer = (left_skate.force_front_outer - calibration_data.left_bias_front_outer)/calibration_data.left_bias_gain_outer - calibration_data.left_preload_front_outer
-	left_skate_force_front_inner = (left_skate.force_front_inner - calibration_data.left_bias_front_inner)/calibration_data.left_bias_gain_inner - calibration_data.left_preload_front_inner
-	left_skate_force_rear        = (left_skate.force_rear        - calibration_data.left_bias_rear)/calibration_data.left_gain_rear - calibration_data.left_preload_rear 
+	left_skate_force_front_outer = float(left_skate.force_front_outer - calibration_data.left_bias_front_outer)/calibration_data.left_bias_gain_outer - calibration_data.left_preload_front_outer
+	left_skate_force_front_inner = float(left_skate.force_front_inner - calibration_data.left_bias_front_inner)/calibration_data.left_bias_gain_inner - calibration_data.left_preload_front_inner
+	left_skate_force_rear        = float(left_skate.force_rear        - calibration_data.left_bias_rear)/calibration_data.left_gain_rear - calibration_data.left_preload_rear 
 	
-        right_skate_force_front_outer = (right_skate.force_front_outer - calibration_data.right_bias_front_inner)/calibration_data.right_bias_gain_inner - calibration_data.right_preload_front_outer
-	right_skate_force_front_inner = (right_skate.force_front_inner - calibration_data.right_bias_front_outer)/calibration_data.right_bias_gain_outer - calibration_data.right_preload_front_inner
-	right_skate_force_rear        = (right_skate.force_rear        - calibration_data.right_bias_rear)/calibration_data.right_gain_rear - calibration_data.right_preload_inner 
+        right_skate_force_front_outer = float(right_skate.force_front_outer - calibration_data.right_bias_front_inner)/calibration_data.right_bias_gain_inner - calibration_data.right_preload_front_outer
+	right_skate_force_front_inner = float(right_skate.force_front_inner - calibration_data.right_bias_front_outer)/calibration_data.right_bias_gain_outer - calibration_data.right_preload_front_inner
+	right_skate_force_rear        = float(right_skate.force_rear        - calibration_data.right_bias_rear)/calibration_data.right_gain_rear - calibration_data.right_preload_inner 
 	
 	total_weight = left_skate_force_front_outer + left_skate_force_front_inner + left_skate_force_rear + right_skate_force_front_outer + right_skate_force_front_inner + right_skate_force_rear 
 
