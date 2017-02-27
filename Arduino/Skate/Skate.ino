@@ -16,14 +16,9 @@
 
 #define CTRL_PERIOD_MS 4.0
 #define SAMP_PERIOD_MS 1.0
-//#define PUB_PERIOD_MS 4.0
 
-
-//ROS Definitions
 #define SERIAL_BUFFER_SIZE 256
-
-//kept the ros master timout to 3 seconds
-#define timeout_threshold 1000
+#define TIMEOUT_MS 500
 
 #include <ros.h>
 #include <std_msgs/Float32.h>
@@ -36,21 +31,17 @@
 #include "Force.h"
 #include "UM.h"
 
-//bool init_motors = 0;
 float target = 0;
 
 long currentTimeStamp = 0;
 long lastCtrlTimeStamp = 0;
 long lastSampTimeStamp = 0;
-long lastPubTimeStamp = 0;
 
-long spinStartTimeStamp = 0;
-long spinDeltaTime = 0;
-
-int global_state;
 int global_set_point;
 float master_time;
 byte skate_fault = 0;
+int timeOverrunCnt = 0;
+bool controlLoopActive = false;
 
 float posnGainsFront[] = {0.3,0,0};
 float posnGainsRear[] = {0.3,0,0};
@@ -62,13 +53,13 @@ float rearVelCmd;
 
 bool checkAdcReady = false;
 
-byte requestIdx = 1;
+byte requestIdx = 1000;
 const byte quatRequest[] = {115,110,112,72,109,2,6};
 const byte accelRequest[] = {115,110,112,76,101,2,2};
 const byte rateRequest[] = {115,110,112,76,97,1,254};
 
 
-void servo_cb(const morpheus_skates::skate_command&);
+void ros_sub_cb(const morpheus_skates::skate_command&);
 void formPacket();
 void check_reset_system();
 void doEncoderFrontChA();
@@ -79,9 +70,14 @@ void serialEvent1();
 
 
 //Sensor data type and publisher declaration
-morpheus_skates::skate_feedback sensor_data;
-ros::Publisher chatter("left", &sensor_data);
-ros::Subscriber<morpheus_skates::skate_command> sub("servo", servo_cb);
+morpheus_skates::skate_feedback feedback;
+#if LEFT_SKATE == true
+  ros::Publisher ros_pub("left", &feedback);
+#endif
+#if RIGHT_SKATE == true
+  ros::Publisher ros_pub("right", &feedback);
+#endif
+ros::Subscriber<morpheus_skates::skate_command> sub("servo", ros_sub_cb);
 ros::NodeHandle nh;
 
 Force forceSensors(FRC_OUTER_CH,FRC_INNER_CH,FRC_REAR_CH);
@@ -102,7 +98,7 @@ void setup() {
   //ROS Setup
   nh.initNode();   
   nh.getHardware()->setBaud(921600);
-  nh.advertise(chatter);
+  nh.advertise(ros_pub);
   nh.subscribe(sub);
 
   //Set up Force Sensing
@@ -138,8 +134,17 @@ void loop(){
   //Control Loop
   if((currentTimeStamp - lastCtrlTimeStamp) >= CTRL_PERIOD_MS) {
     lastCtrlTimeStamp = currentTimeStamp;
+    
+    if(controlLoopActive == true) {
+      timeOverrunCnt = timeOverrunCnt + 1;
+    }
+    controlLoopActive = false;
 
     target = global_set_point;
+    check_reset_system();
+
+    requestIdx = 1;
+    Serial1.write(quatRequest,7);
 
     frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
     if(frontControl.checkModeTransition() == true) frontDrive.resetState();
@@ -148,77 +153,67 @@ void loop(){
     rearVelCmd = rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity());
     if(rearControl.checkModeTransition() == true) rearDrive.resetState();
     rearDrive.setCommand(rearVelCmd);
-     
-    //check_reset_system();
-    
-    //nh.spinOnce();   
-  //}
-
-  //if((currentTimeStamp - lastPubTimeStamp) >= PUB_PERIOD_MS) {
-  //lastPubTimeStamp = currentTimeStamp;
-    
+       
     skate_fault = rearControl.checkErrors();
     skate_fault |= frontControl.checkErrors() << 2;
-
-    formPacket();
-
-    requestIdx = 1;
-    Serial1.write(quatRequest,7);
-    
-    //spinStartTimeStamp = micros();
-    chatter.publish( &sensor_data );
-    nh.spinOnce();
-    //spinDeltaTime = micros() - spinStartTimeStamp;
+    skate_fault |= (timeOverrunCnt & 0xF) << 4;
   }
 
   if(checkAdcReady == true) {
     checkAdcReady = forceSensors.checkReady();
   }
+
+  if((requestIdx == 0) || (currentTimeStamp >= (lastCtrlTimeStamp + 2.0))) {
+    formPacket();
+    ros_pub.publish(&feedback);
+    nh.spinOnce();
+    controlLoopActive = false;
+  }
 }
 
-void servo_cb(const morpheus_skates::skate_command& cmd_msg){
-  //global_set_point = cmd_msg.command_target*(skate_fault==0);
-  global_set_point = cmd_msg.command_target;
+void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
+  global_set_point = cmd_msg.command_target*(skate_fault==0);
   master_time = millis();
-  //init_motors = 1;
 }
 
 void formPacket() {
-    sensor_data.force_front_outer = forceSensors.getAdcOuter();
-    sensor_data.force_front_inner = forceSensors.getAdcInner();
-    sensor_data.force_rear = forceSensors.getAdcRear();
+    feedback.header.stamp = nh.now();
+  
+    feedback.force_front_outer = forceSensors.getAdcOuter();
+    feedback.force_front_inner = forceSensors.getAdcInner();
+    feedback.force_rear = forceSensors.getAdcRear();
 
-    sensor_data.imu_accel_x = imu.accel_x;
-    sensor_data.imu_accel_y = imu.accel_y;
-    sensor_data.imu_accel_z = imu.accel_z;
+    feedback.imu_accel_x = imu.accel_x;
+    feedback.imu_accel_y = imu.accel_y;
+    feedback.imu_accel_z = imu.accel_z;
 
-    sensor_data.imu_rate_x = imu.gyro_x;
-    sensor_data.imu_rate_y = imu.gyro_y;
-    sensor_data.imu_rate_z = imu.gyro_z;
+    feedback.imu_rate_x = imu.gyro_x;
+    feedback.imu_rate_y = imu.gyro_y;
+    feedback.imu_rate_z = imu.gyro_z;
 
-    sensor_data.imu_quat_x = imu.quatx;
-    sensor_data.imu_quat_y = imu.quaty;
-    sensor_data.imu_quat_z = imu.quatz;
-    sensor_data.imu_quat_w = imu.quatw;
+    feedback.imu_quat_x = imu.quatx;
+    feedback.imu_quat_y = imu.quaty;
+    feedback.imu_quat_z = imu.quatz;
+    feedback.imu_quat_w = imu.quatw;
 
-    sensor_data.velocity_cmd_rear = rearVelCmd; 
-    sensor_data.velocity_cmd_front = frontVelCmd;
+    feedback.velocity_cmd_rear = rearVelCmd; 
+    feedback.velocity_cmd_front = frontVelCmd;
 
-    sensor_data.skate_fault = skate_fault;
-    sensor_data.position_filt_rear = rearDrive.getPosition();
-    sensor_data.position_filt_front = frontDrive.getPosition();
+    feedback.skate_fault = skate_fault;
+    feedback.position_filt_rear = rearDrive.getPosition();
+    feedback.position_filt_front = frontDrive.getPosition();
 
-    sensor_data.velocity_filt_rear = rearDrive.getVelocity();    
-    sensor_data.velocity_filt_front = frontDrive.getVelocity();
+    feedback.velocity_filt_rear = rearDrive.getVelocity();    
+    feedback.velocity_filt_front = frontDrive.getVelocity();
 
-    sensor_data.controller_target = frontControl.getControllerTarget(); //Need value for Rear Control
+    feedback.controller_target = frontControl.getControllerTarget(); //Need value for Rear Control
 
-    sensor_data.skate_mode = frontControl.getMode() + (rearControl.getMode()<<2);
+    feedback.skate_mode = frontControl.getMode() + (rearControl.getMode()<<2);
 }
 
 void check_reset_system() 
 {
-  if(millis() - master_time > timeout_threshold) {
+  if(millis() - master_time > TIMEOUT_MS) {
     global_set_point = 0;
   }
 }
@@ -251,11 +246,11 @@ void serialEvent1() {
   if(returnVal == true){
     if(requestIdx == 1) {
       requestIdx = 2;
-      Serial1.write(accelRequest,8);
+      Serial1.write(accelRequest,7);
     }
     if(requestIdx == 2) {
-      requestIdx = 3;
-      Serial1.write(rateRequest,8);
+      requestIdx = 0;
+      Serial1.write(rateRequest,7);
     }
   }
 }

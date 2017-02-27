@@ -11,9 +11,6 @@ UM::UM() : state(STATE_ZERO){}		// Default constructor
 
 int quatA = 0, quatB = 0, quatC = 0, quatD = 0;
 
-
-
-
 typedef union {
  byte array[4];
  float value;
@@ -108,7 +105,6 @@ bool UM::checksum(){
 void UM::save(){
 	switch(address){
 	case DREG_QUAT_AB :
-	//case DREG_EULER_PHI_THETA :
 		if(packet_is_batch){
 			quatA = data[0] << 8;
 			quatA |= data[1];
@@ -129,11 +125,6 @@ void UM::save(){
 			gyro_x = convert(data);
 			gyro_y = convert(data + 4);
 			gyro_z = convert(data + 8);
-
-
-			//gyro_x = data[0]<<24 |  data[1]<<16 | data[2]<<8 | data[3];	
-			//gyro_y = data[4]<<24 |  data[5]<<16 | data[6]<<8 | data[7];
-			//gyro_z = data[8]<<24 |  data[9]<<16 | data[10]<<8 | data[11];
 		}
 		break;
 	case DREG_ACCEL_PROC_X :		
@@ -141,10 +132,6 @@ void UM::save(){
 			accel_x = convert(data);
 			accel_y = convert(data + 4);
 			accel_z = convert(data + 8);
-			//accel_x = data[0]<<24 |  data[1]<<16 | data[2]<<8 | data[3];	
-			//accel_y = data[4]<<24 |  data[5]<<16 | data[6]<<8 | data[7];
-			//accel_z = data[8]<<24 |  data[9]<<16 | data[10]<<8 | data[11];
-
 		}
 	break;
 	}
