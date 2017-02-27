@@ -142,9 +142,9 @@ catkin_install_python(PROGRAMS src/take_user_input.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Declare a C++ library
-# add_library(motor
-#   src/${PROJECT_NAME}/motor.cpp
-# )
+add_library(motor
+    src/${morpheus_skate}/imu_integrator.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
