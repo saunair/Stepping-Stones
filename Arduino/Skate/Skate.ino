@@ -1,10 +1,10 @@
-//Revision 2/25/2017
+//Revision 2/28/2017
 #define LEFT_SKATE 1
 #define RIGHT_SKATE 0
 
-#define FRC_OUTER_CH 0
+#define FRC_OUTER_CH 2
 #define FRC_INNER_CH 1
-#define FRC_REAR_CH 2
+#define FRC_REAR_CH 0
 
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
@@ -18,7 +18,7 @@
 #define SAMP_PERIOD_MS 1.0
 
 #define SERIAL_BUFFER_SIZE 256
-#define TIMEOUT_MS 500
+#define TIMEOUT_MS 1000
 
 #include <ros.h>
 #include <std_msgs/Float32.h>
@@ -36,12 +36,14 @@ float target = 0;
 long currentTimeStamp = 0;
 long lastCtrlTimeStamp = 0;
 long lastSampTimeStamp = 0;
+long lastPubTimeStamp = 0;
 
 int global_set_point;
 float master_time;
 byte skate_fault = 0;
 int timeOverrunCnt = 0;
 bool controlLoopActive = false;
+bool imuRxComplete = false;
 
 float posnGainsFront[] = {0.3,0,0};
 float posnGainsRear[] = {0.3,0,0};
@@ -53,7 +55,7 @@ float rearVelCmd;
 
 bool checkAdcReady = false;
 
-byte requestIdx = 1000;
+byte requestIdx = 0;
 const byte quatRequest[] = {115,110,112,72,109,2,6};
 const byte accelRequest[] = {115,110,112,76,101,2,2};
 const byte rateRequest[] = {115,110,112,76,97,1,254};
@@ -116,7 +118,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
   rearDrive.initializeDrive();
 
-  Serial1.begin(921600);
+  Serial1.begin(115200);
 }
 
 void loop(){ 
@@ -138,13 +140,29 @@ void loop(){
     if(controlLoopActive == true) {
       timeOverrunCnt = timeOverrunCnt + 1;
     }
-    controlLoopActive = false;
 
+    controlLoopActive = true;
+    
     target = global_set_point;
     check_reset_system();
 
-    requestIdx = 1;
-    Serial1.write(quatRequest,7);
+    switch(requestIdx) {
+      case 0:
+        Serial1.write(quatRequest,7);
+        requestIdx = 1;
+        break;
+      case 1:
+        Serial1.write(accelRequest,7);
+        requestIdx = 2;
+        break;
+      case 2:
+        Serial1.write(rateRequest,7);
+        requestIdx = 0;
+        break;
+      default:
+        requestIdx = 0;
+        break;  
+    }
 
     frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
     if(frontControl.checkModeTransition() == true) frontDrive.resetState();
@@ -157,17 +175,20 @@ void loop(){
     skate_fault = rearControl.checkErrors();
     skate_fault |= frontControl.checkErrors() << 2;
     skate_fault |= (timeOverrunCnt & 0xF) << 4;
+    controlLoopActive = false;
   }
 
   if(checkAdcReady == true) {
     checkAdcReady = forceSensors.checkReady();
   }
 
-  if((requestIdx == 0) || (currentTimeStamp >= (lastCtrlTimeStamp + 2.0))) {
+  //if((imuRxComplete == true) || ((currentTimeStamp-lastPubTimeStamp) >= PUB_PERIOD_MS)) {
+  if(imuRxComplete == true) {
+    imuRxComplete = false;
+    lastPubTimeStamp = currentTimeStamp;
     formPacket();
     ros_pub.publish(&feedback);
     nh.spinOnce();
-    controlLoopActive = false;
   }
 }
 
@@ -240,18 +261,9 @@ ISR (ADC_vect) {
 
 void serialEvent1() {
   bool returnVal;
-  while(Serial1.available()) {
-    returnVal = imu.encode(Serial1.read());
-  }
+  returnVal = imu.encode(Serial1.read());
   if(returnVal == true){
-    if(requestIdx == 1) {
-      requestIdx = 2;
-      Serial1.write(accelRequest,7);
-    }
-    if(requestIdx == 2) {
-      requestIdx = 0;
-      Serial1.write(rateRequest,7);
-    }
+    imuRxComplete = true;
   }
 }
 
