@@ -1,6 +1,6 @@
 //Revision 2/28/2017
-#define LEFT_SKATE 1
-#define RIGHT_SKATE 0
+#define LEFT_SKATE 0
+#define RIGHT_SKATE 1
 
 #define FRC_OUTER_CH 2
 #define FRC_INNER_CH 1
@@ -16,6 +16,7 @@
 
 #define CTRL_PERIOD_MS 4.0
 #define SAMP_PERIOD_MS 1.0
+#define PUB_PERIOD_MS 4.0
 
 #define SERIAL_BUFFER_SIZE 256
 #define TIMEOUT_MS 1000
@@ -47,8 +48,8 @@ bool imuRxComplete = false;
 
 float posnGainsFront[] = {0.3,0,0};
 float posnGainsRear[] = {0.3,0,0};
-float velGainsFront[] = {0,0.0003,0};
-float velGainsRear[] = {0,0.0003,0};
+float velGainsFront[] = {0,0.0006,0};
+float velGainsRear[] = {0,0.0006,0};
 
 float frontVelCmd;
 float rearVelCmd;
@@ -182,8 +183,7 @@ void loop(){
     checkAdcReady = forceSensors.checkReady();
   }
 
-  //if((imuRxComplete == true) || ((currentTimeStamp-lastPubTimeStamp) >= PUB_PERIOD_MS)) {
-  if(imuRxComplete == true) {
+  if((imuRxComplete == true) || ((currentTimeStamp-lastPubTimeStamp) >= PUB_PERIOD_MS)) {
     imuRxComplete = false;
     lastPubTimeStamp = currentTimeStamp;
     formPacket();
@@ -193,7 +193,8 @@ void loop(){
 }
 
 void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
-  global_set_point = cmd_msg.command_target*(skate_fault==0);
+  //global_set_point = cmd_msg.command_target*(skate_fault==0);
+  global_set_point = cmd_msg.command_target;
   master_time = millis();
 }
 
