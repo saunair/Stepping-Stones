@@ -31,9 +31,9 @@ class skate(object):
 	self.name = name
         
         ########### set appropriate values ########
-	self.MAX_preload_F1 = 70
-        self.MAX_preload_F2 = 70
-        self.MAX_preload_F3 = 70
+	self.MAX_preload_F1 = 1000
+        self.MAX_preload_F2 = 1000
+        self.MAX_preload_F3 = 80
     	
 	########### initialize variables ##########
 	self.w = -1
@@ -44,7 +44,7 @@ class skate(object):
         self.gain_front_inner = []
         self.gain_rear = []
         self.count = 0
-        self.sensor_no = -1
+        self.sensor_number = -1
     	self.preload_front_outer = []
         self.preload_front_inner = []
     	self.preload_rear        = []
@@ -59,7 +59,7 @@ class skate(object):
         self.gain_front_inner = []
         self.gain_rear        = []
         self.count = 0
-        self.sensor_no = -1
+        self.sensor_number = -1
     	self.preload_front_outer = []
         self.preload_front_inner = []
     	self.preload_rear =        []
@@ -86,9 +86,9 @@ class skate(object):
        if self.w>0:
        #print data.header.stamp
            if self.count<=200:
-               self.bias_front_outer += data.force_front_outer
-   	       self.bias_front_inner += data.force_front_inner
-   	       self.bias_rear 	 += data.force_rear
+               self.bias_front_outer += self.data.force_front_outer
+   	       self.bias_front_inner += self.data.force_front_inner
+   	       self.bias_rear 	     += self.data.force_rear
    	       self.count            += 1
 
            elif self.count==201:
@@ -96,7 +96,6 @@ class skate(object):
    	       self.bias_front_inner/=200
    	       self.bias_rear/=200
        	       self.count += 1
-	       self.w = -1
            elif self.count == 202: 
        	       self.sensor_number = input("enter skate sensor number for gain calculation")
        	       self.w = input("input weight here")
@@ -105,8 +104,9 @@ class skate(object):
    
        if self.w>0:
 	   ###### ignore these values for sync!!!! ######### 
-	   if self.count<1200:
+	   if self.count<1200 and self.count > 202:
                 self.count += 1
+                print "wait"
 		
 	   elif self.count==1200:
 		
@@ -128,6 +128,7 @@ class skate(object):
 		elif self.sensor_number == 2:
            	    self.gain_front_inner.append(float(self.data.force_front_inner - self.bias_front_inner)/self.w)
 		elif self.sensor_number == 3:
+                    print "checkkkkk"
        	   	    self.gain_rear.append(float(self.data.force_rear - self.bias_rear)/self.w)
 		self.count += 1
            
@@ -293,10 +294,10 @@ class skate(object):
 
 def start(left_skate_start, right_skate_start):
     rospy.init_node('bias', anonymous=True)
-    #rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
-    rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
-    right_skate_start.run()
-    #left_skate_start.run()
+    rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
+    #rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
+    #right_skate_start.run()
+    left_skate_start.run()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
