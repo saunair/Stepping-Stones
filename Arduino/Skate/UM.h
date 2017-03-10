@@ -13,6 +13,8 @@ class UM{
 public:
 	float gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z;
 	float quatx, quaty, quatz, quatw;
+  int quatA, quatB, quatC, quatD;
+  char updates;
 	
 	UM();
 	

@@ -1,4 +1,4 @@
-//Revision 2/28/2017
+//Revision 3/9/2017
 #define LEFT_SKATE 0
 #define RIGHT_SKATE 1
 
@@ -14,11 +14,11 @@
 #define ENC2_CHB_PIN 3
 #define ESC2_PIN 9
 
-#define CTRL_PERIOD_MS 4.0
-#define SAMP_PERIOD_MS 1.0
-#define PUB_PERIOD_MS 4.0
+#define CTRL_PERIOD_MS 9.0
+#define SAMP_PERIOD_MS 3.0
+//#define PUB_PERIOD_MS 15.0
 
-#define SERIAL_BUFFER_SIZE 256
+#define SERIAL_BUFFER_SIZE 512
 #define TIMEOUT_MS 1000
 
 #include <ros.h>
@@ -45,6 +45,12 @@ byte skate_fault = 0;
 int timeOverrunCnt = 0;
 bool controlLoopActive = false;
 bool imuRxComplete = false;
+bool imuTxComplete = false;
+
+long startTime1 = 0;
+long startTime2 = 0;
+long startTime3 = 0;
+long startTime4 = 0;
 
 float posnGainsFront[] = {0.3,0,0};
 float posnGainsRear[] = {0.3,0,0};
@@ -57,9 +63,14 @@ float rearVelCmd;
 bool checkAdcReady = false;
 
 byte requestIdx = 0;
+//UM7
 const byte quatRequest[] = {115,110,112,72,109,2,6};
 const byte accelRequest[] = {115,110,112,76,101,2,2};
 const byte rateRequest[] = {115,110,112,76,97,1,254};
+//UM6
+/*const byte quatRequest[] = {115,110,112,72,100,1,253};
+const byte accelRequest[] = {115,110,112,76,94,1,251};
+const byte rateRequest[] = {115,110,112,76,92,1,249};*/
 
 
 void ros_sub_cb(const morpheus_skates::skate_command&);
@@ -100,7 +111,7 @@ void setup() {
   
   //ROS Setup
   nh.initNode();   
-  nh.getHardware()->setBaud(921600);
+  nh.getHardware()->setBaud(115200);
   nh.advertise(ros_pub);
   nh.subscribe(sub);
 
@@ -123,10 +134,10 @@ void setup() {
 }
 
 void loop(){ 
-  currentTimeStamp = millis();
+  currentTimeStamp = micros();
 
   //Sampling Loop
-  if((currentTimeStamp - lastSampTimeStamp) >= SAMP_PERIOD_MS) {
+  if((currentTimeStamp - lastSampTimeStamp) >= (SAMP_PERIOD_MS*1000)) {
     lastSampTimeStamp = currentTimeStamp;
 
     frontDrive.updateState();
@@ -135,35 +146,25 @@ void loop(){
   }
 
   //Control Loop
-  if((currentTimeStamp - lastCtrlTimeStamp) >= CTRL_PERIOD_MS) {
+  if((currentTimeStamp - lastCtrlTimeStamp) >= (CTRL_PERIOD_MS*1000)) {
     lastCtrlTimeStamp = currentTimeStamp;
+    feedback.debug_int3 = micros() - startTime1;
+    startTime1 = micros();
     
+    //if((controlLoopActive == true) || (imuRxComplete == false)) {
     if(controlLoopActive == true) {
       timeOverrunCnt = timeOverrunCnt + 1;
     }
 
     controlLoopActive = true;
+
+    //Serial1.write(quatRequest,7);
+    //requestIdx = 1;
+    //imuRxComplete = false;
+    //imuTxComplete = true;
     
     target = global_set_point;
     check_reset_system();
-
-    switch(requestIdx) {
-      case 0:
-        Serial1.write(quatRequest,7);
-        requestIdx = 1;
-        break;
-      case 1:
-        Serial1.write(accelRequest,7);
-        requestIdx = 2;
-        break;
-      case 2:
-        Serial1.write(rateRequest,7);
-        requestIdx = 0;
-        break;
-      default:
-        requestIdx = 0;
-        break;  
-    }
 
     frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
     if(frontControl.checkModeTransition() == true) frontDrive.resetState();
@@ -176,6 +177,13 @@ void loop(){
     skate_fault = rearControl.checkErrors();
     skate_fault |= frontControl.checkErrors() << 2;
     skate_fault |= (timeOverrunCnt & 0xF) << 4;
+    feedback.debug_int1 = int(micros() - startTime1);
+
+    formPacket();
+    ros_pub.publish(&feedback);
+    //feedback.debug_int3 = 0;
+    nh.spinOnce();
+    feedback.debug_int2 = int(micros() - startTime1);
     controlLoopActive = false;
   }
 
@@ -183,13 +191,15 @@ void loop(){
     checkAdcReady = forceSensors.checkReady();
   }
 
-  if((imuRxComplete == true) || ((currentTimeStamp-lastPubTimeStamp) >= PUB_PERIOD_MS)) {
+  /*if((imuRxComplete == true) || ((currentTimeStamp-lastPubTimeStamp) >= PUB_PERIOD_MS)) {
     imuRxComplete = false;
     lastPubTimeStamp = currentTimeStamp;
     formPacket();
     ros_pub.publish(&feedback);
     nh.spinOnce();
-  }
+    endTime = micros();
+    feedback.debug_int1 = int(endTime - startTime);
+  }*/
 }
 
 void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
@@ -205,19 +215,6 @@ void formPacket() {
     feedback.force_front_inner = forceSensors.getAdcInner();
     feedback.force_rear = forceSensors.getAdcRear();
 
-    feedback.imu_accel_x = imu.accel_x;
-    feedback.imu_accel_y = imu.accel_y;
-    feedback.imu_accel_z = imu.accel_z;
-
-    feedback.imu_rate_x = imu.gyro_x;
-    feedback.imu_rate_y = imu.gyro_y;
-    feedback.imu_rate_z = imu.gyro_z;
-
-    feedback.imu_quat_x = imu.quatx;
-    feedback.imu_quat_y = imu.quaty;
-    feedback.imu_quat_z = imu.quatz;
-    feedback.imu_quat_w = imu.quatw;
-
     feedback.velocity_cmd_rear = rearVelCmd; 
     feedback.velocity_cmd_front = frontVelCmd;
 
@@ -227,10 +224,29 @@ void formPacket() {
 
     feedback.velocity_filt_rear = rearDrive.getVelocity();    
     feedback.velocity_filt_front = frontDrive.getVelocity();
-
-    feedback.controller_target = frontControl.getControllerTarget(); //Need value for Rear Control
+    
+    feedback.controller_target_rear = rearControl.getControllerTarget();
+    feedback.controller_target_front = frontControl.getControllerTarget();
 
     feedback.skate_mode = frontControl.getMode() + (rearControl.getMode()<<2);
+
+    if(imu.updates == 7) {
+      imu.updates = 0;
+      feedback.debug_int4 = feedback.debug_int4 + 1;
+         
+      feedback.imu_accel_x = imu.accel_x;
+      feedback.imu_accel_y = imu.accel_y;
+      feedback.imu_accel_z = imu.accel_z;
+
+      feedback.imu_rate_x = imu.gyro_x;
+      feedback.imu_rate_y = imu.gyro_y;
+      feedback.imu_rate_z = imu.gyro_z;
+
+      feedback.imu_quat_x = imu.quatA;
+      feedback.imu_quat_y = imu.quatB;
+      feedback.imu_quat_z = imu.quatC;
+      feedback.imu_quat_w = imu.quatD;
+    }
 }
 
 void check_reset_system() 
@@ -260,11 +276,33 @@ ISR (ADC_vect) {
   checkAdcReady = forceSensors.serviceSensors(ADC);  
 }
 
-void serialEvent1() {
+//void serialEvent1() {
+ISR (USART1_RX_vect) {
   bool returnVal;
-  returnVal = imu.encode(Serial1.read());
-  if(returnVal == true){
-    imuRxComplete = true;
-  }
+  char data;
+  //if(feedback.debug_int3 == 0) feedback.debug_int3 = micros() - startTime1;
+  data = UDR1;
+  returnVal = imu.encode(data);
+  /*if(returnVal == true){
+    if(imuTxComplete == false) {
+        /*switch(requestIdx) {
+          case 1:
+            Serial1.write(accelRequest,7);
+            requestIdx = 2;
+            break;
+          case 2:
+            Serial1.write(rateRequest,7);
+            imuTxComplete = true;
+            break;
+          default:
+            break;
+        }*/
+    /*}
+    else {
+        imuRxComplete = true;
+        feedback.debug_int1 = int(micros() - startTime1);  
+        
+    }
+  }*/
 }
 

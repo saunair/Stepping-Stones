@@ -1,15 +1,20 @@
 #include "UM.h"
 
+//UM7
 #define DREG_EULER_PHI_THETA 0x70	// Packet address sent from the UM7 that contains roll,pitch,yaw and rates.
 #define DREG_ACCEL_PROC_X  0x65		//Packet address sent from the UM7 that contains processed accel_x data.
 #define DREG_ACCEL_PROC_Y  0x66		//Packet address sent from the UM7 that contains processed accel_y data.
 #define DREG_ACCEL_PROC_Z  0x67		//Packet address sent from the UM7 that contains processed accel_z data.
 #define DREG_QUAT_AB	   0x6D		//Packet address sent from the UM7 that contains quaternion vector elements 1 and 2; use as a pointer for 3 and 4
-#define DREG_GYRO_PROC_X   0x61		// angular rates	  
+#define DREG_GYRO_PROC_X   0x61		// angular rates	
+
+/*//UM6
+#define DREG_ACCEL_PROC_X 0x5E
+#define DREG_QUAT_AB 0x64
+#define DREG_GYRO_PROC_X  0x5C*/
 
 UM::UM() : state(STATE_ZERO){}		// Default constructor
 
-int quatA = 0, quatB = 0, quatC = 0, quatD = 0;
 
 typedef union {
  byte array[4];
@@ -105,6 +110,7 @@ bool UM::checksum(){
 void UM::save(){
 	switch(address){
 	case DREG_QUAT_AB :
+    updates |= 1<<2;
 		if(packet_is_batch){
 			quatA = data[0] << 8;
 			quatA |= data[1];
@@ -121,13 +127,15 @@ void UM::save(){
 		}
 		break;
 	case DREG_GYRO_PROC_X:
+    updates |= 1<<1;
 		if(packet_is_batch){
 			gyro_x = convert(data);
 			gyro_y = convert(data + 4);
 			gyro_z = convert(data + 8);
 		}
 		break;
-	case DREG_ACCEL_PROC_X :		
+	case DREG_ACCEL_PROC_X :
+    updates |= 1<<0;		
 		if(packet_is_batch){
 			accel_x = convert(data);
 			accel_y = convert(data + 4);
