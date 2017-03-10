@@ -12,9 +12,9 @@ class Force {
   const int chRear;
   public:
     Force(int outer,int inner,int rear):chOuter(outer),chInner(inner),chRear(rear) {currentChannel = chOuter;}
-    bool startCycle();
+    void startCycle();
     bool checkReady();
-    bool serviceSensors(int);
+    void serviceSensors(int);
     int getAdcOuter();
     int getAdcInner();
     int getAdcRear();
@@ -27,6 +27,7 @@ class Force {
     int adcRear;
 
     long nextConversionTime;
+    char conversionCount;
 };
 
 #endif

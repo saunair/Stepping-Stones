@@ -6,44 +6,38 @@
 #include "Force.h"
 
 
-bool Force::startCycle() {
+void Force::startCycle() {
   currentChannel = chOuter;
   ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
-  nextConversionTime = micros() + 100;
-  return true;
+  ADCSRA |= bit (ADSC) | bit (ADIE); //Trigger conversion to be thrown out
+  conversionCount = 0;
 }
 
-bool Force::checkReady() {
-  if(micros() >= nextConversionTime) {
-    ADCSRA |= bit (ADSC) | bit (ADIE);
-    return false;  
+void Force::serviceSensors(int adcVal) {
+  if(conversionCount == 0) {
+    ADCSRA |= bit (ADSC) | bit (ADIE);  
+    conversionCount = 1;
   }
-  return true;
-}
-
-bool Force::serviceSensors(int adcVal) {
+  
   if(currentChannel == chOuter){
       adcOuter = adcVal;
       currentChannel = chInner;
       ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
-      nextConversionTime = micros() + 200;
-      return true;
+      ADCSRA |= bit (ADSC) | bit (ADIE);  
+      conversionCount = 0;
   }
   
   if(currentChannel == chInner) {
       adcInner = adcVal;
       currentChannel = chRear;
       ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
-      nextConversionTime = micros() + 200;
-      return true;
+      ADCSRA |= bit (ADSC) | bit (ADIE);  
+      conversionCount = 0;
   }
 
   if(currentChannel == chRear) {
       adcRear = adcVal;
-      return false;
   }
-
-  return false;
 }
 
 int Force::getAdcOuter() {
