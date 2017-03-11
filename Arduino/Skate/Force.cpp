@@ -18,25 +18,27 @@ void Force::serviceSensors(int adcVal) {
     ADCSRA |= bit (ADSC) | bit (ADIE);  
     conversionCount = 1;
   }
-  
-  if(currentChannel == chOuter){
-      adcOuter = adcVal;
-      currentChannel = chInner;
-      ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
-      ADCSRA |= bit (ADSC) | bit (ADIE);  
-      conversionCount = 0;
-  }
-  
-  if(currentChannel == chInner) {
-      adcInner = adcVal;
-      currentChannel = chRear;
-      ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
-      ADCSRA |= bit (ADSC) | bit (ADIE);  
-      conversionCount = 0;
-  }
 
-  if(currentChannel == chRear) {
-      adcRear = adcVal;
+  else {  
+    if(currentChannel == chOuter){
+        adcOuter = adcVal;
+        currentChannel = chInner;
+        ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
+        ADCSRA |= bit (ADSC) | bit (ADIE);  
+        conversionCount = 0;
+    }
+    
+    else if(currentChannel == chInner) {
+        adcInner = adcVal;
+        currentChannel = chRear;
+        ADMUX  =  bit (REFS0) | (currentChannel & 0x07);
+        ADCSRA |= bit (ADSC) | bit (ADIE);  
+        conversionCount = 0;
+    }
+  
+    else if(currentChannel == chRear) {
+        adcRear = adcVal;
+    }
   }
 }
 

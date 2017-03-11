@@ -110,7 +110,7 @@ void setup() {
   //Set up Force Sensing
   ADCSRA = bit(ADEN); //turn ADC on
   ADCSRA |= bit (ADPS0) |  bit (ADPS1) | bit (ADPS2);  // Prescaler of 128
-  ADMUX  =  bit (REFS0) | (0 & 0x07);    // AVcc and select input port
+  ADMUX  =  bit (REFS0) | (FRC_OUTER_CH & 0x07);    // AVcc and select input port
 
   //Set Up Front Skate
   attachInterrupt(digitalPinToInterrupt(ENC1_CHA_PIN), doEncoderFrontChA, CHANGE);
@@ -133,9 +133,9 @@ void loop(){
   if((currentTimeStamp - lastSampTimeStamp) >= (SAMP_PERIOD_MS*1000)) {
     lastSampTimeStamp = currentTimeStamp;
 
+    forceSensors.startCycle();
     frontDrive.updateState();
     rearDrive.updateState();
-    forceSensors.startCycle();
   }
 
   //Control Loop
