@@ -121,6 +121,7 @@ ImuFilterRos::ImuFilterRos(ros::NodeHandle nh, ros::NodeHandle nh_private):
 
   imu_subscriber_.reset(new ImuSubscriber(
     nh_, ros::names::resolve("imu") + "/data_raw", queue_size));
+  ROS_INFO ("Subscribing");
 
   if (use_mag_)
   {
@@ -150,6 +151,7 @@ ImuFilterRos::ImuFilterRos(ros::NodeHandle nh, ros::NodeHandle nh_private):
   else
   {
     imu_subscriber_->registerCallback(&ImuFilterRos::imuCallback, this);
+    ROS_INFO ("callback");
   }
 }
 
@@ -160,8 +162,10 @@ ImuFilterRos::~ImuFilterRos()
 
 void ImuFilterRos::imuCallback(const ImuMsg::ConstPtr& imu_msg_raw)
 {
+printf("in init");
   boost::mutex::scoped_lock(mutex_);
 
+printf("put init");
   const geometry_msgs::Vector3& ang_vel = imu_msg_raw->angular_velocity;
   const geometry_msgs::Vector3& lin_acc = imu_msg_raw->linear_acceleration;
 
@@ -173,7 +177,6 @@ void ImuFilterRos::imuCallback(const ImuMsg::ConstPtr& imu_msg_raw)
     geometry_msgs::Quaternion init_q;
     StatelessOrientation::computeOrientation(world_frame_, lin_acc, init_q);
     filter_.setOrientation(init_q.w, init_q.x, init_q.y, init_q.z);
-
     // initialize time
     last_time_ = time;
     initialized_ = true;
@@ -194,6 +197,7 @@ void ImuFilterRos::imuCallback(const ImuMsg::ConstPtr& imu_msg_raw)
       lin_acc.x, lin_acc.y, lin_acc.z,
       dt);
 
+  printf("before publishing transform");
   publishFilteredMsg(imu_msg_raw);
   if (publish_tf_)
     publishTransform(imu_msg_raw);

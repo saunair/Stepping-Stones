@@ -54,6 +54,9 @@ def zero_point_server():
                 z_x = float(sum(z_x))/len(z_x)
                 z_y = float(sum(z_y))/len(z_y)
                 z_z = float(sum(z_z))/len(z_z)
+                rospy.set_param('zero_pos_x', z_x)
+                rospy.set_param('zero_pos_y', z_y)
+                rospy.set_param('zero_pos_z', z_z)
             count+=1
         except:
             z_x = 0
@@ -68,8 +71,6 @@ def zero_point_server():
     #stop the node maybe ?
     rospy.on_shutdown(myhook)
 
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
 
 if __name__ == "__main__":
     time.sleep(20)

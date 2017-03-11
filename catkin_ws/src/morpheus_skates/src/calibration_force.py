@@ -25,12 +25,15 @@ config_file = morpheus_path + '/config/calibration_values.yaml'
 class skate(object):
 
     def __init__(self, name):
+	
+
+	self.data = []
 	self.name = name
         
         ########### set appropriate values ########
-	self.MAX_preload_F1 = 20
-        self.MAX_preload_F2 = 20
-        self.MAX_preload_F3 = 20
+	self.MAX_preload_F1 = 1000
+        self.MAX_preload_F2 = 1000
+        self.MAX_preload_F3 = 80
     	
 	########### initialize variables ##########
 	self.w = -1
@@ -41,7 +44,7 @@ class skate(object):
         self.gain_front_inner = []
         self.gain_rear = []
         self.count = 0
-        self.sensor_no = -1
+        self.sensor_number = -1
     	self.preload_front_outer = []
         self.preload_front_inner = []
     	self.preload_rear        = []
@@ -56,43 +59,54 @@ class skate(object):
         self.gain_front_inner = []
         self.gain_rear        = []
         self.count = 0
-        self.sensor_no = -1
+        self.sensor_number = -1
     	self.preload_front_outer = []
         self.preload_front_inner = []
     	self.preload_rear =        []
 
-    def values(self,data):
-       print "repeat"
+    def update_values(self,data):
+	self.data = data 
+	
+    def run(self):
+	previous_sequence = 0
+        while(1):
+            if(self.data!=[]):
+                if((self.data.header.seq != previous_sequence)):
+                    self.calculate_values(self.data)
+                    previous_sequence = self.data.header.seq
+
+    def calculate_values(self, data):
        if self.count==0:
            self.bias_front_outer = 0
            self.bias_front_inner = 0
            self.bias_rear        = 0
    	   self.count           += 1
-   
+  	   self.w = input("input mode here, -2 for preload, 1 for gain and bias")
 
-       print data.header.stamp
-       if self.count<=200:
-           self.bias_front_outer += data.force_front_outer
-   	   self.bias_front_inner += data.force_front_inner
-   	   self.bias_rear 	 += data.force_rear
-   	   self.count            += 1
+       if self.w>0:
+       #print data.header.stamp
+           if self.count<=200:
+               self.bias_front_outer += self.data.force_front_outer
+   	       self.bias_front_inner += self.data.force_front_inner
+   	       self.bias_rear 	     += self.data.force_rear
+   	       self.count            += 1
 
-       elif self.count==201:
-   	   self.bias_front_outer/=200
-   	   self.bias_front_inner/=200
-   	   self.bias_rear/=200
-       	   self.count += 1
-	   self.w = -1
-       elif self.count == 202: 
-       	   self.sensor_number = input("enter skate sensor number for gain calculation")
-       	   self.w = input("input weight here")
-       	   self.count += 1
+           elif self.count==201:
+   	       self.bias_front_outer/=200
+   	       self.bias_front_inner/=200
+   	       self.bias_rear/=200
+       	       self.count += 1
+           elif self.count == 202: 
+       	       self.sensor_number = input("enter skate sensor number for gain calculation")
+       	       self.w = input("input weight here")
+       	       self.count += 1
    	   ####### add the skate name in the input
    
        if self.w>0:
 	   ###### ignore these values for sync!!!! ######### 
-	   if self.count<1200:
+	   if self.count<1200 and self.count > 202:
                 self.count += 1
+                print "wait"
 		
 	   elif self.count==1200:
 		
@@ -109,20 +123,21 @@ class skate(object):
        	   	
 		if self.sensor_number == 1:
                     
-		    self.gain_front_outer.append(float(data.force_front_outer - self.bias_front_outer)/self.w)
-		    print "check for sanjay", (data.force_front_outer - self.bias_front_outer), self.w
+		    self.gain_front_outer.append(float(self.data.force_front_outer - self.bias_front_outer)/self.w)
+		    #print "check for sanjay", (data.force_front_outer - self.bias_front_outer), self.w
 		elif self.sensor_number == 2:
-           	    self.gain_front_inner.append(float(data.force_front_inner - self.bias_front_inner)/self.w)
+           	    self.gain_front_inner.append(float(self.data.force_front_inner - self.bias_front_inner)/self.w)
 		elif self.sensor_number == 3:
-       	   	    self.gain_rear.append(float(data.force_rear - self.bias_rear)/self.w)
+                    print "checkkkkk"
+       	   	    self.gain_rear.append(float(self.data.force_rear - self.bias_rear)/self.w)
 		self.count += 1
            
            ###### end of routine for this sensor number##########
 	   elif self.count==1400:
 		if self.sensor_number == 1:
-		    print self.gain_front_outer
+		    #print self.gain_front_outer
        	   	    self.gain_front_outer = float(sum(self.gain_front_outer))/len(self.gain_front_outer)
-		    print "check", self.gain_front_outer
+		    #print "check", self.gain_front_outer
 		elif self.sensor_number == 2:
        		    self.gain_front_inner = float(sum(self.gain_front_inner))/len(self.gain_front_inner)
 		elif self.sensor_number == 3:
@@ -150,9 +165,9 @@ class skate(object):
                 self.count += 1
 	   ############ mechanical preload code ################ 
 	   elif self.count > 1800 and self.count < 2200:
-		self.preload_front_outer.append(float(data.force_front_outer - self.bias_front_outer)/self.gain_front_outer) 
-        	self.preload_front_inner.append(float(data.force_front_inner - self.bias_front_inner)/self.gain_front_inner)
-    		self.preload_rear.append((float(data.force_rear - self.bias_front_outer)/self.gain_rear))
+		self.preload_front_outer.append(float(self.data.force_front_outer - self.bias_front_outer)/self.gain_front_outer) 
+        	self.preload_front_inner.append(float(self.data.force_front_inner - self.bias_front_inner)/self.gain_front_inner)
+    		self.preload_rear.append((float(self.data.force_rear - self.bias_rear)/self.gain_rear))
                 self.count += 1 
            elif self.count == 2200:
        	   	self.preload_front_outer = float(sum(self.preload_front_outer))/len(self.preload_front_outer)
@@ -162,13 +177,13 @@ class skate(object):
 
 		#### go to sync if preload is above the threshold 
            	if self.preload_front_outer > self.MAX_preload_F1:
-       	   	    print "Front outer load not corrected"
+       	   	    print "Front outer load not corrected", self.preload_front_outer
 		    self.count = 1401 
            	if self.preload_front_inner > self.MAX_preload_F2:
-       	            print "Front inner load not corrected"
-		    self.count = 1401 
+       	            print "Front inner load not corrected",  self.preload_front_inner
+		    self.count = 1401
            	if self.preload_rear > self.MAX_preload_F3:
-       	            print "Rear load not corrected"
+       	            print "Rear load not corrected", self.preload_rear
 		    self.count = 1401
 
 		if (self.preload_front_outer < self.MAX_preload_F1 and self.preload_front_inner < self.MAX_preload_F2 and self.preload_rear < self.MAX_preload_F3): 
@@ -177,7 +192,7 @@ class skate(object):
 	   elif self.count == 2201:
    		self.count = 0 
                 if self.preload_front_outer < self.MAX_preload_F1 and  self.preload_front_inner < self.MAX_preload_F2 and self.preload_rear < self.MAX_preload_F3:
-       		    self.data_update(self.sensor_number)  
+       		    self.data_update()  
             	    self.restart_routine() 
 	        else:
        	            #### go back to preload routine
@@ -188,6 +203,7 @@ class skate(object):
 		#self.restart_routine()
     ########### update the dictionary for this particular skate
        elif self.w==-2:
+	    print "koushik"
 	    ### go to this preload directly ###
 	    self.count = 1700
 	    #### to get into the loop ####
@@ -199,7 +215,7 @@ class skate(object):
             self.gain_front_inner =  rospy.get_param(self.name + "_gain_front_inner")
             self.gain_rear        =  rospy.get_param(self.name + "_gain_rear")
 	    
-    def data_update(self, sensor_number):
+    def data_update(self):
 	
         bias_front_outer = self.name + "_bias_front_outer"
         bias_front_inner = self.name + "_bias_front_inner"
@@ -255,6 +271,7 @@ class skate(object):
             self.d['left_bias_rear']            =   rospy.get_param('left_bias_rear')
 	    self.d['left_preload_front_outer']  =   rospy.get_param('left_preload_front_outer')
             self.d['left_preload_front_inner']  =   rospy.get_param('left_preload_front_inner')
+            self.d['left_preload_rear']         =   rospy.get_param('left_preload_rear')
             self.d['left_gain_rear']         =   rospy.get_param('left_gain_rear')
 	    self.d['left_gain_front_outer']  =   rospy.get_param('left_gain_front_outer')
             self.d['left_gain_front_inner']  =   rospy.get_param('left_gain_front_inner')
@@ -277,9 +294,10 @@ class skate(object):
 
 def start(left_skate_start, right_skate_start):
     rospy.init_node('bias', anonymous=True)
-    rospy.Subscriber("left" , skate_feedback, left_skate_start.values)
-    rospy.Subscriber("right", skate_feedback, right_skate_start.values)
-
+    rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
+    #rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
+    #right_skate_start.run()
+    left_skate_start.run()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 

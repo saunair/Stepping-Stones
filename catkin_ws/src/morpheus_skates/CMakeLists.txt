@@ -57,6 +57,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
     FILES
+    sensors_normalized.srv
     zero_point.srv
     yaml_values.srv
  )
@@ -122,13 +123,13 @@ include_directories(
 )
 
 
-catkin_install_python(PROGRAMS src/motor_speed.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
 catkin_install_python(PROGRAMS src/calibration_arduino.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 catkin_install_python(PROGRAMS src/kinect_zero.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+catkin_install_python(PROGRAMS src/force_normalization.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 catkin_install_python(PROGRAMS src/stepping_stones.py
@@ -137,14 +138,13 @@ catkin_install_python(PROGRAMS src/stepping_stones.py
 catkin_install_python(PROGRAMS src/yaml_serv.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-
 catkin_install_python(PROGRAMS src/take_user_input.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Declare a C++ library
-# add_library(motor
-#   src/${PROJECT_NAME}/motor.cpp
-# )
+add_library(motor
+    src/${morpheus_skate}/imu_integrator.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

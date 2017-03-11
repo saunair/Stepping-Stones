@@ -26,6 +26,7 @@ user_input.calibration_enable = 0
 user_input.command_target = 0
 position_control = 1
 velocity_control = 2
+total_weight = 0
 
 #previous_left_time  = rospy.Time.now() 
 #previous_right_time = rospy.Time.now()
@@ -45,6 +46,28 @@ z_y=0.0881804
 z_z=0.211088
 
 
+
+### required gains from the rosparam server
+left_bias_front_outer = rospy.get_param('left_bias_front_outer')
+left_bias_front_inner = rospy.get_param('left_bias_front_inner')
+left_bias_rear = rospy.get_param('left_bias_rear')
+left_gain_front_outer = rospy.get_param('left_gain_front_outer')
+left_gain_front_inner = rospy.get_param('left_gain_front_inner')
+left_gain_rear = rospy.get_param('left_gain_rear')
+left_preload_front_outer = rospy.get_param('left_preload_front_outer')
+left_preload_front_inner = rospy.get_param('left_preload_front_inner')
+left_preload_rear = rospy.get_param('left_preload_rear')
+
+right_bias_front_outer = rospy.get_param('right_bias_front_outer')
+right_bias_front_inner = rospy.get_param('right_bias_front_inner')
+right_bias_rear = rospy.get_param('right_bias_rear')
+right_gain_front_outer = rospy.get_param('right_gain_front_outer')
+right_gain_front_inner = rospy.get_param('right_gain_front_inner')
+right_gain_rear = rospy.get_param('right_gain_rear')
+right_preload_front_outer = rospy.get_param('right_preload_front_outer')
+right_preload_front_inner = rospy.get_param('right_preload_front_inner')
+right_preload_rear = rospy.get_param('right_preload_rear')
+
 #Kinect-based controller values
 kp = 50 # mm/s / m
 
@@ -60,23 +83,23 @@ def process_input(data):
 
 
 def stop_system_right(right):
-    global send_control, velocity_threshold, previous_right_time, right_skate_fault
-    if not((right.velocity_filt_rear - send_control.command_target) < velocity_threshold):
-        send_control.calibration_enable = 0        
-        send_control.command_target = 0
-        print "Power is out on the Right!"
+    global send_control, previous_right_time, right_skate_fault
     right_skate_fault = right.skate_fault
     #previous_right_time = right.header.stamp 
     #previous_right_time = rospy.get_time()
 
+    #print "right_force_front_outer", float(float(right.force_front_outer - right_bias_front_outer)/right_gain_front_outer - right_preload_front_outer)/total_weight
+    #print "right_force_front_inner", float(float(right.force_front_inner - right_bias_front_inner)/right_gain_front_inner - right_preload_front_inner)/total_weight
+    #print "right_force_rear",        float(((right.force_rear - right_bias_rear)/right_gain_rear) - right_preload_rear)/total_weight
+    previous_right_time = rospy.get_time()
+
 def stop_system_left(left):
-    global send_control, velocity_threshold, previous_left_time, left_skate_fault
-    if not((left.velocity_filt_rear - send_control.command_target) < velocity_threshold):
-        send_control.calibration_enable = 0
-        send_control.command_target = 0
-        print "Power is out on the left!"
-    #previous_left_time = left.header.stamp 
-     
+    global send_control, previous_left_time, left_skate_fault
+    
+    #print "left_force_front_outer", float(float(left.force_front_outer - left_bias_front_outer)/left_gain_front_outer - left_preload_front_outer)/total_weight
+    #print "left_force_front_inner", float(float(left.force_front_inner - left_bias_front_inner)/left_gain_front_inner - left_preload_front_inner)/total_weight
+    #print "left_force_rear",        float(((left.force_rear - left_bias_rear)/left_gain_rear) - left_preload_rear)/total_weight
+
     left_skate_fault = left.skate_fault
     #previous_left_time = rospy.Time.now()
     previous_left_time = rospy.get_time()
@@ -109,6 +132,22 @@ def ask_zero_point():
         print "Service call failed: %s"%e
 
 
+def run_normalization_routine():
+   
+    rospy.wait_for_service('sensors_normalized')
+    try:
+        response = rospy.ServiceProxy('sensors_normalized', sensors_normalized)
+        #not passing one anymore to  move on from empty
+        response = response()
+        print "total_weight", response.total_weight
+        return resp1.total_weight
+        #return resp1
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
+
+
+
 #main higher level control code
 def send_controls():
   
@@ -123,8 +162,10 @@ def send_controls():
     i = 0
     rate = rospy.Rate(100) # 100hz
     pub.publish(send_control)
+
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)
+
     #delay
     #time.sleep(5)
     #rate = rospy.Rate(30.0)
@@ -178,6 +219,7 @@ def send_controls():
         rate.sleep()
 
 if __name__ == '__main__':
+    global total_weight
     if skip_kinect == False:
 	    try:
 		z_x, z_y, z_z = ask_zero_point()
@@ -192,6 +234,7 @@ if __name__ == '__main__':
 		z_z = 0.21108
 
     try:
+        total_weight = run_normalization_routine()  
         send_controls()
     except rospy.ROSInterruptException:
         pass
