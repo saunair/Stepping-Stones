@@ -119,7 +119,7 @@ def send_controls():
     previous_right_time  = rospy.Time.now()
     listener_trans = tf.TransformListener() 
     i = 0
-    rate = rospy.Rate(1) # 1hz
+    rate = rospy.Rate(100) # 100hz
     pub.publish(send_control)
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)

@@ -1,6 +1,6 @@
 //Revision 3/10/2017
-#define LEFT_SKATE 0
-#define RIGHT_SKATE 1
+#define LEFT_SKATE 1
+#define RIGHT_SKATE 0
 
 #define FRC_OUTER_CH 2
 #define FRC_INNER_CH 1
