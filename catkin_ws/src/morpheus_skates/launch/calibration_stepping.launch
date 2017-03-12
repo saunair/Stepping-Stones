@@ -1,7 +1,9 @@
 <launch>
 
-<node pkg="morpheus_skates" type="calibration_arduino.py" name="calibration_node" output="screen"/>
+<node pkg="morpheus_skates" type="calibration_force.py" name="calibration_node" output="screen"/>
 
+<node pkg="rosserial_python" type="serial_node.py" name="serial_node1" output="screen" args="_port:=/dev/ttyACM0 _baud:=115200"/>
+<node pkg="rosserial_python" type="serial_node2.py" name="serial_node2" output="screen" args="_port:=/dev/ttyACM1 _baud:=115200"/>
 
 
 <rosparam command="load" file="$(find morpheus_skates)/config/calibration_values.yaml" />
