@@ -56,6 +56,8 @@ def update_system_right(right):
     display_weight.right_force_front_outer = right_weight_front_outer
     display_weight.right_force_front_inner = right_weight_front_inner
     display_weight.right_force_rear        = right_weight_rear
+    display_weight.right_total = right_weight_front_outer + right_weight_front_inner + right_weight_rear
+    display_weight.total = display_weight.left_total + display_weight.right_total
 
 def update_system_left(left):
     global send_control, previous_left_time, left_bias_front_outer, left_bias_front_inner, left_bias_rear, left_gain_front_outer, left_gain_front_inner, left_gain_rear, left_preload_front_outer, left_preload_front_inner, left_preload_rear, total_weight, left_force_front_outer, left_force_front_inner, left_force_rear, display_weight
@@ -65,8 +67,8 @@ def update_system_left(left):
     display_weight.left_force_front_outer = left_weight_front_outer
     display_weight.left_force_front_inner = left_weight_front_inner
     display_weight.left_force_rear        = left_weight_rear
-    print left_weight_front_outer, 'left_weight_front_outer'
-
+    display_weight.left_total = left_weight_front_outer + left_weight_front_inner + left_weight_rear
+    display_weight.total = display_weight.left_total + display_weight.right_total
 
 
 if __name__ == '__main__':
@@ -81,6 +83,6 @@ if __name__ == '__main__':
     pub = rospy.Publisher('pounds_per_sensor', pounds_display, queue_size=100)
     while 1:
     	pub.publish(display_weight)
-        print "rospy spin"
+        # print "rospy spin"
 	r.sleep()
-        print "rospy not spinning"
+        # print "rospy not spinning"

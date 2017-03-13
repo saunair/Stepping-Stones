@@ -1,6 +1,7 @@
 {left_bias_front_inner: 15, left_bias_front_outer: 15, left_bias_rear: 15, left_gain_front_inner: 5.123817284621297,
-  left_gain_front_outer: 4.506665559200959, left_gain_rear: 0.658946908455322, left_preload_front_inner: 0.1628837290256932,
-  left_preload_front_outer: 0.19019446770193266, left_preload_rear: 1.1029978793136608,
-  right_bias_front_inner: 15, right_bias_front_outer: 15, right_bias_rear: 15, right_gain_front_inner: 4.723576560488393,
-  right_gain_front_outer: 4.122504413961696, right_gain_rear: 0.304304129342363, right_preload_front_inner: 0.19737815511796605,
-  right_preload_front_outer: 0.06626626195190817, right_preload_rear: 0.5847599325712342}
+  left_gain_front_outer: 4.506665559200959, left_gain_rear: 0.658946908455322, left_preload_front_inner: 42.761136562027,
+  left_preload_front_outer: 0.8903548034818519, left_preload_rear: 81.66748436076885,
+  right_bias_front_inner: 15, right_bias_front_outer: 15, right_bias_rear: 15, right_gain_front_inner: 4.733377631961449,
+  right_gain_front_outer: 4.147720584906509, right_gain_rear: 0.23211710727550872,
+  right_preload_front_inner: 28.38584045109497, right_preload_front_outer: 31.097190251849646,
+  right_preload_rear: 94.47741624392188}

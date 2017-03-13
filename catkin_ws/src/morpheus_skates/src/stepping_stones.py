@@ -3,6 +3,8 @@
 import rospy
 import time
 from std_msgs.msg import UInt16
+from std_msgs.msg import Float64
+
 from morpheus_skates.msg import skate_command
 from morpheus_skates.msg import skate_feedback
 import numpy
@@ -85,23 +87,11 @@ def process_input(data):
 def stop_system_right(right):
     global send_control, previous_right_time, right_skate_fault
     right_skate_fault = right.skate_fault
-    #previous_right_time = right.header.stamp 
-    #previous_right_time = rospy.get_time()
-
-    #print "right_force_front_outer", float(float(right.force_front_outer - right_bias_front_outer)/right_gain_front_outer - right_preload_front_outer)/total_weight
-    #print "right_force_front_inner", float(float(right.force_front_inner - right_bias_front_inner)/right_gain_front_inner - right_preload_front_inner)/total_weight
-    #print "right_force_rear",        float(((right.force_rear - right_bias_rear)/right_gain_rear) - right_preload_rear)/total_weight
     previous_right_time = rospy.get_time()
 
 def stop_system_left(left):
     global send_control, previous_left_time, left_skate_fault
-    
-    #print "left_force_front_outer", float(float(left.force_front_outer - left_bias_front_outer)/left_gain_front_outer - left_preload_front_outer)/total_weight
-    #print "left_force_front_inner", float(float(left.force_front_inner - left_bias_front_inner)/left_gain_front_inner - left_preload_front_inner)/total_weight
-    #print "left_force_rear",        float(((left.force_rear - left_bias_rear)/left_gain_rear) - left_preload_rear)/total_weight
-
     left_skate_fault = left.skate_fault
-    #previous_left_time = rospy.Time.now()
     previous_left_time = rospy.get_time()
 
 
@@ -140,7 +130,7 @@ def run_normalization_routine():
         #not passing one anymore to  move on from empty
         response = response()
         print "total_weight", response.total_weight
-        return resp1.total_weight
+        return response.total_weight
         #return resp1
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
@@ -150,10 +140,10 @@ def run_normalization_routine():
 
 #main higher level control code
 def send_controls():
-  
     global send_control, previous_left_time, previous_right_time
     global z_x, z_y, z_z
     pub = rospy.Publisher('servo', skate_command, queue_size=100)
+    kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
     
     rospy.init_node('stepping_stones', anonymous=True)
     previous_left_time  = rospy.get_time()
@@ -165,10 +155,6 @@ def send_controls():
 
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)
-
-    #delay
-    #time.sleep(5)
-    #rate = rospy.Rate(30.0)
     
     #subscribe to user inputs
     rospy.Subscriber("user_inputs", skate_command, process_input)
@@ -181,17 +167,13 @@ def send_controls():
             try:
                 (trans1,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                #continue
-                pass
+		pass
     
             try:
                 (trans2,rot2) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                #print "problem"
-                #continue
                 pass
     
-            
             #current kinect values 
             try:
                 x_current = ((trans2[0] + trans1[0])/2)
@@ -199,23 +181,19 @@ def send_controls():
                 z_current = ((trans2[2] + trans1[2])/2)
                                                   
                 x_error = z_x - x_current
-                #print x_error
                 if user_input.command_target > 100:
                     send_control.command_target = user_input.command_target + kp*x_error
                 else:
                     send_control.command_target = user_input.command_target
             except:
                 send_control.command_target = user_input.command_target
+		x_error = 0
                 pass
         
         send_control.header.stamp = rospy.Time.now()	
         
-        #check_timeout(rospy.get_time())
-        
         pub.publish(send_control)
-	#print "in loop"
-	#hello_str = "state = %d; set_point" % (send_control.state, send_control.set_point)
-        #print send_control.state, send_control.set_point
+        kin_pub.publish(x_error)
         rate.sleep()
 
 if __name__ == '__main__':

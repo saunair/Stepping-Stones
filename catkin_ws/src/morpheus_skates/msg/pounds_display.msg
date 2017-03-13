@@ -5,3 +5,6 @@ float32 left_force_rear
 float32 right_force_front_outer
 float32 right_force_front_inner
 float32 right_force_rear
+float32 right_total
+float32 left_total
+float32 total

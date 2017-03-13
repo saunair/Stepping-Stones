@@ -31,9 +31,9 @@ class skate(object):
 	self.name = name
         
         ########### set appropriate values ########
-	self.MAX_preload_F1 = 1000
-        self.MAX_preload_F2 = 1000
-        self.MAX_preload_F3 = 80
+	self.MAX_preload_F1 = 50
+        self.MAX_preload_F2 = 50
+        self.MAX_preload_F3 = 100
     	
 	########### initialize variables ##########
 	self.w = -1
@@ -289,12 +289,15 @@ class skate(object):
         self.count = 1402
 	#self.restart_routine()
 
-def start(left_skate_start, right_skate_start):
+def start(left_skate_start, right_skate_start, skate_side):
     rospy.init_node('bias', anonymous=True)
-    #rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
-    rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
-    right_skate_start.run()
-    #left_skate_start.run()
+    
+    if(skate_side == 1):
+        rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
+        left_skate_start.run()
+    elif(skate_side == 2):
+        rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
+        right_skate_start.run()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
@@ -302,4 +305,6 @@ def start(left_skate_start, right_skate_start):
 if __name__ == '__main__':                           
     right_skate = skate('right')
     left_skate =  skate('left')
-    start(left_skate, right_skate)
+    skate_side = input("enter 1 for left, 2 for right")
+
+    start(left_skate, right_skate, skate_side)
