@@ -106,7 +106,6 @@ class skate(object):
 	   ###### ignore these values for sync!!!! ######### 
 	   if self.count<1200 and self.count > 202:
                 self.count += 1
-                print "wait"
 		
 	   elif self.count==1200:
 		
@@ -122,13 +121,11 @@ class skate(object):
            elif self.count>1200 and self.count<1400:
        	   	
 		if self.sensor_number == 1:
-                    
 		    self.gain_front_outer.append(float(self.data.force_front_outer - self.bias_front_outer)/self.w)
 		    #print "check for sanjay", (data.force_front_outer - self.bias_front_outer), self.w
 		elif self.sensor_number == 2:
            	    self.gain_front_inner.append(float(self.data.force_front_inner - self.bias_front_inner)/self.w)
 		elif self.sensor_number == 3:
-                    print "checkkkkk"
        	   	    self.gain_rear.append(float(self.data.force_rear - self.bias_rear)/self.w)
 		self.count += 1
            
@@ -294,10 +291,10 @@ class skate(object):
 
 def start(left_skate_start, right_skate_start):
     rospy.init_node('bias', anonymous=True)
-    rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
-    #rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
-    #right_skate_start.run()
-    left_skate_start.run()
+    #rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
+    rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
+    right_skate_start.run()
+    #left_skate_start.run()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 

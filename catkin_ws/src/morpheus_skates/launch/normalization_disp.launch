@@ -2,7 +2,8 @@
 <rosparam command="load" file="$(find morpheus_skates)/config/calibration_values.yaml" />
 <node pkg="morpheus_skates" type="force_normalization.py" name="normalization" output="screen"/>
 <node pkg="morpheus_skates" type="normalization_display.py" name="normalization_display" output="screen"/>
+<node pkg="morpheus_skates" type="pounds_display.py" name="pounds_display" output="screen"/>
 <node pkg="morpheus_skates" type="yaml_serv.py" name="yaml_serv" output="screen"/>
-<node pkg="rosserial_python" type="serial_node.py" name="serial_node1" output="screen" args="_port:=/dev/ttyACM0 _baud:=921600"/>
-<node pkg="rosserial_python" type="serial_node2.py" name="serial_node2" output="screen" args="_port:=/dev/ttyACM1 _baud:=921600"/>
+<node pkg="rosserial_python" type="serial_node.py" name="serial_node1" output="screen" args="_port:=/dev/ttyACM0 _baud:=115200"/>
+<node pkg="rosserial_python" type="serial_node2.py" name="serial_node2" output="screen" args="_port:=/dev/ttyACM1 _baud:=115200"/>
 </launch>

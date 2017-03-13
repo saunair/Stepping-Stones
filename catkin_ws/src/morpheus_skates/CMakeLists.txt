@@ -52,6 +52,7 @@ add_message_files(
    FILES
    skate_feedback.msg
    skate_command.msg
+   pounds_display.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -126,10 +127,18 @@ include_directories(
 catkin_install_python(PROGRAMS src/calibration_arduino.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+catkin_install_python(PROGRAMS src/calibration_force.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+catkin_install_python(PROGRAMS src/pounds_display.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 catkin_install_python(PROGRAMS src/kinect_zero.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 catkin_install_python(PROGRAMS src/force_normalization.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+catkin_install_python(PROGRAMS src/normalization_display.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 catkin_install_python(PROGRAMS src/stepping_stones.py
