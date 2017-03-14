@@ -198,7 +198,6 @@ def data_write():
         d["right_gain_f3"] = rospy.get_param("right_gain_f3")
     
     if left_bias_f1 != -1: 
-        #left_gain_f2 =1000
         
         d["left_bias_f1"] = left_bias_f1
         d["left_bias_f2"] = left_bias_f2
@@ -244,18 +243,6 @@ def data_write():
 
     stream = file(config_file, 'w')
     yaml.dump(d, stream)
-    #rospy.dump_params(config_file, "left_bias_f1", verbose=False)
-    #rospy.dump_params(config_file, "left_bias_f2", verbose=False)
-    #rospy.dump_params(config_file, "left_bias_f3", verbose=False)
-    #rospy.dump_params(config_file, "left_gain_f1", verbose=False)
-   # rospy.dump_params(config_file, "left_gain_f2", verbose=False)
-   # rospy.dump_params(config_file, "left_gain_f3", verbose=False)
-   # rospy.dump_params(config_file, "right_bias_f1", verbose=False)
-   # rospy.dump_params(config_file, "right_bias_f2", verbose=False)
-   # rospy.dump_params(config_file, "right_bias_f3", verbose=False)
-   # rospy.dump_params(config_file, "right_gain_f1", verbose=False)
-   # rospy.dump_params(config_file, "right_gain_f2", verbose=False)
-   # rospy.dump_params(config_file, "right_gain_f3", verbose=False)
     print left_gain_f2
     print rospy.get_param("Written the values in YAML!!!!")
     restart_routine():    
