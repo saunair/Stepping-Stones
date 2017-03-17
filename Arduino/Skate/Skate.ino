@@ -2,9 +2,9 @@
 #define LEFT_SKATE 1
 #define RIGHT_SKATE 0
 
-#define FRC_OUTER_CH 2
+#define FRC_OUTER_CH 0
 #define FRC_INNER_CH 1
-#define FRC_REAR_CH 0
+#define FRC_REAR_CH 2
 
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
