@@ -1,6 +1,6 @@
-//Revision 3/10/2017
-#define LEFT_SKATE 1
-#define RIGHT_SKATE 0
+//Revision 3/18/2017
+#define LEFT_SKATE_IND_PIN 52
+#define RIGHT_SKATE_IND_PIN 53
 
 #define FRC_OUTER_CH 0
 #define FRC_INNER_CH 1
@@ -56,6 +56,9 @@ float velGainsRear[] = {0,0.0006,0};
 float frontVelCmd;
 float rearVelCmd;
 
+bool leftSkate = false;
+bool rightSkate = false;
+
 //UM7
 const byte allRequests[] = {115,110,112,72,109,2,6,115,110,112,76,101,2,2,115,110,112,76,97,1,254};
 /*const byte quatRequest[] = {115,110,112,72,109,2,6};
@@ -73,38 +76,46 @@ void doEncoderFrontChA();
 void doEncoderFrontChB();
 void doEncoderRearChA();
 void doEncoderRearChB();
-void serialEvent1();
 
 //Sensor data type and publisher declaration
 morpheus_skates::skate_feedback feedback;
-#if LEFT_SKATE == true
-  ros::Publisher ros_pub("left", &feedback);
-#endif
-#if RIGHT_SKATE == true
-  ros::Publisher ros_pub("right", &feedback);
-#endif
+ros::Publisher ros_pub_left("left", &feedback);
+ros::Publisher ros_pub_right("right", &feedback);
 ros::Subscriber<morpheus_skates::skate_command> sub("servo", ros_sub_cb);
 ros::NodeHandle nh;
 
 Force forceSensors(FRC_OUTER_CH,FRC_INNER_CH,FRC_REAR_CH);
 
 Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN); 
-Control frontControl(posnGainsFront,velGainsFront,LEFT_SKATE==true,CTRL_PERIOD_MS);
+Control frontControl(posnGainsFront,velGainsFront,CTRL_PERIOD_MS);
 
 Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN);
-Control rearControl(posnGainsRear,velGainsRear,RIGHT_SKATE==true,CTRL_PERIOD_MS);
+Control rearControl(posnGainsRear,velGainsRear,CTRL_PERIOD_MS);
 
 UM imu;
 
 void setup() {
-  if(LEFT_SKATE == RIGHT_SKATE) {
+  pinMode(LEFT_SKATE_IND_PIN, INPUT);
+  pinMode(RIGHT_SKATE_IND_PIN, INPUT);
+  if(digitalRead(LEFT_SKATE_IND_PIN) == digitalRead(RIGHT_SKATE_IND_PIN)) {
     while(1);
+  }
+  if(digitalRead(LEFT_SKATE_IND_PIN) == LOW) {
+    leftSkate = true;    
+  }
+  if(digitalRead(RIGHT_SKATE_IND_PIN) == LOW) {
+    rightSkate = true;
   }
   
   //ROS Setup
   nh.initNode();   
   nh.getHardware()->setBaud(115200);
-  nh.advertise(ros_pub);
+  if(leftSkate == true) {
+    nh.advertise(ros_pub_left);
+  }
+  if(rightSkate == true) {
+    nh.advertise(ros_pub_right);
+  }
   nh.subscribe(sub);
 
   //Set up Force Sensing
@@ -116,11 +127,13 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENC1_CHA_PIN), doEncoderFrontChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC1_CHB_PIN), doEncoderFrontChB, CHANGE);
   frontDrive.initializeDrive();
+  frontControl.setInvertFlag(leftSkate == true);
 
   //Set Up Rear Skate
   attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoderRearChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
   rearDrive.initializeDrive();
+  rearControl.setInvertFlag(rightSkate == true);
 
   Serial1.begin(115200);
   Serial1.write(allRequests,21);
@@ -167,8 +180,12 @@ void loop(){
     feedback.debug_int1 = int(micros() - startTime);
 
     formPacket();
-    ros_pub.publish(&feedback);
-    //feedback.debug_int3 = 0;
+    if(leftSkate == true) {
+      ros_pub_left.publish(&feedback);
+    }
+    if(rightSkate == true) {
+      ros_pub_right.publish(&feedback);
+    }
     nh.spinOnce();
     feedback.debug_int2 = int(micros() - startTime);
     controlLoopActive = false;
@@ -252,7 +269,6 @@ ISR (ADC_vect) {
   forceSensors.serviceSensors(ADC); 
 }
 
-//void serialEvent1() {
 ISR (USART1_RX_vect) {
   char data;
   data = UDR1;

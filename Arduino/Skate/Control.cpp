@@ -5,19 +5,23 @@
 #include "Arduino.h"
 #include "Control.h"
 
-Control::Control(float *posnGains,float *velGains,bool invert,int controlPeriod) {
+Control::Control(float *posnGains,float *velGains,int controlPeriod) {
   posn_Kp = posnGains[0];
   posn_Ki = posnGains[1];
   posn_Kd = posnGains[2];
   vel_Kp = velGains[0];
   vel_Ki = velGains[1];
   vel_Kd = velGains[2];
-  invertFlag = invert;
   controlPeriodMs = controlPeriod;
   modeTransitionFlag = false;
   lastControlTime = millis();
 
   resetIntegrators();
+}
+
+
+void Control::setInvertFlag(bool invert) {
+  invertFlag = invert;
 }
 
 
