@@ -56,11 +56,14 @@ typedef enum {
 
 class Drive {
   public:
-    Drive(int,int,HardwareSerial);
+    Drive(int,int,HardwareSerial*);
     void initializeDrive();
     void serviceEncoder(int);
     void updateState();
     void resetState();
+    void setDutyCycle(float);
+    void setCurrent(float);
+    void resetTimeout();
     float getPosition();
     float getVelocity();
     void setCommand(float);
@@ -70,7 +73,7 @@ class Drive {
   private:
     int encChaPin;
     int encChbPin;
-    HardwareSerial serial;
+    HardwareSerial* serial;
     volatile long encCount;
     boolean A_set;
     boolean B_set;

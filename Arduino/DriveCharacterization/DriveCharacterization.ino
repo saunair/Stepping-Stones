@@ -1,4 +1,4 @@
-//Revision 3/19/2017
+//Revision 3/20/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -41,24 +41,24 @@ void doEncoderFrontChB();
 void doEncoderRearChA();
 void doEncoderRearChB();
 
-Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,Serial2); 
-Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,Serial3);
+Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,&Serial2); 
+Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,&Serial3);
 
 
 void setup() {
   //Determine Skate Side
-  pinMode(LEFT_SKATE_IND_PIN, INPUT);
-  pinMode(RIGHT_SKATE_IND_PIN, INPUT);
+  pinMode(LEFT_SKATE_IND_PIN, INPUT_PULLUP);
+  pinMode(RIGHT_SKATE_IND_PIN, INPUT_PULLUP);
   if(digitalRead(LEFT_SKATE_IND_PIN) == digitalRead(RIGHT_SKATE_IND_PIN)) {
     while(1);
   }
   if(digitalRead(LEFT_SKATE_IND_PIN) == LOW) {
     leftSkate = true; 
-    println("Left Skate");   
+    Serial.println("Left Skate");   
   }
   if(digitalRead(RIGHT_SKATE_IND_PIN) == LOW) {
     rightSkate = true;
-    println("Right Skate");
+    Serial.println("Right Skate");
   }
   
   //Set Up Front Skate
@@ -147,7 +147,7 @@ void loop(){
         break;
 
       case BRAKE_ON_2:
-        dutyCycle = 0
+        dutyCycle = 0;
         break;
     }
 
