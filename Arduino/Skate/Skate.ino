@@ -1,4 +1,4 @@
-//Revision 3/18/2017
+//Revision 3/19/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -95,8 +95,8 @@ Control rearControl(posnGainsRear,velGainsRear,CTRL_PERIOD_MS);
 UM imu;
 
 void setup() {
-  pinMode(LEFT_SKATE_IND_PIN, INPUT);
-  pinMode(RIGHT_SKATE_IND_PIN, INPUT);
+  pinMode(LEFT_SKATE_IND_PIN, INPUT_PULLUP);
+  pinMode(RIGHT_SKATE_IND_PIN, INPUT_PULLUP);
   if(digitalRead(LEFT_SKATE_IND_PIN) == digitalRead(RIGHT_SKATE_IND_PIN)) {
     while(1);
   }

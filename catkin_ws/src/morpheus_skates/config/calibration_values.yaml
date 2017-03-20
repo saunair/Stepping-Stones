@@ -1,7 +1,7 @@
-{left_bias_front_inner: 15, left_bias_front_outer: 15, left_bias_rear: 15, left_gain_front_inner: 5.123817284621297,
-  left_gain_front_outer: 4.506665559200959, left_gain_rear: 0.658946908455322, left_preload_front_inner: 42.761136562027,
-  left_preload_front_outer: 0.8903548034818519, left_preload_rear: 81.66748436076885,
-  right_bias_front_inner: 15, right_bias_front_outer: 15, right_bias_rear: 15, right_gain_front_inner: 4.733377631961449,
-  right_gain_front_outer: 4.147720584906509, right_gain_rear: 0.23211710727550872,
-  right_preload_front_inner: 28.38584045109497, right_preload_front_outer: 31.097190251849646,
-  right_preload_rear: 94.47741624392188}
+{left_bias_front_inner: 15, left_bias_front_outer: 15, left_bias_rear: 15, left_gain_front_inner: 4.252840780478961,
+  left_gain_front_outer: 4.488184725279282, left_gain_rear: 4.5502063890883075, left_preload_front_inner: 47.0002810114461,
+  left_preload_front_outer: 47.532767178098375, left_preload_rear: 46.73174787286217,
+  right_bias_front_inner: 16, right_bias_front_outer: 15, right_bias_rear: 15, right_gain_front_inner: 4.4952448191370085,
+  right_gain_front_outer: 4.063017791661002, right_gain_rear: 4.9500179468772325,
+  right_preload_front_inner: 44.65593231237294, right_preload_front_outer: 44.64686393413671,
+  right_preload_rear: 39.625688589256136}
