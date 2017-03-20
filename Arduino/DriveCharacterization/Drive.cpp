@@ -8,7 +8,7 @@
 #include "crc.h"
 
 
-Drive::Drive(int ECA_pin,int ECB_pin,HardwareSerial &port) {
+Drive::Drive(int ECA_pin,int ECB_pin,HardwareSerial* port) {
   encChaPin = ECA_pin;
   encChbPin = ECB_pin;
   serial = port;
@@ -87,40 +87,44 @@ void Drive::setDutyCycle(float dutyCycle) {
   crc = crc16(sendBuffer,&sendIndex);
 
   //These lines can be moved into a common sendPacket function
-  serial.write(2);
-  serial.write(sendIndex);
-  serial.write(sendBuffer);
-  serial.write(crc);
-  serial.write(3);
+  serial->write(2);
+  serial->write(sendIndex);
+  serial->write(sendBuffer,sendIndex);
+  serial->write(crc);
+  serial->write(3);
 }
 
 
 void Drive::setCurrent(float current) {
   unsigned char sendBuffer[30];
   int32_t sendIndex = 0;
+  unsigned short crc;
 
-  send_buffer[send_index++] = COMM_SET_CURRENT;
-  buffer_append_float32(send_buffer, current, 1000.0, &send_index);  
+  sendBuffer[sendIndex++] = COMM_SET_CURRENT;
+  buffer_append_float32(sendBuffer, current, 1000.0, &sendIndex);  
 
-  serial.write(2);
-  serial.write(sendIndex);
-  serial.write(sendBuffer);
-  serial.write(crc);
-  serial.write(3);  
+  //These lines can be moved into a common sendPacket function
+  serial->write(2);
+  serial->write(sendIndex);
+  serial->write(sendBuffer,sendIndex);
+  serial->write(crc);
+  serial->write(3); 
 }
 
 
 void Drive::resetTimeout() {
   unsigned char sendBuffer[30];
   int32_t sendIndex = 0;
+  unsigned short crc;
 
-  send_buffer[send_index++] = COMM_ALIVE;
+  sendBuffer[sendIndex++] = COMM_ALIVE;
   crc = crc16(sendBuffer,&sendIndex);
 
-  serial.write(2);
-  serial.write(sendIndex);
-  serial.write(sendBuffer);
-  serial.write(crc);
-  serial.write(3);
+  //These lines can be moved into a common sendPacket function
+  serial->write(2);
+  serial->write(sendIndex);
+  serial->write(sendBuffer,sendIndex);
+  serial->write(crc);
+  serial->write(3);
 }
 
