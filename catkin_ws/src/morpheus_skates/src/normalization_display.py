@@ -62,7 +62,7 @@ def stop_system_right(right):
     normalized_force_values.right_normal_front_outer = right_force_front_outer   
     normalized_force_values.right_normal_front_outer = right_force_front_inner 
     normalized_force_values.right_normal_front_outer = right_force_rear        
-
+    normalized_force_values.right_normal_total = normalized_force_values.right_normal_front_outer +  normalized_force_values.right_normal_front_outer + normalized_force_values.right_normal_front_outer
 
 
 
@@ -74,9 +74,7 @@ def stop_system_left(left):
     normalized_force_values.left_normal_front_outer = left_force_front_outer 
     normalized_force_values.left_normal_front_outer = left_force_front_inner 
     normalized_force_values.left_normal_front_outer = left_force_rear        
-    
-
-
+    normalized_force_values.left_normal_total = normalized_force_values.left_normal_front_outer +  normalized_force_values.left_normal_front_outer + normalized_force_values.left_normal_front_outer
 
 def run_normalization_routine():
 
@@ -92,15 +90,13 @@ def run_normalization_routine():
         print "Service call failed: %s"%e
 
 
-
-
 def gait_determination():
     global right_force_front_outer,right_force_front_inner,right_force_rear,left_force_front_inner,left_force_front_outer,left_force_rear, total_weight, normalized_force_values
 
     left_foot_on_ground = (float((left_force_rear + left_force_front_inner + left_force_front_outer)*total_weight) > left_single_stance_threshold)
     right_foot_on_ground = (float((right_force_front_inner + right_force_front_outer + right_force_rear)*total_weight) > right_single_stance_threshold)
 
-
+    normalized_force_values.normal_total =  normalized_force_values.left_normal_total +  normalized_force_values.right_normal_total
     print "gait deter node"
     if(left_foot_on_ground and right_foot_on_ground):
         print "Double Stance"
@@ -121,17 +117,16 @@ if __name__ == '__main__':
     global total_weight, normalized_force_values
     rospy.init_node('normalization_display', anonymous=True)
     total_weight = run_normalization_routine()
-    print "Total weight of user = ", total_weight
     rospy.Subscriber("right", skate_feedback, stop_system_right)
     rospy.Subscriber("left", skate_feedback, stop_system_left)
     pub = rospy.Publisher('normalized_force_per_sensor', user_force_normalized, queue_size=100)
-    
+    r = rospy.Rate(50) 
     while not rospy.is_shutdown():
         gait_determination()
         pub.publish(normalized_force_values)
-        rospy.spin()
+        #rospy.spin()
         #print "working"
-        rate.sleep()
+        r.sleep()
 
 
         

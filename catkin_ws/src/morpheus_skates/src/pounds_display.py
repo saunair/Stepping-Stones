@@ -81,7 +81,7 @@ if __name__ == '__main__':
     rospy.Subscriber("right", skate_feedback, update_system_right)
     rospy.Subscriber("left", skate_feedback, update_system_left)
     pub = rospy.Publisher('pounds_per_sensor', pounds_display, queue_size=100)
-    while 1:
+    while not rospy.is_shutdown():
     	pub.publish(display_weight)
         # print "rospy spin"
 	r.sleep()

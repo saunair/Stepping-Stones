@@ -102,9 +102,6 @@ def normalize_calculation(right_skate, left_skate):
 			##set it in parameter server as well!!!
 
 			rospy.set_param("total_weight",total_weight)
-			print "saurabh", total_weight,"kou",total_weight_right,"sanju",total_weight_left,"front_right",total_weight_right_front,"front_left",total_weight_left_front,"rear_right",right_skate_force_rear
-			print "rear_left",left_skate_force_rear
-			print "done sending"
 			s = rospy.Service('sensors_normalized', sensors_normalized, handle_norm_service)
 			rospy.spin()
 			 
