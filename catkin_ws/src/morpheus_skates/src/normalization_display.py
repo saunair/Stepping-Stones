@@ -94,7 +94,7 @@ def run_normalization_routine():
 
 
 
-def gait_determination(pub):
+def gait_determination():
     global right_force_front_outer,right_force_front_inner,right_force_rear,left_force_front_inner,left_force_front_outer,left_force_rear, total_weight, normalized_force_values
 
     left_foot_on_ground = (float((left_force_rear + left_force_front_inner + left_force_front_outer)*total_weight) > left_single_stance_threshold)
@@ -114,26 +114,24 @@ def gait_determination(pub):
     if(not left_foot_on_ground and not right_foot_on_ground):
         print "In Air"
 
-    pub.publish(normalized_force_values)
   
 
 if __name__ == '__main__':
     
-    global total_weight
-    total_weight = 0
+    global total_weight, normalized_force_values
     rospy.init_node('normalization_display', anonymous=True)
     total_weight = run_normalization_routine()
-    print total_weight
-    #a = input('check')
+    print "Total weight of user = ", total_weight
     rospy.Subscriber("right", skate_feedback, stop_system_right)
     rospy.Subscriber("left", skate_feedback, stop_system_left)
     pub = rospy.Publisher('normalized_force_per_sensor', user_force_normalized, queue_size=100)
     
     while not rospy.is_shutdown():
-        gait_determination(pub)
+        gait_determination()
+        pub.publish(normalized_force_values)
         rospy.spin()
         #print "working"
-        #rate.sleep()
+        rate.sleep()
 
 
         

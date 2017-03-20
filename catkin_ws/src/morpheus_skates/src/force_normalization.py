@@ -111,43 +111,9 @@ def normalize_calculation(right_skate, left_skate):
 			# return None
 	
 
-
-# def gait_determination(right_skate,left_skate):
-# 	global calibration_data
-
-# 	left_skate_force_front_outer = float(float(left_skate.force_front_outer - calibration_data['left_bias_front_outer'])/calibration_data['left_gain_front_outer']) - calibration_data['left_preload_front_outer']
-# 	left_skate_force_front_inner = float(float(left_skate.force_front_inner - calibration_data['left_bias_front_inner'])/calibration_data['left_gain_front_inner']) - calibration_data['left_preload_front_inner']
-# 	left_skate_force_rear        = float(float(left_skate.force_rear        - calibration_data['left_bias_rear'])/calibration_data['left_gain_rear']) - calibration_data['left_preload_rear'] 
-
-# 	right_skate_force_front_outer = float(float(right_skate.force_front_outer - calibration_data['right_bias_front_outer'])/calibration_data['right_gain_front_outer']) - calibration_data['right_preload_front_outer']
-# 	right_skate_force_front_inner = float(float(right_skate.force_front_inner - calibration_data['right_bias_front_inner'])/calibration_data['right_gain_front_inner'])-calibration_data['right_preload_front_inner']
-# 	right_skate_force_rear        = float(float(right_skate.force_rear        - calibration_data['right_bias_rear'])/calibration_data['right_gain_rear']) - calibration_data['right_preload_rear'] 
-
-# 	left_foot_on_ground = (float(left_skate_force_rear + left_skate_force_front_inner + left_skate_force_front_outer) > left_single_stance_threshold)
-# 	right_foot_on_ground = (float(right_skate_force_front_inner + right_skate_force_front_outer + right_skate_force_rear) > right_single_stance_threshold)
-
-# 	if(left_foot_on_ground and right_foot_on_ground):
-# 		print "Double Stance"
-
-# 	if(left_foot_on_ground and not right_foot_on_ground):
-# 		print "Single Stance on Left Foot"
-
-# 	if(right_foot_on_ground and not left_foot_on_ground):
-# 		print "Single Stance on Right Foot"
-
-# 	if(not left_foot_on_ground and not right_foot_on_ground):
-# 		print "In Air"
-
-        #elif (float(left_force_front_outer + left_force_front_inner + left_force_rear)/total_weight > left_double_stance_threshold) and (float(right_force_front_outer + right_force_front_inner + right_force_rear)/total_weight) > right_double_stance_threshold:
-		#print "Left Foot: ",left_foot_on_ground," Right Foot: ",right_foot_on_ground
-
 if __name__ == '__main__':                           
 	right_skate = skate('right')
 	left_skate  = skate('left')
 	rospy.Subscriber("right", skate_feedback, right_skate.update_sensor_readings)
 	rospy.Subscriber("left", skate_feedback, left_skate.update_sensor_readings)
-	#not sure if we need a delay
-	#time.sleep(20)
 	normalize_calculation(right_skate, left_skate)
-	# while 1:
-	# 	gait_determination(right_skate, left_skate)
