@@ -53,6 +53,7 @@ add_message_files(
    skate_feedback.msg
    skate_command.msg
    pounds_display.msg
+   user_force_normalized.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -135,6 +136,8 @@ catkin_install_python(PROGRAMS src/pounds_display.py
 catkin_install_python(PROGRAMS src/kinect_zero.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+catkin_install_python(PROGRAMS src/vr_send.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 catkin_install_python(PROGRAMS src/force_normalization.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
@@ -151,17 +154,20 @@ catkin_install_python(PROGRAMS src/take_user_input.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Declare a C++ library
-add_library(motor
-    src/${morpheus_skate}/imu_integrator.cpp
-)
+##add_library(morpheus
+##    src/${morpheus_skate}/imu_integrator.cpp
+#)
 
+#add_library(talker
+#    src/${morpheus_skate}/vr_talker.cpp
+#)
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
  #add_dependencies(motor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(motor_node src/motor_node.cpp)
+#add_executable(morpheus src/vr_talker.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above

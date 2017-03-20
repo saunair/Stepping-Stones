@@ -94,12 +94,14 @@ def run_normalization_routine():
 
 
 
-def gait_determination():
+def gait_determination(pub):
     global right_force_front_outer,right_force_front_inner,right_force_rear,left_force_front_inner,left_force_front_outer,left_force_rear, total_weight, normalized_force_values
 
     left_foot_on_ground = (float((left_force_rear + left_force_front_inner + left_force_front_outer)*total_weight) > left_single_stance_threshold)
     right_foot_on_ground = (float((right_force_front_inner + right_force_front_outer + right_force_rear)*total_weight) > right_single_stance_threshold)
 
+
+    print "gait deter node"
     if(left_foot_on_ground and right_foot_on_ground):
         print "Double Stance"
 
@@ -128,7 +130,7 @@ if __name__ == '__main__':
     pub = rospy.Publisher('normalized_force_per_sensor', user_force_normalized, queue_size=100)
     
     while not rospy.is_shutdown():
-        gait_determination()
+        gait_determination(pub)
         rospy.spin()
         #print "working"
         #rate.sleep()

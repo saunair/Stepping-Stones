@@ -44,8 +44,11 @@ skate::skate(char name[6]) {
 }
 
 /* quarternions to matrix function, uses a global matrix to manipulate values */
-double*** quatToMatrix( quate q)
+double** quatToMatrix( quate q)
 {
+
+    double** rotation = 0;
+    rotation = new double*[3];
     double sqw = q.w*q.w;
     double sqx = q.x*q.x;
     double sqy = q.y*q.y;
