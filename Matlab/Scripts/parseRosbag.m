@@ -27,6 +27,11 @@ function parseRosbag(filename)
     %    user_position_offset = parseTopic(bag,'/user_position_offset','std_msgs/Float64');
     %end
     
+    
+    if(isempty(strmatch('/tf',bag.AvailableTopics.Properties.RowNames)) == 0)
+         = parseTopic(bag,'/normalized_force_per_sensor','morpheus_skates/user_force_normalized');
+    end
+    
     save(strcat('..\Mat Files\',filename,'.mat'));    
 end
 
