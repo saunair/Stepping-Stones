@@ -1,4 +1,4 @@
-//Revision 3/20/2017
+//Revision 3/21/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -11,6 +11,7 @@
 #define CTRL_PERIOD_MS 1500.0
 #define SAMP_PERIOD_MS 2.0
 #define DISP_PERIOD_MS 10.0
+#define ALIVE_PERIOD_MS 500.0
 
 #include "Drive.h"
 
@@ -46,6 +47,8 @@ Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,&Serial3);
 
 
 void setup() {
+  Serial.begin(115200);
+  
   //Determine Skate Side
   pinMode(LEFT_SKATE_IND_PIN, INPUT_PULLUP);
   pinMode(RIGHT_SKATE_IND_PIN, INPUT_PULLUP);
@@ -71,7 +74,6 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
   rearDrive.initializeDrive();
 
-  Serial.begin(115200);
   Serial.println("Duty Cycle,Front Velocity,Rear Velocity");
 }
 
@@ -86,7 +88,7 @@ void loop(){
   currentTimeStamp = micros();
 
   //Alive Loop
-  if((currentTimeStamp - lastAliveTimeStamp) >= (500 * 1000)) {
+  if((currentTimeStamp - lastAliveTimeStamp) >= (ALIVE_PERIOD_MS*1000)) {
     lastAliveTimeStamp = currentTimeStamp;
     
     frontDrive.resetTimeout();
@@ -105,7 +107,7 @@ void loop(){
   if((currentTimeStamp - lastDispTimeStamp) >= (DISP_PERIOD_MS*1000)) {
     lastDispTimeStamp = currentTimeStamp;
 
-    if(((currentTimeStamp - lastDispTimeStamp) >= (500 * 1000)) && ((currentState == RAMP_UP_POS) || (currentState == RAMP_UP_NEG))) {
+    if(((currentTimeStamp - lastCtrlTimeStamp) >= (ALIVE_PERIOD_MS * 1000)) && ((currentState == RAMP_UP_POS) || (currentState == RAMP_UP_NEG))) {
       Serial.print(dutyCycle);
       Serial.print(",");
       Serial.print(frontDrive.getVelocity());

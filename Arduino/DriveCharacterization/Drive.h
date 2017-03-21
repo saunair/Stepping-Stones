@@ -66,7 +66,6 @@ class Drive {
     void resetTimeout();
     float getPosition();
     float getVelocity();
-    void setCommand(float);
     long updateTimeDelta;
     long lastUpdateTime;
 
@@ -74,6 +73,9 @@ class Drive {
     int encChaPin;
     int encChbPin;
     HardwareSerial* serial;
+    uint8_t sendBuffer[30];
+    int32_t sendIndex;
+    void sendCommand();
     volatile long encCount;
     boolean A_set;
     boolean B_set;

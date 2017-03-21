@@ -25,7 +25,7 @@ Drive::Drive(int ECA_pin,int ECB_pin,HardwareSerial* port) {
 void Drive::initializeDrive() {
   pinMode(encChaPin, INPUT); 
   pinMode(encChbPin, INPUT);
-
+  serial->begin(115200);
   setDutyCycle(0);  
 }
 
@@ -78,53 +78,46 @@ float Drive::getVelocity() {
 
 
 void Drive::setDutyCycle(float dutyCycle) {
-  unsigned char sendBuffer[30];
-  int32_t sendIndex = 0;
   unsigned short crc;
+  sendIndex = 0;
   
   sendBuffer[sendIndex++] = COMM_SET_DUTY;
   buffer_append_float32(sendBuffer, dutyCycle, 100000.0, &sendIndex);
-  crc = crc16(sendBuffer,&sendIndex);
+  crc = crc16(sendBuffer,sendIndex);
+  buffer_append_uint16(sendBuffer, crc, &sendIndex);
 
-  //These lines can be moved into a common sendPacket function
-  serial->write(2);
-  serial->write(sendIndex);
-  serial->write(sendBuffer,sendIndex);
-  serial->write(crc);
-  serial->write(3);
+  sendCommand();
 }
 
 
 void Drive::setCurrent(float current) {
-  unsigned char sendBuffer[30];
-  int32_t sendIndex = 0;
   unsigned short crc;
+  sendIndex = 0;
 
   sendBuffer[sendIndex++] = COMM_SET_CURRENT;
   buffer_append_float32(sendBuffer, current, 1000.0, &sendIndex);  
+  crc = crc16(sendBuffer,sendIndex);
+  buffer_append_uint16(sendBuffer, crc, &sendIndex);
 
-  //These lines can be moved into a common sendPacket function
-  serial->write(2);
-  serial->write(sendIndex);
-  serial->write(sendBuffer,sendIndex);
-  serial->write(crc);
-  serial->write(3); 
+  sendCommand();
 }
 
 
 void Drive::resetTimeout() {
-  unsigned char sendBuffer[30];
-  int32_t sendIndex = 0;
   unsigned short crc;
+  sendIndex = 0;
 
   sendBuffer[sendIndex++] = COMM_ALIVE;
-  crc = crc16(sendBuffer,&sendIndex);
+  crc = crc16(sendBuffer,sendIndex);
+  buffer_append_uint16(sendBuffer, crc, &sendIndex);
 
-  //These lines can be moved into a common sendPacket function
-  serial->write(2);
-  serial->write(sendIndex);
-  serial->write(sendBuffer,sendIndex);
-  serial->write(crc);
-  serial->write(3);
+  sendCommand();
 }
 
+
+void Drive::sendCommand() {
+  serial->write(2);
+  serial->write(sendIndex-2);
+  serial->write(sendBuffer,sendIndex);
+  serial->write(3);
+}
