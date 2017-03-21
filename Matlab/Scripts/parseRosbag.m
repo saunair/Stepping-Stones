@@ -28,9 +28,9 @@ function parseRosbag(filename)
     %end
     
     
-    if(isempty(strmatch('/tf',bag.AvailableTopics.Properties.RowNames)) == 0)
-         = parseTopic(bag,'/normalized_force_per_sensor','morpheus_skates/user_force_normalized');
-    end
+    %if(isempty(strmatch('/tf',bag.AvailableTopics.Properties.RowNames)) == 0)
+    %     = parseTopic(bag,'/normalized_force_per_sensor','morpheus_skates/user_force_normalized');
+    %end
     
     save(strcat('..\Mat Files\',filename,'.mat'));    
 end
