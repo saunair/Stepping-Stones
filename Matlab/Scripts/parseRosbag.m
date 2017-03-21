@@ -10,6 +10,14 @@ function parseRosbag(filename)
     if(isempty(strmatch('/right',bag.AvailableTopics.Properties.RowNames)) == 0)
         right = parseTopic(bag,'/right','morpheus_skates/skate_feedback');
     end
+    
+    if(isempty(strmatch('/pounds_per_sensor',bag.AvailableTopics.Properties.RowNames)) == 0)
+        pounds_per_sensor = parseTopic(bag,'/pounds_per_sensor','morpheus_skates/pounds_display');
+    end
+    
+    if(isempty(strmatch('/normalized_force_per_sensor',bag.AvailableTopics.Properties.RowNames)) == 0)
+        normalized_force_per_sensor = parseTopic(bag,'/normalized_force_per_sensor','morpheus_skates/user_force_normalized');
+    end
 
     if(isempty(strmatch('/servo',bag.AvailableTopics.Properties.RowNames)) == 0)
         servo = parseTopic(bag,'/servo','morpheus_skates/skate_command');
