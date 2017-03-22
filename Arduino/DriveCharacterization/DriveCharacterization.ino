@@ -2,6 +2,8 @@
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
+#define TEST_START_PIN 22
+
 #define ENC1_CHA_PIN 21
 #define ENC1_CHB_PIN 20
 
@@ -73,6 +75,13 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoderRearChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
   rearDrive.initializeDrive();
+
+  pinMode(TEST_START_PIN, INPUT_PULLUP);
+  while(1) {
+    if(digitalRead(TEST_START_PIN) == LOW) {
+      break;
+    }
+  }
 
   Serial.println("Duty Cycle,Front Velocity,Rear Velocity");
 }
