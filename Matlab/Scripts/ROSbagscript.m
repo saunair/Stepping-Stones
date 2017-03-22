@@ -12,7 +12,7 @@ for i=1:size(directory1,1)
         replace = '';
         fileparse = regexprep(fileparse,pattern,replace);
         filename = strcat(directory(i),fileparse)     
-        parseRosbag(filename);
+        parseRosbag(filename{1});
 %       files = [files, filename]
     end
 %disp(filename)    
