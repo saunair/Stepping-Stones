@@ -1,4 +1,4 @@
-//Revision 3/19/2017
+//Revision 3/22/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -6,12 +6,12 @@
 #define FRC_INNER_CH 1
 #define FRC_REAR_CH 2
 
-#define ENC1_CHA_PIN 21
-#define ENC1_CHB_PIN 20
+#define ENC1_CHA_PIN 2
+#define ENC1_CHB_PIN 3
 #define ESC1_PIN 7 
 
-#define ENC2_CHA_PIN 2
-#define ENC2_CHB_PIN 3
+#define ENC2_CHA_PIN 21
+#define ENC2_CHB_PIN 20
 #define ESC2_PIN 9
 
 #define CTRL_PERIOD_MS 10.0
