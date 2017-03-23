@@ -4,13 +4,15 @@
 
 #include "Arduino.h"
 #include "Drive.h"
+#include "buffer.h"
+#include "crc.h"
 
 
-Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin) {
+Drive::Drive(int ECA_pin,int ECB_pin,HardwareSerial* port) {
   encChaPin = ECA_pin;
   encChbPin = ECB_pin;
-  escPin = ESC_pin;
-  onTime = 1500;
+  serial = port;
+  
   commandLim = 0;
 
   A_set = false;
@@ -18,16 +20,13 @@ Drive::Drive(int ECA_pin,int ECB_pin,int ESC_pin) {
   resetState();
 
   lastUpdateTime = micros();
-  lastCommandTime = micros();
 }
 
 void Drive::initializeDrive() {
   pinMode(encChaPin, INPUT); 
   pinMode(encChbPin, INPUT);
-  pinMode(escPin, OUTPUT);
-
-  esc.attach(escPin,1000,2000);
-  setCommand(0);  
+  serial->begin(115200);
+  setDutyCycle(0);  
 }
 
 
@@ -77,22 +76,48 @@ float Drive::getVelocity() {
   return wheelVelocityEstimate;
 }
 
-    
-void Drive::setCommand(float command) {
-  commandTimeDelta = micros() - lastCommandTime;
-  lastCommandTime = micros();
-  
-  commandLim = constrain(command,-100,100);
-  onTime = 1500;
-  
-  if(commandLim > 0) {
-    onTime = (int)map(commandLim, 0, 100, 1520, (2000-1520)*(SPEED_LIM_MAX/100)+1520);
-  }
-  else {
-    if(commandLim < 0) {
-      onTime = (int)map(commandLim, -100, 0, (1480-1000)*(SPEED_LIM_MIN/100)+1480, 1480);
-    }
-  }
 
-  esc.writeMicroseconds(onTime);
+void Drive::setDutyCycle(float dutyCycle) {
+  unsigned short crc;
+  sendIndex = 0;
+  
+  sendBuffer[sendIndex++] = COMM_SET_DUTY;
+  buffer_append_float32(sendBuffer, dutyCycle, 100000.0, &sendIndex);
+  crc = crc16(sendBuffer,sendIndex);
+  buffer_append_uint16(sendBuffer, crc, &sendIndex);
+
+  sendCommand();
+}
+
+
+void Drive::setCurrent(float current) {
+  unsigned short crc;
+  sendIndex = 0;
+
+  sendBuffer[sendIndex++] = COMM_SET_CURRENT;
+  buffer_append_float32(sendBuffer, current, 1000.0, &sendIndex);  
+  crc = crc16(sendBuffer,sendIndex);
+  buffer_append_uint16(sendBuffer, crc, &sendIndex);
+
+  sendCommand();
+}
+
+
+void Drive::resetTimeout() {
+  unsigned short crc;
+  sendIndex = 0;
+
+  sendBuffer[sendIndex++] = COMM_ALIVE;
+  crc = crc16(sendBuffer,sendIndex);
+  buffer_append_uint16(sendBuffer, crc, &sendIndex);
+
+  sendCommand();
+}
+
+
+void Drive::sendCommand() {
+  serial->write(2);
+  serial->write(sendIndex-2);
+  serial->write(sendBuffer,sendIndex);
+  serial->write(3);
 }

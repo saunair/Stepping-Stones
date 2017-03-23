@@ -58,7 +58,7 @@ float Control::computePositionCommand(float target,float wheelPosition) {
   positionErrorPrev = positionError;
   positionError = positionTarget - wheelPosition;
 
-  if(invertFlag == false) {
+  /*if(invertFlag == false) {
     positionError = constrain(positionError,0,abs(positionError));
   }
   else {  
@@ -68,7 +68,8 @@ float Control::computePositionCommand(float target,float wheelPosition) {
   positionErrorSum = positionErrorSum + positionError;
   positionErrorDiff = positionError - positionErrorPrev;
      
-  return posn_Kp*positionError + posn_Ki*positionErrorSum + posn_Kd*positionErrorDiff;
+  return posn_Kp*positionError + posn_Ki*positionErrorSum + posn_Kd*positionErrorDiff;*/
+  return 0; //Just apply brake
 }
 
 
@@ -83,7 +84,7 @@ float Control::computeVelocityCommand(float target,float wheelVelocity) {
   velocityErrorSum = velocityErrorSum + velocityError;
   velocityErrorDiff = velocityError - velocityErrorPrev;
       
-  return vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff;
+  return ((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00036*target + 0.0065));
 }
 
 
@@ -115,7 +116,8 @@ bool Control::checkModeTransition() {
 
 float Control::getControllerTarget() {
   if(controlMode == Position_Mode){
-    return positionTarget;
+    //return positionTarget;
+    return 0;
   }
   else {
     return velocityTargetLim;

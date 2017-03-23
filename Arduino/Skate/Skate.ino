@@ -1,4 +1,4 @@
-//Revision 3/22/2017
+//Revision 3/23/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -8,14 +8,16 @@
 
 #define ENC1_CHA_PIN 2
 #define ENC1_CHB_PIN 3
-#define ESC1_PIN 7 
 
 #define ENC2_CHA_PIN 21
 #define ENC2_CHB_PIN 20
-#define ESC2_PIN 9
+
+#define DEAD_MAN_SW_PIN 30
+#define HEARTBEAT_PIN 45
 
 #define CTRL_PERIOD_MS 10.0
 #define SAMP_PERIOD_MS 2.0
+#define ALIVE_PERIOD_MS 500.0
 
 #define SERIAL_BUFFER_SIZE 512
 #define TIMEOUT_MS 1000
@@ -36,7 +38,7 @@ float target = 0;
 long currentTimeStamp = 0;
 long lastCtrlTimeStamp = 0;
 long lastSampTimeStamp = 0;
-long lastPubTimeStamp = 0;
+long lastAliveTimeStamp = 0;
 
 int global_set_point;
 float master_time;
@@ -48,13 +50,19 @@ bool imuTxComplete = false;
 
 long startTime = 0;
 
-float posnGainsFront[] = {0.3,0,0};
-float posnGainsRear[] = {0.3,0,0};
-float velGainsFront[] = {0,0.0006,0};
-float velGainsRear[] = {0,0.0006,0};
+//float posnGainsFront[] = {0.3,0,0};
+//float posnGainsRear[] = {0.3,0,0};
+float posnGainsFront[] = {0,0,0};
+float posnGainsRear[] = {0,0,0};
+//float velGainsFront[] = {0,0.0006,0};
+//float velGainsRear[] = {0,0.0006,0};
+float velGainsFront[] = {0.0001,0,0}; //Start with P-gains only in addition to FF
+float velGainsRear[] = {0.0001,0,0};
 
 float frontVelCmd;
+float frontVelCmdPrev = 0;
 float rearVelCmd;
+float rearVelCmdPrev = 0;
 
 bool leftSkate = false;
 bool rightSkate = false;
@@ -86,10 +94,10 @@ ros::NodeHandle nh;
 
 Force forceSensors(FRC_OUTER_CH,FRC_INNER_CH,FRC_REAR_CH);
 
-Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,ESC1_PIN); 
+Drive frontDrive(ENC1_CHA_PIN,ENC1_CHB_PIN,&Serial2); 
 Control frontControl(posnGainsFront,velGainsFront,CTRL_PERIOD_MS);
 
-Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,ESC2_PIN);
+Drive rearDrive(ENC2_CHA_PIN,ENC2_CHB_PIN,&Serial3);
 Control rearControl(posnGainsRear,velGainsRear,CTRL_PERIOD_MS);
 
 UM imu;
@@ -135,6 +143,9 @@ void setup() {
   rearDrive.initializeDrive();
   rearControl.setInvertFlag(rightSkate == true);
 
+  pinMode(DEAD_MAN_SW_PIN, INPUT_PULLUP);
+  pinMode(HEARTBEAT_PIN, OUTPUT);
+
   Serial1.begin(115200);
   Serial1.write(allRequests,21);
 }
@@ -166,13 +177,15 @@ void loop(){
     target = global_set_point;
     check_reset_system();
 
+    frontVelCmdPrev = frontVelCmd;
     frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
     if(frontControl.checkModeTransition() == true) frontDrive.resetState();
-    frontDrive.setCommand(frontVelCmd);
+    if(frontVelCmdPrev != frontVelCmd) frontDrive.setDutyCycle(frontVelCmd);
 
+    rearVelCmdPrev = rearVelCmd;
     rearVelCmd = rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity());
     if(rearControl.checkModeTransition() == true) rearDrive.resetState();
-    rearDrive.setCommand(rearVelCmd);
+    if(rearVelCmdPrev != rearVelCmd) rearDrive.setDutyCycle(rearVelCmd);
        
     skate_fault = rearControl.checkErrors();
     skate_fault |= frontControl.checkErrors() << 2;
@@ -189,6 +202,16 @@ void loop(){
     nh.spinOnce();
     feedback.debug_int2 = int(micros() - startTime);
     controlLoopActive = false;
+  }
+
+  //Alive Loop
+  if((currentTimeStamp - lastAliveTimeStamp) >= (ALIVE_PERIOD_MS*1000)) {
+    lastAliveTimeStamp = currentTimeStamp;
+    
+    frontDrive.resetTimeout();
+    rearDrive.resetTimeout();
+
+    digitalWrite(HEARTBEAT_PIN,!digitalRead(HEARTBEAT_PIN));
   }
 }
 
@@ -219,6 +242,9 @@ void formPacket() {
     feedback.controller_target_front = frontControl.getControllerTarget();
 
     feedback.skate_mode = frontControl.getMode() + (rearControl.getMode()<<2);
+
+    //Migrate read to control class
+    feedback.dead_man_enable = (digitalRead(DEAD_MAN_SW_PIN) == LOW);
 
     if(imu.updates == 7) {
       imu.updates = 0;
