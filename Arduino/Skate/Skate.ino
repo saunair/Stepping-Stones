@@ -56,8 +56,8 @@ float posnGainsFront[] = {0,0,0};
 float posnGainsRear[] = {0,0,0};
 //float velGainsFront[] = {0,0.0006,0};
 //float velGainsRear[] = {0,0.0006,0};
-float velGainsFront[] = {0.0001,0,0}; //Start with P-gains only in addition to FF
-float velGainsRear[] = {0.0001,0,0};
+float velGainsFront[] = {0,0.00001,0};
+float velGainsRear[] = {0,0.00001,0};
 
 float frontVelCmd;
 float frontVelCmdPrev = 0;
@@ -216,8 +216,8 @@ void loop(){
 }
 
 void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
-  global_set_point = cmd_msg.command_target*(skate_fault==0);
-  //global_set_point = cmd_msg.command_target;
+  //global_set_point = cmd_msg.command_target*(skate_fault==0);
+  global_set_point = cmd_msg.command_target;
   master_time = millis();
 }
 
