@@ -84,7 +84,7 @@ float Control::computeVelocityCommand(float target,float wheelVelocity) {
   velocityErrorSum = velocityErrorSum + velocityError;
   velocityErrorDiff = velocityError - velocityErrorPrev;
       
-  return ((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00036*velocityTargetLim + 0.0065));
+  return ((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00038*velocityTargetLim + 0.0065));
 }
 
 
