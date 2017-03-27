@@ -1,9 +1,9 @@
-//Revision 3/24/2017
+//Revision 3/26/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
-#define FRC_OUTER_CH 0
-#define FRC_INNER_CH 1
+#define FRC_OUTER_CH 1
+#define FRC_INNER_CH 0
 #define FRC_REAR_CH 2
 
 #define ENC1_CHA_PIN 2
@@ -141,7 +141,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENC2_CHA_PIN), doEncoderRearChA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC2_CHB_PIN), doEncoderRearChB, CHANGE);
   rearDrive.initializeDrive();
-  rearControl.setInvertFlag(rightSkate == true);
+  rearControl.setInvertFlag(leftSkate == true);
 
   pinMode(DEAD_MAN_SW_PIN, INPUT_PULLUP);
   pinMode(HEARTBEAT_PIN, OUTPUT);

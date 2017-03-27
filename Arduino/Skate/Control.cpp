@@ -74,8 +74,11 @@ float Control::computePositionCommand(float target,float wheelPosition) {
 
 
 float Control::computeVelocityCommand(float target,float wheelVelocity) {
+  float command;
+  
   //Apply acceleration  limit
-  velocityTarget = target;      
+  velocityTarget = target;  
+  if(invertFlag == true) velocityTarget = velocityTarget * -1;    
   velocityTargetLimPrev = velocityTargetLim;
   velocityTargetLim = constrain(velocityTarget,velocityTargetLimPrev-ACCEL_LIMIT*(controlPeriodMs/1000.0),velocityTargetLimPrev+ACCEL_LIMIT*(controlPeriodMs/1000.0));
 
@@ -83,8 +86,10 @@ float Control::computeVelocityCommand(float target,float wheelVelocity) {
   velocityError = velocityTargetLim - wheelVelocity;
   velocityErrorSum = velocityErrorSum + velocityError;
   velocityErrorDiff = velocityError - velocityErrorPrev;
+
+  command = ((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00038*velocityTargetLim + 0.0065));
       
-  return ((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00038*velocityTargetLim + 0.0065));
+  return command;
 }
 
 
