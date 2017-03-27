@@ -13,6 +13,8 @@ import roslib; roslib.load_manifest('morpheus_skates')
 
 total_weight = 0
 
+publish_rate = rospy.get_param("publish_rate")
+
 ###change these!
 right_single_stance_threshold = 10
 #right_double_stance_threshold = 0.4
@@ -97,6 +99,11 @@ def gait_determination():
     right_foot_on_ground = (float((right_force_front_inner + right_force_front_outer + right_force_rear)*total_weight) > right_single_stance_threshold)
 
     normalized_force_values.normal_total =  normalized_force_values.left_normal_total +  normalized_force_values.right_normal_total
+
+    ### add ML classifier and check!!!!
+
+    
+
     print "gait deter node"
     if(left_foot_on_ground and right_foot_on_ground):
         print "Double Stance"
@@ -120,7 +127,7 @@ if __name__ == '__main__':
     rospy.Subscriber("right", skate_feedback, stop_system_right)
     rospy.Subscriber("left", skate_feedback, stop_system_left)
     pub = rospy.Publisher('normalized_force_per_sensor', user_force_normalized, queue_size=100)
-    r = rospy.Rate(50) 
+    r = rospy.Rate(publish_rate) 
     while not rospy.is_shutdown():
         gait_determination()
         pub.publish(normalized_force_values)

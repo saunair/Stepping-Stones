@@ -2,6 +2,7 @@
 import rospy
 from morpheus_skates.msg import skate_command
 
+publish_rate = rospy.get_param("publish_rate")
 
 def keyboard_input():
     try:
@@ -15,7 +16,7 @@ def keyboard_input():
 def state_publisher():
     pub = rospy.Publisher('user_inputs', skate_command, queue_size=10)
     rospy.init_node('user_input', anonymous=True)
-    rate = rospy.Rate(100) # 100hz
+    rate = rospy.Rate(publish_rate) # 100hz
     message = skate_command()
     while not rospy.is_shutdown():
         state, value = keyboard_input()

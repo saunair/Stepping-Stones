@@ -15,8 +15,7 @@ import roslib; roslib.load_manifest('morpheus_skates')
 display_weight = pounds_display()
 
 
-
-
+publish_rate = rospy.get_param("publish_rate")
 
 right_force_front_outer = 0
 right_force_front_inner = 0
@@ -77,7 +76,7 @@ if __name__ == '__main__':
     # total_weight = run_normalization_routine()
     #print total_weight
     #a = input('check')
-    r = rospy.Rate(50)
+    r = rospy.Rate(publish_rate)
     rospy.Subscriber("right", skate_feedback, update_system_right)
     rospy.Subscriber("left", skate_feedback, update_system_left)
     pub = rospy.Publisher('pounds_per_sensor', pounds_display, queue_size=100)

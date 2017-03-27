@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # license removed for brevity
+#MRSD TEAM-H; Morpheus Skates
+#Author: Saurabh Nair
+#Edited By Brad Factor
+
 import rospy
 import time
 from std_msgs.msg import UInt16
@@ -15,6 +19,9 @@ import roslib; roslib.load_manifest('morpheus_skates')
 
 skip_kinect = False; #Used for debugging controls/comms without Kinect functionality
 
+publish_rate = rospy.get_param("publish_rate")
+
+##### This node is the main master node that uses every service and controls most of the data flow. The command of the speed to the motor nodes is given by this file
 
 left_skate_fault = 0
 right_skate_fault = 0;
@@ -30,8 +37,6 @@ position_control = 1
 velocity_control = 2
 total_weight = 0
 
-#previous_left_time  = rospy.Time.now() 
-#previous_right_time = rospy.Time.now()
 
 #velocity threshold! please decide!
 velocity_threshold = 300
@@ -46,7 +51,6 @@ send_control.command_target = 0
 z_x= 3.45787 
 z_y=0.0881804
 z_z=0.211088
-
 
 
 ### required gains from the rosparam server
@@ -81,9 +85,8 @@ def process_input(data):
     except:
         user_input.calibration_enable = 0
         user_input.command_target = 0
-        #print user_input.set_point
 
-
+## The next teo methods check for the time of the latest message from the skates for stopping if timed out
 def stop_system_right(right):
     global send_control, previous_right_time, right_skate_fault
     right_skate_fault = right.skate_fault
@@ -94,11 +97,10 @@ def stop_system_left(left):
     left_skate_fault = left.skate_fault
     previous_left_time = rospy.get_time()
 
-
+## Check if the skate times out
 def check_timeout(current_time):
     global send_control, time_threshold, previous_left_time, previous_right_time, right_skate_fault, left_skate_fault
     if ((current_time - previous_left_time)>time_threshold ):
-            #and (current_time - previous_right_time)>time_threshold):
         print current_time, previous_left_time
         send_control.command_target = 0
         print "One of the skates has timed out"
@@ -107,42 +109,50 @@ def check_timeout(current_time):
         send_control.command_target = 0
         print "fault detected"
 
-#ask for the zero point from the kinect
+
+#Ask for the zero point from the kinect
 def ask_zero_point():
     #not waiting for 2 secs!!
     rospy.wait_for_service('zero_point')
     try:
         resp1 = rospy.ServiceProxy('zero_point', zero_point)
-        #not passing one anymore to  move on from empty
         resp1 = resp1()
         print "zero_point =" ,resp1
         return resp1.zero_x, resp1.zero_y, resp1.zero_z
-        #return resp1
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
 
+## Ask for total weight of the user
 def run_normalization_routine():
-   
     rospy.wait_for_service('sensors_normalized')
     try:
         response = rospy.ServiceProxy('sensors_normalized', sensors_normalized)
-        #not passing one anymore to  move on from empty
         response = response()
         print "total_weight", response.total_weight
         return response.total_weight
-        #return resp1
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
 
+## Ask for total weight of the user
+def ask_shoe_size():
+    rospy.wait_for_service('shoe_size')
+    try:
+        response = rospy.ServiceProxy('user_shoe_size', user_shoe_size)
+        response = response()
+        print "shoe_size", response.user_shoe_size
+        return response.user_shoe_size
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 
 
 #main higher level control code
 def send_controls():
     global send_control, previous_left_time, previous_right_time
     global z_x, z_y, z_z
-    pub = rospy.Publisher('servo', skate_command, queue_size=100)
+    left_pub = rospy.Publisher('command_left', skate_command, queue_size=100)
+    right_pub = rospy.Publisher('command_right', skate_command, queue_size=100)
     kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
     
     rospy.init_node('stepping_stones', anonymous=True)
@@ -150,8 +160,9 @@ def send_controls():
     previous_right_time  = rospy.Time.now()
     listener_trans = tf.TransformListener() 
     i = 0
-    rate = rospy.Rate(100) # 100hz
-    pub.publish(send_control)
+    rate = rospy.Rate(publish_rate) # 100hz
+    left_pub.publish(send_control)
+    right_pub.publish(send_control)
 
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)
@@ -192,12 +203,13 @@ def send_controls():
         
         send_control.header.stamp = rospy.Time.now()	
         
-        pub.publish(send_control)
+        left_pub.publish(send_control)
+        right_pub.publish(send_control)
         kin_pub.publish(x_error)
         rate.sleep()
 
 if __name__ == '__main__':
-    global total_weight
+    global total_weight, shoe_size
     if skip_kinect == False:
 	    try:
 		z_x, z_y, z_z = ask_zero_point()
@@ -212,7 +224,8 @@ if __name__ == '__main__':
 		z_z = 0.21108
 
     try:
-        total_weight = run_normalization_routine()  
+        total_weight = run_normalization_routine() 
+        shoe_size =  ask_shoe_size()
         send_controls()
     except rospy.ROSInterruptException:
         pass

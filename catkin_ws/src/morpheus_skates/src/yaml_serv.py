@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from motor.srv import *
+from morpheus_skates.srv import *
 import rospy
 import tf
 import roslib; roslib.load_manifest('morpheus_skates')

@@ -10,7 +10,7 @@ def talker():
     pub = rospy.Publisher('servo', UInt16, queue_size=100)
     rospy.init_node('motor_control', anonymous=True)
     i = 0
-    rate = rospy.Rate(30) # 1hz
+    rate = rospy.Rate(50) # 1hz
     pub.publish(50)
     hello_str = "%d" % 50
     rospy.loginfo(hello_str)

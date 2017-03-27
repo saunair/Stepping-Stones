@@ -9,20 +9,16 @@ from morpheus_skates.msg import skate_feedback
 import os
 import roslib; roslib.load_manifest('morpheus_skates')
 
-#config_file = '~/catkin_ws/src/motor/config/calibration_values.yaml'
-
-config_file = '/home/stepping/mrsd_team_H/Stepping-Stones/catkin_ws/src/morpheus_skates/config/calibration_values.yaml'
+config_file = '../config/calibration_values.yaml'
 total_weight = 0
 total_weight_left = 0
 total_weight_right = 0
 total_weight_left_front = 0
 total_weight_right_front =0
+
 ###change these!
 right_single_stance_threshold = 10
-#right_double_stance_threshold = 0.4
-
 left_single_stance_threshold = 10
-#left_double_stance_threshold = 0.4
 
 
 class skate(object):
@@ -68,13 +64,9 @@ def normalize_calculation(right_skate, left_skate):
 	rospy.init_node('normalization')
 
 	while(right_skate.counter <= 51 and left_skate.counter <= 51):
-		# if (right_skate.counter <=51 or left_skate.counter<=51):
-		# 	# print "right",right_skate.counter,"left",left_skate.counter
-
 		if(right_skate.counter == 51 and left_skate.counter==51):
 			right_skate.counter = 52
 			left_skate.counter = 52
-			# print "saurnaj"
 			with open(config_file, 'r') as stream:
 				try:
 					calibration_data = yaml.load(stream)
@@ -105,7 +97,6 @@ def normalize_calculation(right_skate, left_skate):
 			s = rospy.Service('sensors_normalized', sensors_normalized, handle_norm_service)
 			rospy.spin()
 			 
-			# return None
 	
 
 if __name__ == '__main__':                           
