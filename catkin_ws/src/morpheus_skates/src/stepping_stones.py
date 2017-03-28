@@ -142,7 +142,8 @@ def run_normalization_routine():
 def send_controls():
     global send_control, previous_left_time, previous_right_time
     global z_x, z_y, z_z
-    pub = rospy.Publisher('servo', skate_command, queue_size=100)
+    left_pub = rospy.Publisher('left_command', skate_command, queue_size=100)
+    right_pub = rospy.Publisher('right_command', skate_command, queue_size=100)
     kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
     
     rospy.init_node('stepping_stones', anonymous=True)
@@ -151,15 +152,16 @@ def send_controls():
     listener_trans = tf.TransformListener() 
     i = 0
     rate = rospy.Rate(100) # 100hz
-    pub.publish(send_control)
+    left_pub.publish(send_control)
+    right_pub.publish(send_control)
 
-    hello_str = "%d" % 50
-    rospy.loginfo(hello_str)
+    #hello_str = "%d" % 50
+    #rospy.loginfo(hello_str)
     
     #subscribe to user inputs
     rospy.Subscriber("user_inputs", skate_command, process_input)
-    rospy.Subscriber("right", skate_feedback, stop_system_right)
-    rospy.Subscriber("left", skate_feedback, stop_system_left)
+    rospy.Subscriber("right_feedback", skate_feedback, stop_system_right)
+    rospy.Subscriber("left_feedback", skate_feedback, stop_system_left)
     
     while not rospy.is_shutdown():
         
@@ -192,7 +194,8 @@ def send_controls():
         
         send_control.header.stamp = rospy.Time.now()	
         
-        pub.publish(send_control)
+    	left_pub.publish(send_control)
+    	right_pub.publish(send_control)	
         kin_pub.publish(x_error)
         rate.sleep()
 
@@ -212,7 +215,7 @@ if __name__ == '__main__':
 		z_z = 0.21108
 
     try:
-        total_weight = run_normalization_routine()  
+        #total_weight = run_normalization_routine()  
         send_controls()
     except rospy.ROSInterruptException:
         pass

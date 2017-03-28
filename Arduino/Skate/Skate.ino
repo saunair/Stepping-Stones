@@ -1,4 +1,4 @@
-//Revision 3/26/2017
+//Revision 3/28/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -87,9 +87,10 @@ void doEncoderRearChB();
 
 //Sensor data type and publisher declaration
 morpheus_skates::skate_feedback feedback;
-ros::Publisher ros_pub_left("left", &feedback);
-ros::Publisher ros_pub_right("right", &feedback);
-ros::Subscriber<morpheus_skates::skate_command> sub("servo", ros_sub_cb);
+ros::Publisher ros_pub_left("left_feedback", &feedback);
+ros::Publisher ros_pub_right("right_feedback", &feedback);
+ros::Subscriber<morpheus_skates::skate_command> ros_sub_left("left_command", ros_sub_cb);
+ros::Subscriber<morpheus_skates::skate_command> ros_sub_right("right_command", ros_sub_cb);
 ros::NodeHandle nh;
 
 Force forceSensors(FRC_OUTER_CH,FRC_INNER_CH,FRC_REAR_CH);
@@ -120,11 +121,12 @@ void setup() {
   nh.getHardware()->setBaud(115200);
   if(leftSkate == true) {
     nh.advertise(ros_pub_left);
+    nh.subscribe(ros_sub_left);
   }
   if(rightSkate == true) {
     nh.advertise(ros_pub_right);
+    nh.subscribe(ros_sub_right);
   }
-  nh.subscribe(sub);
 
   //Set up Force Sensing
   ADCSRA = bit(ADEN); //turn ADC on
@@ -216,8 +218,8 @@ void loop(){
 }
 
 void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
-  //global_set_point = cmd_msg.command_target*(skate_fault==0);
-  global_set_point = cmd_msg.command_target;
+  global_set_point = cmd_msg.command_target*(skate_fault==0);
+  //global_set_point = cmd_msg.command_target;
   master_time = millis();
 }
 

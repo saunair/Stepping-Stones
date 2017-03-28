@@ -50,9 +50,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
    FILES
-   skate_feedback.msg
-   skate_command.msg
+   integrated_message.msg
    pounds_display.msg
+   skate_command.msg
+   skate_feedback.msg
    user_force_normalized.msg
  )
 
@@ -60,8 +61,9 @@ add_message_files(
 add_service_files(
     FILES
     sensors_normalized.srv
-    zero_point.srv
+    user_shoe_size.srv
     yaml_values.srv
+    zero_point.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -125,8 +127,8 @@ include_directories(
 )
 
 
-catkin_install_python(PROGRAMS src/calibration_arduino.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+#catkin_install_python(PROGRAMS src/calibration_arduino.py
+#  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 catkin_install_python(PROGRAMS src/calibration_force.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

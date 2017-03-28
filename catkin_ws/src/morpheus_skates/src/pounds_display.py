@@ -78,8 +78,8 @@ if __name__ == '__main__':
     #print total_weight
     #a = input('check')
     r = rospy.Rate(50)
-    rospy.Subscriber("right", skate_feedback, update_system_right)
-    rospy.Subscriber("left", skate_feedback, update_system_left)
+    rospy.Subscriber("right_feedback", skate_feedback, update_system_right)
+    rospy.Subscriber("left_feedback", skate_feedback, update_system_left)
     pub = rospy.Publisher('pounds_per_sensor', pounds_display, queue_size=100)
     while not rospy.is_shutdown():
     	pub.publish(display_weight)

@@ -111,6 +111,6 @@ def normalize_calculation(right_skate, left_skate):
 if __name__ == '__main__':                           
 	right_skate = skate('right')
 	left_skate  = skate('left')
-	rospy.Subscriber("right", skate_feedback, right_skate.update_sensor_readings)
-	rospy.Subscriber("left", skate_feedback, left_skate.update_sensor_readings)
+	rospy.Subscriber("right_feedback", skate_feedback, right_skate.update_sensor_readings)
+	rospy.Subscriber("left_feedback", skate_feedback, left_skate.update_sensor_readings)
 	normalize_calculation(right_skate, left_skate)

@@ -86,8 +86,8 @@ def agg_message_publish():
     listener_trans4 = tf.TransformListener()
     listener_trans5 = tf.TransformListener()
 
-    rospy.Subscriber("left", String, left_update)
-    rospy.Subscriber("right", String, right_update)
+    rospy.Subscriber("left_feedback", String, left_update)
+    rospy.Subscriber("right_feedback", String, right_update)
     rospy.Subscriber("pounds_per_sensor", String, pounds_update)
     rospy.Subscriber("normalized_force_per_sensor", user_force_normalized, normalize_update)
 
@@ -109,6 +109,17 @@ def agg_message_publish():
         total_message.hip_right[0] = trans_right_hip[0]
         total_message.hip_right[1] = trans_right_hip[1]
         total_message.hip_right[2] = trans_right_hip[2] 
+
+        total_message.foot_left[0] = trans_left_foot[0]
+        total_message.foot_left[1] = trans_left_foot[1]
+        total_message.foot_left[2] = trans_left_foot[2]
+
+        total_message.foot_right[0] = trans_right_foot[0]
+        total_message.foot_right[1] = trans_right_foot[1]
+        total_message.foot_right[2] = trans_right_foot[2] 	
+
+	total_message.user_position_ofset = u	
+
         pub.publish(total_message)
         
         rate.sleep()

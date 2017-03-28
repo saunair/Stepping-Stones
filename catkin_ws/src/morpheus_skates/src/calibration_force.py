@@ -293,10 +293,10 @@ def start(left_skate_start, right_skate_start, skate_side):
     rospy.init_node('bias', anonymous=True)
     
     if(skate_side == 1):
-        rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
+        rospy.Subscriber("left_feedback" , skate_feedback, left_skate_start.update_values)
         left_skate_start.run()
     elif(skate_side == 2):
-        rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
+        rospy.Subscriber("right_feedbakc", skate_feedback, right_skate_start.update_values)
         right_skate_start.run()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()

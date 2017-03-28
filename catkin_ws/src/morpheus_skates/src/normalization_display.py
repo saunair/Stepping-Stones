@@ -117,8 +117,8 @@ if __name__ == '__main__':
     global total_weight, normalized_force_values
     rospy.init_node('normalization_display', anonymous=True)
     total_weight = run_normalization_routine()
-    rospy.Subscriber("right", skate_feedback, stop_system_right)
-    rospy.Subscriber("left", skate_feedback, stop_system_left)
+    rospy.Subscriber("right_feedback", skate_feedback, stop_system_right)
+    rospy.Subscriber("left_feedback", skate_feedback, stop_system_left)
     pub = rospy.Publisher('normalized_force_per_sensor', user_force_normalized, queue_size=100)
     r = rospy.Rate(50) 
     while not rospy.is_shutdown():

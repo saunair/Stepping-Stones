@@ -9,7 +9,7 @@ shoe_size = 11.2
 def keyboard_input():
     global shoe_size
     try:
-        shoe_size = input("Please input the user show size in inches")
+        shoe_size = input("Please input the user shoe size in inches")
     except:
         shoe_size = 11.2
     rospy.set_param('user_shoe_size', shoe_size)

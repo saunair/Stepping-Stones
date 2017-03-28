@@ -158,8 +158,8 @@ def bias():
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
     rospy.init_node('bias', anonymous=True)
-    rospy.Subscriber("left", Num, left_values)
-    rospy.Subscriber("right", Num, right_values)
+    rospy.Subscriber("left_feedback", Num, left_values)
+    rospy.Subscriber("right_feedback", Num, right_values)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
