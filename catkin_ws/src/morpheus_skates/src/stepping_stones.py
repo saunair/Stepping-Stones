@@ -13,6 +13,7 @@ import tf
 
 import roslib; roslib.load_manifest('morpheus_skates')
 
+publish_rate = rospy.get_param("publish_rate")
 skip_kinect = False; #Used for debugging controls/comms without Kinect functionality
 
 
@@ -151,7 +152,7 @@ def send_controls():
     previous_right_time  = rospy.Time.now()
     listener_trans = tf.TransformListener() 
     i = 0
-    rate = rospy.Rate(100) # 100hz
+    rate = rospy.Rate(publish_rate) # 100hz
     left_pub.publish(send_control)
     right_pub.publish(send_control)
 
