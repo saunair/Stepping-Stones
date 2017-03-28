@@ -4,3 +4,5 @@ catkin_ws/build/
 catkin_ws/devel/
 catkin_ws/install
 *.pyc
+*.swp
+*.swo
