@@ -6,3 +6,7 @@ catkin_ws/install
 *.pyc
 *.swp
 *.swo
+.*.swp
+.*.py.swp
+.*.swp
+
