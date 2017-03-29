@@ -1,6 +1,7 @@
 <launch>
 <rosparam command="load" file="$(find morpheus_skates)/config/calibration_values.yaml" />
 <param name="publish_rate" type="int" value="100" />
+<param name="skip_kinect" type="int" value="0" />
 <node pkg="morpheus_skates" type="kinect_zero.py" name="kinect_zero" output="screen"/>
 <node pkg="morpheus_skates" type="stepping_stones.py" name="stepping_stones" output="screen"/>
 <node pkg="morpheus_skates" type="yaml_serv.py" name="yaml_serv" output="screen"/>
@@ -10,4 +11,5 @@
 <node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" output="screen"/>
 <node pkg="morpheus_skates" type="normalization_display.py" name="normalization_display" output="screen"/>
 <node pkg="morpheus_skates" type="pounds_display.py" name="pounds_display" output="screen"/>
+<node pkg="morpheus_skates" type="message_integrate.py" name="message_integration" output="screen"/>
 </launch>

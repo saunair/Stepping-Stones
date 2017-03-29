@@ -11,7 +11,7 @@ import roslib; roslib.load_manifest('morpheus_skates')
 
 #config_file = '~/catkin_ws/src/motor/config/calibration_values.yaml'
 
-config_file = '../config/calibration_values.yaml'
+config_file = '/home/stepping/mrsd_team_H/Stepping-Stones/catkin_ws/src/morpheus_skates/config/calibration_values.yaml'
 total_weight = 0
 total_weight_left = 0
 total_weight_right = 0
@@ -68,13 +68,10 @@ def normalize_calculation(right_skate, left_skate):
 	rospy.init_node('normalization')
 
 	while(right_skate.counter <= 51 and left_skate.counter <= 51):
-		# if (right_skate.counter <=51 or left_skate.counter<=51):
-		# 	# print "right",right_skate.counter,"left",left_skate.counter
 
 		if(right_skate.counter == 51 and left_skate.counter==51):
 			right_skate.counter = 52
 			left_skate.counter = 52
-			# print "saurnaj"
 			with open(config_file, 'r') as stream:
 				try:
 					calibration_data = yaml.load(stream)

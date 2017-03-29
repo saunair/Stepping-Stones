@@ -97,7 +97,8 @@ def gait_determination():
     right_foot_on_ground = (float((right_force_front_inner + right_force_front_outer + right_force_rear)*total_weight) > right_single_stance_threshold)
 
     normalized_force_values.normal_total =  normalized_force_values.left_normal_total +  normalized_force_values.right_normal_total
-    print "gait deter node"
+    #print "gait deter node"
+    '''
     if(left_foot_on_ground and right_foot_on_ground):
         print "Double Stance"
 
@@ -109,7 +110,7 @@ def gait_determination():
 
     if(not left_foot_on_ground and not right_foot_on_ground):
         print "In Air"
-
+    '''
   
 
 if __name__ == '__main__':

@@ -24,8 +24,8 @@ right_skate_fault = 0;
 #state values
 user_input = skate_command()
 send_control = skate_command()
-calibration = 0
-user_input.calibration_enable = 0
+send_control_left = skate_command()
+send_control_right = skate_command()
 user_input.command_target = 0
 position_control = 1
 velocity_control = 2
@@ -40,7 +40,6 @@ velocity_threshold = 300
 #time threshold
 time_threshold = 20
 
-send_control.calibration_enable = 0
 send_control.command_target = 0
 
 #default zero points
@@ -77,10 +76,8 @@ kp = 50 # mm/s / m
 def process_input(data):
     global user_input
     try:
-        user_input.calibration_enable = data.calibration_enable
         user_input.command_target = data.command_target
     except:
-        user_input.calibration_enable = 0
         user_input.command_target = 0
         #print user_input.set_point
 
@@ -141,24 +138,20 @@ def run_normalization_routine():
 
 #main higher level control code
 def send_controls():
-    global send_control, previous_left_time, previous_right_time
+    global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate
     global z_x, z_y, z_z
     left_pub = rospy.Publisher('left_command', skate_command, queue_size=100)
     right_pub = rospy.Publisher('right_command', skate_command, queue_size=100)
     kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
-    
     rospy.init_node('stepping_stones', anonymous=True)
     previous_left_time  = rospy.get_time()
     previous_right_time  = rospy.Time.now()
     listener_trans = tf.TransformListener() 
-    i = 0
+    x_error = 0
     rate = rospy.Rate(publish_rate) # 100hz
-    left_pub.publish(send_control)
-    right_pub.publish(send_control)
+    left_pub.publish(send_control_left)
+    right_pub.publish(send_control_right)
 
-    #hello_str = "%d" % 50
-    #rospy.loginfo(hello_str)
-    
     #subscribe to user inputs
     rospy.Subscriber("user_inputs", skate_command, process_input)
     rospy.Subscriber("right_feedback", skate_feedback, stop_system_right)
@@ -166,39 +159,39 @@ def send_controls():
     
     while not rospy.is_shutdown():
         
-        if not(user_input.calibration_enable):
-            try:
-                (trans1,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-		pass
+        try:
+            (trans1,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+	    pass
     
-            try:
-                (trans2,rot2) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                pass
+        try:
+            (trans2,rot2) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
     
-            #current kinect values 
-            try:
-                x_current = ((trans2[0] + trans1[0])/2)
-                y_current = ((trans2[1] + trans1[1])/2)
-                z_current = ((trans2[2] + trans1[2])/2)
-                                                  
-                x_error = z_x - x_current
-                if user_input.command_target > 100:
-                    send_control.command_target = user_input.command_target + kp*x_error
-                else:
-                    send_control.command_target = user_input.command_target
-            except:
-                pass
-            if skip_kinect==True:
-                send_control.command_target = user_input.command_target
+        #current kinect values 
+        try:
+            x_current = ((trans2[0] + trans1[0])/2)
+            y_current = ((trans2[1] + trans1[1])/2)
+            z_current = ((trans2[2] + trans1[2])/2)
+                                              
+            x_error = z_x - x_current
+            if user_input.command_target > 100:
+                send_control.command_target = user_input.command_target + kp*x_error
             else:
+                send_control.command_target = user_input.command_target
+        except:
+            pass
+        if skip_kinect==True:
+            send_control.command_target = user_input.command_target
 		
         
         send_control.header.stamp = rospy.Time.now()	
         check_timeout(rospy.get_time()) 
-    	left_pub.publish(send_control)
-    	right_pub.publish(send_control)	
+        send_control_left = send_control
+        send_control_right = send_control
+    	left_pub.publish(send_control_left)
+    	right_pub.publish(send_control_right)	
         kin_pub.publish(x_error)
         rate.sleep()
 
