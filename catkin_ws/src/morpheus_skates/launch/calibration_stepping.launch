@@ -1,5 +1,5 @@
 <launch>
-
+<param name="publish_rate" type="int" value="100" />
 <node pkg="morpheus_skates" type="calibration_force.py" name="calibration_node" output="screen"/>
 
 <node pkg="rosserial_python" type="serial_node.py" name="serial_node1" output="screen" args="_port:=/dev/ttyACM0 _baud:=115200"/>
