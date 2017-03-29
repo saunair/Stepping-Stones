@@ -14,7 +14,7 @@ import tf
 import roslib; roslib.load_manifest('morpheus_skates')
 
 publish_rate = rospy.get_param("publish_rate")
-skip_kinect = False; #Used for debugging controls/comms without Kinect functionality
+skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms without Kinect functionality
 
 
 left_skate_fault = 0

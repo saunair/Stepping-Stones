@@ -74,9 +74,6 @@ def normalize_update(data1):
     if preload_left_loose:
         rospy.logwarn("Fix preload for left")
 	
-
-
-    
     total_message.normalized_force = data.normalized_force
 
 def agg_message_publish():
@@ -95,36 +92,43 @@ def agg_message_publish():
     rospy.Subscriber("pounds_per_sensor", pounds_display, pounds_update)
     rospy.Subscriber("normalized_force_per_sensor", user_force_normalized, normalize_update)
     rospy.Subscriber("user_position_offset", Float64, position_offset_update)
+    acquire_zero_point = 1
+    while(acquire_zero_point):
+        try:
+            z_x = rospy.get_param("z_x")
+            z_y = rospy.get_param("z_y")
+            z_z = rospy.get_param("z_z")
+            acquire_zero_point = 0
+        except:
+            continue
 
     while not rospy.is_shutdown():
+        
         (trans_left_hip,rot1)   = listener_trans1.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
         (trans_right_hip,rot1)  = listener_trans2.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
         (trans_left_foot,rot1)  = listener_trans3.lookupTransform('/openni_depth_frame', '/left_foot_1', rospy.Time(0))
         (trans_right_foot,rot1) = listener_trans4.lookupTransform('/openni_depth_frame', '/right_foot_1', rospy.Time(0))
         (trans_COM,rot1)        = listener_trans5.lookupTransform('/openni_depth_frame', '/centre_mass', rospy.Time(0))
 
-        total_message.centre_of_mass_kinect[0] = trans_COM[0]
-        total_message.centre_of_mass_kinect[1] = trans_COM[1]
-        total_message.centre_of_mass_kinect[2] = trans_COM[2]
+        total_message.centre_of_mass_kinect[0] = trans_COM[0] - z_x
+        total_message.centre_of_mass_kinect[1] = trans_COM[1] - z_y
+        total_message.centre_of_mass_kinect[2] = trans_COM[2] - z_z 
 
-        total_message.hip_left[0] = trans_left_hip[0] 
-        total_message.hip_left[1] = trans_left_hip[1]
-        total_message.hip_left[2] = trans_left_hip[2]
+        total_message.hip_left[0] = trans_left_hip[0] - z_x 
+        total_message.hip_left[1] = trans_left_hip[1] - z_y
+        total_message.hip_left[2] = trans_left_hip[2] - z_z
         
-        total_message.hip_right[0] = trans_right_hip[0]
-        total_message.hip_right[1] = trans_right_hip[1]
-        total_message.hip_right[2] = trans_right_hip[2] 
+        total_message.hip_right[0] = trans_right_hip[0] - z_x
+        total_message.hip_right[1] = trans_right_hip[1] - z_y
+        total_message.hip_right[2] = trans_right_hip[2] - z_z 
 
-        total_message.foot_left[0] = trans_left_foot[0]
-        total_message.foot_left[1] = trans_left_foot[1]
-        total_message.foot_left[2] = trans_left_foot[2]
+        total_message.foot_left[0] = trans_left_foot[0] - z_x
+        total_message.foot_left[1] = trans_left_foot[1] - z_y
+        total_message.foot_left[2] = trans_left_foot[2] - z_z
 
-        total_message.foot_right[0] = trans_right_foot[0]
-        total_message.foot_right[1] = trans_right_foot[1]
-        total_message.foot_right[2] = trans_right_foot[2] 	
-
-	total_message.user_position_ofset = u	
-
+        total_message.foot_right[0] = trans_right_foot[0] - z_x
+        total_message.foot_right[1] = trans_right_foot[1] - z_y
+        total_message.foot_right[2] = trans_right_foot[2] - z_z 	
         pub.publish(total_message)
         
         rate.sleep()
