@@ -15,6 +15,7 @@ Control::Control(float *posnGains,float *velGains,int controlPeriod) {
   controlPeriodMs = controlPeriod;
   modeTransitionFlag = false;
   lastControlTime = millis();
+  skate_fault = 0;
 
   resetIntegrators();
 }
@@ -100,7 +101,6 @@ void Control::resetIntegrators() {
 
     
 int Control::checkErrors() {
-  int skate_fault = 0;
   if (positionError > POSN_ERROR_THRESHOLD) skate_fault |= 1<<0;   
   if (velocityErrorSum > VEL_ERROR_THRESHOLD) skate_fault |= 1<<1;
 

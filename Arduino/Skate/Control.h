@@ -8,7 +8,7 @@
 #define ACCEL_LIMIT 100.0
 
 #define POSN_ERROR_THRESHOLD 70
-#define VEL_ERROR_THRESHOLD 21000
+#define VEL_ERROR_THRESHOLD 10000
 
 #include "Arduino.h"
 
@@ -61,6 +61,7 @@ class Control {
     float motorCommand;
 
     bool modeTransitionFlag;
+    int skate_fault;
 };
 
 #endif
