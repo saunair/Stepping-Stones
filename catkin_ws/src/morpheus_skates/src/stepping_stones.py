@@ -104,7 +104,7 @@ def check_timeout(current_time):
         send_control.command_target = 0
         print "One of the skates has timed out"
     #fault detected
-    if not(left_skate_fault or right_skate_fault):
+    if (left_skate_fault or right_skate_fault):
         send_control.command_target = 0
         print "fault detected"
 

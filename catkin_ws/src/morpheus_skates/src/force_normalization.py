@@ -11,7 +11,7 @@ import roslib; roslib.load_manifest('morpheus_skates')
 
 #config_file = '~/catkin_ws/src/motor/config/calibration_values.yaml'
 
-config_file = '/home/stepping/mrsd_team_H/Stepping-Stones/catkin_ws/src/morpheus_skates/config/calibration_values.yaml'
+config_file = '../config/calibration_values.yaml'
 total_weight = 0
 total_weight_left = 0
 total_weight_right = 0
