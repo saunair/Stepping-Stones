@@ -25,6 +25,10 @@ def pounds_update(data):
     global total_message, PreloadThreshold
     total_message.pounds_values = data.pounds_values
 
+def position_offset_update(data):
+    global total_message, PreloadThreshold
+    total_message.user_position_offset = data.data
+
 def normalize_update(data1):
 	data = data1
     global total_message, 
@@ -86,10 +90,11 @@ def agg_message_publish():
     listener_trans4 = tf.TransformListener()
     listener_trans5 = tf.TransformListener()
 
-    rospy.Subscriber("left_feedback", String, left_update)
-    rospy.Subscriber("right_feedback", String, right_update)
-    rospy.Subscriber("pounds_per_sensor", String, pounds_update)
+    rospy.Subscriber("left_feedback", skate_feedback, left_update)
+    rospy.Subscriber("right_feedback", fkate_feedback, right_update)
+    rospy.Subscriber("pounds_per_sensor", pounds_display, pounds_update)
     rospy.Subscriber("normalized_force_per_sensor", user_force_normalized, normalize_update)
+    rospy.Subscriber("user_position_offset", Float64, position_offset_update)
 
     while not rospy.is_shutdown():
         (trans_left_hip,rot1)   = listener_trans1.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
