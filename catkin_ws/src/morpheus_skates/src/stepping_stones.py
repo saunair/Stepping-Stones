@@ -189,12 +189,14 @@ def send_controls():
                 else:
                     send_control.command_target = user_input.command_target
             except:
-                send_control.command_target = user_input.command_target
-		x_error = 0
                 pass
+            if skip_kinect==True:
+                send_control.command_target = user_input.command_target
+            else:
+		
         
         send_control.header.stamp = rospy.Time.now()	
-        
+        check_timeout(rospy.get_time()) 
     	left_pub.publish(send_control)
     	right_pub.publish(send_control)	
         kin_pub.publish(x_error)
