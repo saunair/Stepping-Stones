@@ -13,6 +13,8 @@ PreloadThreshold = -0.06
 
 preload_right_loose = 0
 preload_left_loose = 0
+announce_right_loose = 0
+announce_left_loose = 0
 
 total_message = integrated_message()
 
@@ -35,7 +37,7 @@ def position_offset_update(data):
 def normalize_update(data1):
     
     data = copy.deepcopy(data1)
-    global total_message, preload_left_loose, preload_right_loose 
+    global total_message, preload_left_loose, preload_right_loose, announce_left_loose, announce_right_loose
    
     if data.left_normal_front_outer<0:
     	if data.left_normal_front_outer<PreloadThreshold:
@@ -73,10 +75,12 @@ def normalize_update(data1):
     	data.right_normal_rear=0
 
 
-    if preload_right_loose:
+    if preload_right_loose and not(announce_right_loose):
         rospy.logwarn("Fix preload for right")
-    if preload_left_loose:
+	announce_right_loose = 1
+    if preload_left_loose and not(announce_left_loose):
         rospy.logwarn("Fix preload for left")
+	announce_left_loose = 1
 	
     total_message.normalized_force = data
 

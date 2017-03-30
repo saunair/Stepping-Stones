@@ -38,7 +38,7 @@ total_weight = 0
 velocity_threshold = 300
 
 #time threshold
-time_threshold = 20
+time_threshold = 2
 
 send_control.command_target = 0
 
