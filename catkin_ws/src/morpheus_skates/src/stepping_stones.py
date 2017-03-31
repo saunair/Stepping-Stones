@@ -47,6 +47,8 @@ z_x= 3.45787
 z_y=0.0881804
 z_z=0.211088
 
+skate_fault_annun = False
+skate_power_annun = False
 
 
 ### required gains from the rosparam server
@@ -95,15 +97,20 @@ def stop_system_left(left):
 
 def check_timeout(current_time):
     global send_control, time_threshold, previous_left_time, previous_right_time, right_skate_fault, left_skate_fault
+    global skate_fault_annun, skate
     if ((current_time - previous_left_time)>time_threshold ):
             #and (current_time - previous_right_time)>time_threshold):
-        print current_time, previous_left_time
+        #print current_time, previous_left_time
         send_control.command_target = 0
-        print "One of the skates has timed out"
+	if not(skate_power_annun):
+            print "One of the skates has timed out"
+ 	    skate_power_annun = True
     #fault detected
     if (left_skate_fault or right_skate_fault):
         send_control.command_target = 0
-        print "fault detected"
+	if not(skate_fault_annun):
+            print "Internal skate fault detected!"
+	    skate_fault_annun = True
 
 #ask for the zero point from the kinect
 def ask_zero_point():
@@ -168,6 +175,24 @@ def send_controls():
             (trans2,rot2) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             pass
+
+        try:
+            (trans_left_foot,rot1)  = listener_trans.lookupTransform('/openni_depth_frame', '/left_foot_1', rospy.Time(0))
+        except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+        try:
+            (trans_right_foot,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/right_foot_1', rospy.Time(0))
+        except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+        try:
+            (trans_COM,rot1)        = listener_trans.lookupTransform('/openni_depth_frame', '/centre_mass', rospy.Time(0))
+        except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+	
+	try:
+	    print trans1, trans2, trans_left_foot, trans_right_foot, trans_COM
+        except:
+	    pass
     
         #current kinect values 
         try:
