@@ -101,8 +101,8 @@ void Control::resetIntegrators() {
 
     
 int Control::checkErrors() {
-  if (positionError > POSN_ERROR_THRESHOLD) skate_fault |= 1<<0;   
-  if (velocityErrorSum > VEL_ERROR_THRESHOLD) skate_fault |= 1<<1;
+  //if (positionError > POSN_ERROR_THRESHOLD) skate_fault |= 1<<0;   
+ // if (velocityErrorSum > VEL_ERROR_THRESHOLD) skate_fault |= 1<<1;
 
   return skate_fault;  
 }

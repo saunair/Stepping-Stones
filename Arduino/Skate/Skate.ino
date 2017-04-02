@@ -1,4 +1,4 @@
-//Revision 3/28/2017
+//Revision 4/1/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -56,8 +56,8 @@ float posnGainsFront[] = {0,0,0};
 float posnGainsRear[] = {0,0,0};
 //float velGainsFront[] = {0,0.0006,0};
 //float velGainsRear[] = {0,0.0006,0};
-float velGainsFront[] = {0,0.00001,0};
-float velGainsRear[] = {0,0.00001,0};
+float velGainsFront[] = {0.0,0.00001,0};
+float velGainsRear[] = {0.0,0.00001,0};
 
 float frontVelCmd;
 float frontVelCmdPrev = 0;
@@ -180,13 +180,13 @@ void loop(){
     check_reset_system();
 
     frontVelCmdPrev = frontVelCmd;
-    frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
     if(frontControl.checkModeTransition() == true) frontDrive.resetState();
+    frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
     if(frontVelCmdPrev != frontVelCmd) frontDrive.setDutyCycle(frontVelCmd);
 
     rearVelCmdPrev = rearVelCmd;
-    rearVelCmd = rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity());
     if(rearControl.checkModeTransition() == true) rearDrive.resetState();
+    rearVelCmd = rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity());
     if(rearVelCmdPrev != rearVelCmd) rearDrive.setDutyCycle(rearVelCmd);
        
     skate_fault = rearControl.checkErrors();
