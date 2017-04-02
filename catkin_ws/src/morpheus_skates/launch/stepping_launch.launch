@@ -11,5 +11,4 @@
 <node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" output="screen"/>
 <node pkg="morpheus_skates" type="normalization_display.py" name="normalization_display" output="screen"/>
 <node pkg="morpheus_skates" type="pounds_display.py" name="pounds_display" output="screen"/>
-<node pkg="morpheus_skates" type="message_integrate.py" name="message_integration" output="screen"/>
 </launch>

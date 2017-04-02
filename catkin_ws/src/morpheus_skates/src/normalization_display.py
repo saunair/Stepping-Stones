@@ -56,25 +56,25 @@ right_preload_rear = rospy.get_param('right_preload_rear')
 def stop_system_right(right):
     global send_control, previous_right_time, right_bias_front_outer, right_bias_front_inner, right_bias_rear, right_gain_front_outer, right_gain_front_inner, right_gain_rear, right_preload_front_outer, right_preload_front_inner, right_preload_rear, total_weight, right_force_front_outer, right_force_front_inner, right_force_rear, normalized_force_values
 
-    right_force_front_outer = float(float(float(right.force_front_outer - right_bias_front_outer)/right_gain_front_outer) - right_preload_front_outer)/total_weight
-    right_force_front_inner = float(float(float(right.force_front_inner - right_bias_front_inner)/right_gain_front_inner) - right_preload_front_inner)/total_weight
-    right_force_rear        = float((float(right.force_rear - right_bias_rear)/right_gain_rear) - right_preload_rear)/total_weight
-    normalized_force_values.right_normal_front_outer = right_force_front_outer   
-    normalized_force_values.right_normal_front_outer = right_force_front_inner 
-    normalized_force_values.right_normal_front_outer = right_force_rear        
-    normalized_force_values.right_normal_total = normalized_force_values.right_normal_front_outer +  normalized_force_values.right_normal_front_outer + normalized_force_values.right_normal_front_outer
+    right_force_front_outer = float(float(float(right.force_front_outer - right_bias_front_outer)/right_gain_front_outer) - right_preload_front_outer)
+    right_force_front_inner = float(float(float(right.force_front_inner - right_bias_front_inner)/right_gain_front_inner) - right_preload_front_inner)
+    right_force_rear        = float(float(float(right.force_rear - right_bias_rear)/right_gain_rear) - right_preload_rear)
+    normalized_force_values.right_normal_front_outer = right_force_front_outer/total_weight   
+    normalized_force_values.right_normal_front_inner = right_force_front_inner/total_weight
+    normalized_force_values.right_normal_rear = right_force_rear/total_weight
+    normalized_force_values.right_normal_total = normalized_force_values.right_normal_front_outer +  normalized_force_values.right_normal_front_inner + normalized_force_values.right_normal_rear
 
 
 
 def stop_system_left(left):
     global send_control, previous_left_time, left_bias_front_outer, left_bias_front_inner, left_bias_rear, left_gain_front_outer, left_gain_front_inner, left_gain_rear, left_preload_front_outer, left_preload_front_inner, left_preload_rear, total_weight, left_force_front_outer, left_force_front_inner, left_force_rear, normalized_force_values
-    left_force_front_outer =  float(float(left.force_front_outer - left_bias_front_outer)/left_gain_front_outer - left_preload_front_outer)/total_weight
-    left_force_front_inner = float(float(left.force_front_inner - left_bias_front_inner)/left_gain_front_inner - left_preload_front_inner)/total_weight
-    left_force_rear        = float(((left.force_rear - left_bias_rear)/left_gain_rear) - left_preload_rear)/total_weight
-    normalized_force_values.left_normal_front_outer = left_force_front_outer 
-    normalized_force_values.left_normal_front_outer = left_force_front_inner 
-    normalized_force_values.left_normal_front_outer = left_force_rear        
-    normalized_force_values.left_normal_total = normalized_force_values.left_normal_front_outer +  normalized_force_values.left_normal_front_outer + normalized_force_values.left_normal_front_outer
+    left_force_front_outer =  float(float(float(left.force_front_outer - left_bias_front_outer)/left_gain_front_outer) - left_preload_front_outer)
+    left_force_front_inner =  float(float(float(left.force_front_inner - left_bias_front_inner)/left_gain_front_inner) - left_preload_front_inner)
+    left_force_rear        =  float(float(float(left.force_rear - left_bias_rear)/left_gain_rear) - left_preload_rear)
+    normalized_force_values.left_normal_front_outer = left_force_front_outer/total_weight 
+    normalized_force_values.left_normal_front_inner = left_force_front_inner/total_weight
+    normalized_force_values.left_normal_rear = left_force_rear/total_weight
+    normalized_force_values.left_normal_total = normalized_force_values.left_normal_front_outer +  normalized_force_values.left_normal_front_inner + normalized_force_values.left_normal_rear
 
 def run_normalization_routine():
 
