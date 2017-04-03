@@ -121,7 +121,7 @@ class ControlsStateMachine:
         self.transitions[TransitionName] = newtransition
 
     #Add new states if needed
-    def AddState(self, StateName, newstate) 
+    def AddState(self, StateName, newstate)
         self.states[StateName] = newstate
 
     #State setting function
