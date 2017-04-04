@@ -136,8 +136,8 @@ class ControlsStateMachine:
     def Execute(self):
         if (self.trans): #If there is a transition
             self.CurrentState.Exit() #Exit the current state
-            self.trans.Execute() #Execute transition
-            self.SetState(self.trans.toState) #Transition to the new state
+            self.Transition.Execute() #Execute transition
+            self.SetState(self.Transition.toState) #Transition to the new state
             self.CurrentState.Enter() #Enter the new state
             self.trans = None #Reset transition variable
         self.CurrentState.Execute() #Execute the new state
