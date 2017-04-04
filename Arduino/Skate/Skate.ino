@@ -56,8 +56,8 @@ float posnGainsFront[] = {0,0,0};
 float posnGainsRear[] = {0,0,0};
 //float velGainsFront[] = {0,0.0006,0};
 //float velGainsRear[] = {0,0.0006,0};
-float velGainsFront[] = {0.0,0.00001,0};
-float velGainsRear[] = {0.0,0.00001,0};
+float velGainsFront[] = {0.0005,0,0};
+float velGainsRear[] = {0.0005,0,0};
 
 float frontVelCmd;
 float frontVelCmdPrev = 0;
