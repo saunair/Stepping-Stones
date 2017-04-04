@@ -1,4 +1,4 @@
-//Revision 4/1/2017
+//Revision 4/4/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -65,6 +65,7 @@ float frontVelCmd;
 float frontVelCmdPrev = 0;
 float rearVelCmd;
 float rearVelCmdPrev = 0;
+bool prevFreeWheel = false;
 
 bool leftSkate = false;
 bool rightSkate = false;
@@ -180,20 +181,41 @@ void loop(){
 
     target = global_set_point;
     check_reset_system();
-
     frontVelCmdPrev = frontVelCmd;
-    if(frontControl.checkModeTransition() == true) frontDrive.resetState();
-    frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
-    if(frontVelCmdPrev != frontVelCmd) frontDrive.setDutyCycle(frontVelCmd);
-
     rearVelCmdPrev = rearVelCmd;
+    if(frontControl.checkModeTransition() == true) frontDrive.resetState();
     if(rearControl.checkModeTransition() == true) rearDrive.resetState();
-    rearVelCmd = rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity());
-    if(rearVelCmdPrev != rearVelCmd) rearDrive.setDutyCycle(rearVelCmd);
-       
-    skate_fault = rearControl.checkErrors();
-    skate_fault |= frontControl.checkErrors() << 2;
-    skate_fault |= (timeOverrunCnt & 0xF) << 4;
+
+    if(target > 0) {      
+      frontVelCmd = frontControl.computeCommand(target,frontDrive.getPosition(),frontDrive.getVelocity());
+      if(frontVelCmdPrev != frontVelCmd) frontDrive.setDutyCycle(frontVelCmd);  
+      
+      rearVelCmd = rearControl.computeCommand(target,rearDrive.getPosition(),rearDrive.getVelocity());
+      if(rearVelCmdPrev != rearVelCmd) rearDrive.setDutyCycle(rearVelCmd);
+         
+      skate_fault = rearControl.checkErrors();
+      skate_fault |= frontControl.checkErrors() << 2;
+      skate_fault |= (timeOverrunCnt & 0xF) << 4;
+    }
+    else {
+      if(target == 0) {
+        if(prevFreeWheel == true) {
+          frontDrive.setDutyCycle(0.0001);
+          rearDrive.setDutyCycle(0.0001);
+          prevFreeWheel = false;
+        }
+        else {
+          frontDrive.setDutyCycle(0);
+          rearDrive.setDutyCycle(0);
+        }
+      }
+      else {
+        frontDrive.setCurrent(0);
+        rearDrive.setCurrent(0);
+        prevFreeWheel = true;
+      }
+    }
+    
     feedback.debug_int1 = int(micros() - startTime);
 
     formPacket();
@@ -220,8 +242,8 @@ void loop(){
 }
 
 void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
-  global_set_point = cmd_msg.command_target*(skate_fault==0);
-  //global_set_point = cmd_msg.command_target;
+  //global_set_point = cmd_msg.command_target*(skate_fault==0);
+  global_set_point = cmd_msg.command_target;
   master_time = millis();
 }
 
