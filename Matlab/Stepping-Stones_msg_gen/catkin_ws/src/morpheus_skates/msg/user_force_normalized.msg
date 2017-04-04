@@ -1,0 +1,10 @@
+Header header
+float32 left_normal_front_outer
+float32 left_normal_front_inner
+float32 left_normal_rear
+float32 right_normal_front_outer
+float32 right_normal_front_inner
+float32 right_normal_rear
+float32 right_normal_total
+float32 left_normal_total
+float32 normal_total
