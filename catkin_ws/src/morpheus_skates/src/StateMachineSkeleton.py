@@ -130,8 +130,8 @@ class ControlsStateMachine:
         self.CurrentState = self.states[StateName] #Look for the passed state in the states dictionary
     
     #Transition function
-    def Transition(self, TransitionName)
-        self.trans = self.transitions[TransitionName] #Repeat for transition
+    def ToTransition(self, ToTransitionName)
+        self.trans = self.transitions[ToTransitionName] #Repeat for transition
 
     def Execute(self):
         if (self.trans): #If there is a transition
@@ -144,7 +144,7 @@ class ControlsStateMachine:
 
 ###Use imported as parent class/character in place of class below
 char  = type("char", (object,){})
-class MorpheusSkate(char):
+class ControlSkate(char):
     def __init__(self):
         self.ControlsStateMachine = ControlsStateMachine(self)
 
