@@ -71,7 +71,7 @@ right_preload_front_inner = rospy.get_param('right_preload_front_inner')
 right_preload_rear = rospy.get_param('right_preload_rear')
 
 #Kinect-based controller values
-kp = 50 # mm/s / m
+kp = 100 # mm/s / m
 
 def process_input(data):
     global user_input
@@ -108,7 +108,7 @@ def position_offset_update(data):
 
 def check_timeout(current_time):
     global send_control, time_threshold, previous_left_time, previous_right_time, right_skate_fault, left_skate_fault
-    global skate_fault_annun, skate
+    global skate_fault_annun, skate_power_annun
     if ((current_time - previous_left_time)>time_threshold ) or ((current_time - previous_right_time)>time_threshold):
         #print current_time, previous_left_time
         send_control.command_target = 0
