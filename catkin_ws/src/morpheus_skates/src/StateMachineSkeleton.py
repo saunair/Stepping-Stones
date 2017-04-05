@@ -1,16 +1,16 @@
 #Import SVM Output
-try:
-    from stepping_stones import MorpheusSkate #import morpheus skate parent class
-    from stepping_stones import SVM_Out_State #SVM Output
-except ImportError:
-    print "hag diya"
-    print ImportError
-    pass
+# try:
+#     from stepping_stones import MorpheusSkate #import morpheus skate parent class
+#     from stepping_stones import SVM_Out_State #SVM Output
+# except ImportError:
+#     print "hag diya"
+#     print ImportError
+#     pass
 
 #Warnings:
 import warnings
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+#logger = logging.getLogger(__name__)
+#logger.addHandler(logging.NullHandler())
 #Other useful packages:
 from time import clock
 import numpy
@@ -96,17 +96,14 @@ class DoubleStanceInMotion(State):
 
 
 ###Transitions
-
 class Transition(object):
-    def __init__(self, fromState, toState):
+    def __init__(self, toState):
         self.toState = toState
-        self.fromState = fromState
     def Execute(self):
         print "Transitioning"
 
 
 ###State Machine
-
 class ControlsStateMachine:
     def __init__(self, char):
         self.char = char
@@ -117,56 +114,72 @@ class ControlsStateMachine:
         self.trans = None #Current transition
 
     #Add new transitions if needed
-    def AddTransition(self, TransitionName, newtransition)
+    def AddTransition(self, TransitionName, newtransition):
         self.transitions[TransitionName] = newtransition
 
     #Add new states if needed
-    def AddState(self, StateName, newstate)
+    def AddState(self, StateName, newstate):
         self.states[StateName] = newstate
 
     #State setting function
-    def SetState(self, StateName)
+    def SetState(self, StateName):
         self.PreviousState = self.CurrentState
         self.CurrentState = self.states[StateName] #Look for the passed state in the states dictionary
     
-    #Transition function
-    def ToTransition(self, ToTransitionName)
-        self.trans = self.transitions[ToTransitionName] #Repeat for transition
+    #Sets the Transition state
+    def SetTransition(self, SetTransitionName):
+        self.trans = self.transitions[SetTransitionName] 
 
     def Execute(self):
         if (self.trans): #If there is a transition
             self.CurrentState.Exit() #Exit the current state
-            self.Transition.Execute() #Execute transition
-            self.SetState(self.Transition.toState) #Transition to the new state
+            self.trans.Execute() #Execute transition
+            self.SetState(self.trans.toState) #Transition to the new state
             self.CurrentState.Enter() #Enter the new state
             self.trans = None #Reset transition variable
         self.CurrentState.Execute() #Execute the new state
 
 ###Use imported as parent class/character in place of class below
-char  = type("char", (object,){})
-class ControlSkate(char):
+class ControlSkate(object):
     def __init__(self):
         self.ControlsStateMachine = ControlsStateMachine(self)
 
-        ### Add all states:
+        ### Add all states to the dictionary for states:
         self.ControlsStateMachine.AddState("SingleStanceInPlace", SingleStanceInPlace(self.ControlsStateMachine))
         self.ControlsStateMachine.AddState("SingleStanceInMotion", SingleStanceInMotion(self.ControlsStateMachine))
         self.ControlsStateMachine.AddState("DoubleStanceInPlace", DoubleStanceInPlace(self.ControlsStateMachine))
         self.ControlsStateMachine.AddState("DoubleStanceInMotion", DoubleStanceInMotion(self.ControlsStateMachine))
 
-        ###Add all transitions:
-        self.ControlsStateMachine.AddTransition("FromDoubleStanceInPlaceToSingleStanceInPlace", Transition("SingleStanceInPlace"))
-        self.ControlsStateMachine.AddTransition("FromSingleStanceInPlaceToSingleStanceInMotion", Transition("SingleStanceInMotion"))
-        self.ControlsStateMachine.AddTransition("FromSingleStanceInMotionToDoubleStanceInMotion", Transition("DoubleStanceInMotion"))
-        self.ControlsStateMachine.AddTransition("FromDoubleStanceInMotionToDoubleStanceInPlace", Transition("DoubleStanceInPlace"))
-        self.ControlsStateMachine.AddTransition("FromDoubleStanceInMotionToSingleStanceInPlace", Transition("SingleStanceInPlace"))
-        self.ControlsStateMachine.AddTransition("FromDoubleStanceInMotionToSingleStanceInMotion", Transition("SingleStanceInMotion"))       
-
-        '''self.ControlsStateMachine.AddTransition("FromDoubleStanceInPlaceToSingleStanceInMotion", Transition(""))
-        self.ControlsStateMachine.AddTransition("FromDoubleStanceInPlaceToSingleStanceInPlace", Transition(""))'''
-
+        ###Add all transitions to the dictionary for transitions:
+        self.ControlsStateMachine.AddTransition("SingleStanceInPlace", Transition("SingleStanceInPlace"))
+        self.ControlsStateMachine.AddTransition("SingleStanceInMotion", Transition("SingleStanceInMotion"))
+        self.ControlsStateMachine.AddTransition("DoubleStanceInMotion", Transition("DoubleStanceInMotion"))
+        self.ControlsStateMachine.AddTransition("DoubleStanceInPlace", Transition("DoubleStanceInPlace"))
+        
+        
         ###Default State: Double Stance in Place
         self.ControlsStateMachine.SetState("DoubleStanceInPlace") #Always start in double stance in place
 
-        def Execute(self):
-            self.ControlsStateMachine.Execute()
+    def Execute(self):
+        self.ControlsStateMachine.Execute()
+
+###Testing this shit
+
+if __name__=='__main__':
+	statemachine = ControlSkate()
+	print statemachine.ControlsStateMachine.transitions
+	for i in xrange(20):
+		startTime = clock()
+		timeInt = 1
+		#Wait for 1 second
+		while(startTime+timeInt>clock()):
+			pass
+		State = input('Enter the state:')
+
+		#1: DoubleStanceInPlace
+		#2: SingleStanceInPlace
+		#3: SingleStanceInMotion
+		#4: DoubleStanceInMotion
+		if not (State == statemachine.ControlsStateMachine.CurrentState):
+			statemachine.ControlsStateMachine.SetTransition(State)
+		statemachine.Execute()
