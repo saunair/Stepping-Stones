@@ -56,10 +56,19 @@ float posnGainsFront[] = {0,0,0};
 float posnGainsRear[] = {0,0,0};
 //float velGainsFront[] = {0,0.0006,0};
 //float velGainsRear[] = {0,0.0006,0};
-float velGainsFront[] = {0.0007,0,0};
-float velGainsRear[] = {0.0007,0,0};
+//float velGainsFront[] = {0.0007,0,0};
+//float velGainsRear[] = {0.0007,0,0};
+//float velGainsFront[] = {0.002,0,0.00004};
+//float velGainsRear[] = {0.002,0,0.00004};
 //float velGainsFront[] = {0,0,0};
 //float velGainsRear[] = {0,0,0};
+
+//float velGainsFront[] = {0.00125,0,0.0};
+//float velGainsRear[] = {0.00125,0,0.0};
+//float velGainsFront[] = {0.00125,0.00006,0};
+//float velGainsRear[] = {0.00125,0.00006,0};
+float velGainsFront[] = {0.001,0.00001,0};
+float velGainsRear[] = {0.001,0.00001,0};
 
 float frontVelCmd;
 float frontVelCmdPrev = 0;
@@ -291,6 +300,9 @@ void formPacket() {
 
       Serial1.write(allRequests,21);
     }
+
+    feedback.debug_float1 = rearControl.getVelocityErrorSum();
+    feedback.debug_float2 = frontControl.getVelocityErrorSum();
 }
 
 void check_reset_system() 
