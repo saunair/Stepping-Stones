@@ -191,7 +191,8 @@ def normalize_update(data1):
     if preload_left_loose and not(announce_left_loose):
         rospy.logwarn("Fix preload for left")
 	announce_left_loose = 1
-	
+
+    total_message.header.stamp = rospy.get_rostime()	
     total_message.normalized_force = data
 
 #main higher level control code

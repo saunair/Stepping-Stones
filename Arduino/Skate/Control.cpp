@@ -45,6 +45,7 @@ float Control::computeCommand(float target,float wheelPosition,float wheelVeloci
   }
 
   if(controlMode == Position_Mode) {
+    resetIntegrators();
     return computePositionCommand(target,wheelPosition);
   }
 
@@ -56,6 +57,8 @@ float Control::computeCommand(float target,float wheelPosition,float wheelVeloci
 
 float Control::computePositionCommand(float target,float wheelPosition) {
   positionTarget = target;
+  velocityTarget = 0;
+  velocityTargetLim = 0;
   positionErrorPrev = positionError;
   positionError = positionTarget - wheelPosition;
 
@@ -85,10 +88,10 @@ float Control::computeVelocityCommand(float target,float wheelVelocity) {
 
   velocityErrorPrev = velocityError;   
   velocityError = velocityTargetLim - wheelVelocity;
-  velocityErrorSum = velocityErrorSum + velocityError;
+  velocityErrorSum = constrain(velocityErrorSum + velocityError,-INTEG_LIMIT,INTEG_LIMIT);
   velocityErrorDiff = velocityError - velocityErrorPrev;
 
-  command = ((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00038*velocityTargetLim + 0.0065));
+  command = constrain(((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00038*velocityTargetLim + 0.0065)),-1,1);
       
   return command;
 }
@@ -121,11 +124,16 @@ bool Control::checkModeTransition() {
 
 float Control::getControllerTarget() {
   if(controlMode == Position_Mode){
-    //return positionTarget;
-    return 0;
+    return positionTarget;
+    //return 0;
   }
   else {
     return velocityTargetLim;
   }
+}
+
+
+float Control::getVelocityErrorSum() {
+  return velocityErrorSum;
 }
 
