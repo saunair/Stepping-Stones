@@ -21,10 +21,9 @@ import numpy
 class State(object): #State base class
     def __init__(self, ControlsStateMachine):
         self.ControlsStateMachine = ControlsStateMachine
-        self.timer = 0
-        self.startTime = 0
+        
     def Enter(self):
-        self.startTime = int(clock())
+        pass
     def Execute(self):
         pass
     def Exit(self):
@@ -34,7 +33,8 @@ class SingleStanceInPlace(State):
     def __init__(self,ControlsStateMachine):
         #super().__init__(ControlsStateMachine) in python 3
         super(SingleStanceInPlace,self).__init__(ControlsStateMachine)
-
+        self.name = 'SingleStanceInPlace'
+        self.ID = 1
     def Enter(self):
         print 'Entering single stance in place...'
         super(SingleStanceInPlace, self).Enter()
@@ -50,6 +50,8 @@ class SingleStanceInMotion(State):
     def __init__(self,ControlsStateMachine):
         #super().__init__(ControlsStateMachine) in python 3
         super(SingleStanceInMotion,self).__init__(ControlsStateMachine)
+        self.name = 'SingleStanceInMotion'
+        self.ID = 2
 
     def Enter(self):
         print 'Entering single stance in motion...'
@@ -66,6 +68,8 @@ class DoubleStanceInPlace(State):
     def __init__(self,ControlsStateMachine):
         #super().__init__(ControlsStateMachine) in python 3
         super(DoubleStanceInPlace,self).__init__(ControlsStateMachine)
+        self.name = 'DoubleStanceInPlace'
+        self.ID = 3
 
     def Enter(self):
         print 'Entering double stance in place...'
@@ -82,6 +86,8 @@ class DoubleStanceInMotion(State):
     def __init__(self,ControlsStateMachine):
         #super().__init__(ControlsStateMachine) in python 3
         super(DoubleStanceInMotion,self).__init__(ControlsStateMachine)
+        self.name = 'DoubleStanceInMotion'
+    	self.ID = 4
 
     def Enter(self):
         print 'Entering double stance in motion...'
@@ -129,6 +135,7 @@ class ControlsStateMachine:
     #Sets the Transition state
     def SetTransition(self, SetTransitionName):
         self.trans = self.transitions[SetTransitionName] 
+        print self.trans
 
     def Execute(self):
         if (self.trans): #If there is a transition
@@ -167,19 +174,12 @@ class ControlSkate(object):
 
 if __name__=='__main__':
 	statemachine = ControlSkate()
-	print statemachine.ControlsStateMachine.transitions
-	for i in xrange(20):
-		startTime = clock()
-		timeInt = 1
-		#Wait for 1 second
-		while(startTime+timeInt>clock()):
-			pass
+	while 1:
 		State = input('Enter the state:')
-
 		#1: DoubleStanceInPlace
 		#2: SingleStanceInPlace
 		#3: SingleStanceInMotion
 		#4: DoubleStanceInMotion
-		if not (State == statemachine.ControlsStateMachine.CurrentState):
+		if not(State == statemachine.ControlsStateMachine.CurrentState.name):
 			statemachine.ControlsStateMachine.SetTransition(State)
-		statemachine.Execute()
+			statemachine.Execute()
