@@ -16,7 +16,7 @@ skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms
 
 left_skate_fault = 0
 right_skate_fault = 0;
-PreloadThreshold = -0.06
+PreloadThreshold = -0.2
 preload_right_loose = 0
 preload_left_loose = 0
 announce_right_loose = 0
@@ -184,6 +184,15 @@ def normalize_update(data1):
         if data.right_normal_rear<PreloadThreshold:
     	    preload_right_loose = True
     	data.right_normal_rear=0
+
+    if data.left_normal_total<=0:
+        data.left_normal_total=0
+
+    if data.right_normal_total<=0:
+        data.right_normal_total=0
+
+    if data.normal_total<=0:
+        data.normal_total=0
 
     if preload_right_loose and not(announce_right_loose):
         rospy.logwarn("Fix preload for right")
