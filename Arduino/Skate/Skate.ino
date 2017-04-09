@@ -1,4 +1,4 @@
-//Revision 4/5/2017
+//Revision 4/8/2017-2
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -61,7 +61,7 @@ float posnGainsRear[] = {0,0,0};
 //float velGainsFront[] = {0.002,0,0.00004};
 //float velGainsRear[] = {0.002,0,0.00004};
 
-float velGainsFront[] = {0,0,0};
+//float velGainsFront[] = {0,0,0};
 //float velGainsRear[] = {0,0,0};
 
 //float velGainsFront[] = {0.00125,0,0.0};
@@ -71,13 +71,14 @@ float velGainsFront[] = {0,0,0};
 
 //float velGainsFront[] = {0.0005,0.000005,0};
 
-//Current Left Gains
-float velGainsFront[] = {0,0,0};
-float velGainsRear[] = {0.001,0.00001,0};
+//Previous Left Gains
+//float velGainsFront[] = {0,0,0};
+//float velGainsRear[] = {0.001,0.00001,0};
 
-//Current Right Gains
 //float velGainsFront[] = {0.001,0.00001,0};
 //float velGainsRear[] = {0.001,0.00001,0};
+float velGainsFront[] = {0.001,0.000008,0};
+float velGainsRear[] = {0.001,0.000008,0};
 
 float frontVelCmd;
 float frontVelCmdPrev = 0;

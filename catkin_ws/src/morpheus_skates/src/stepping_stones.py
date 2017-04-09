@@ -184,19 +184,17 @@ def normalize_update(data1):
         if data.right_normal_rear<PreloadThreshold:
     	    preload_right_loose = True
     	data.right_normal_rear=0
-
-    if data.left_normal_total<=0:
-        data.left_normal_total=0
-
-    if data.right_normal_total<=0:
-        data.right_normal_total=0
-
-    if data.normal_total<=0:
-        data.normal_total=0
-
+    
+    data.left_normal_total = data.left_normal_rear + data.left_normal_front_inner + data.left_normal_front_outer
+    
+    data.right_normal_total = data.right_normal_rear + data.right_normal_front_inner + data.right_normal_front_outer
+     
+    data.normal_total = data.left_normal_total + data.right_normal_total 
+     
     if preload_right_loose and not(announce_right_loose):
         rospy.logwarn("Fix preload for right")
 	announce_right_loose = 1
+    
     if preload_left_loose and not(announce_left_loose):
         rospy.logwarn("Fix preload for left")
 	announce_left_loose = 1
@@ -228,8 +226,9 @@ def send_controls():
     
     while not rospy.is_shutdown():
         
+        #invert the frames for left and right
         try:
-            (trans_left_hip,rot_left_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
+            (trans_left_hip,rot_left_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
             total_message.hip_left[0] = trans_left_hip[0] - z_x 
             total_message.hip_left[1] = trans_left_hip[1] - z_y
             total_message.hip_left[2] = trans_left_hip[2] - z_z
@@ -237,7 +236,7 @@ def send_controls():
 	    	pass
     
         try:
-            (trans_right_hip,rot_right_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
+            (trans_right_hip,rot_right_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
             total_message.hip_right[0] = trans_right_hip[0] - z_x
             total_message.hip_right[1] = trans_right_hip[1] - z_y
             total_message.hip_right[2] = trans_right_hip[2] - z_z 
@@ -245,14 +244,14 @@ def send_controls():
             pass
 
         try:
-            (trans_left_foot,rot_left_foot)  = listener_trans.lookupTransform('/openni_depth_frame', '/left_foot_1', rospy.Time(0))
+            (trans_left_foot,rot_left_foot)  = listener_trans.lookupTransform('/openni_depth_frame', '/right_foot_1', rospy.Time(0))
             total_message.foot_left[0] = trans_left_foot[0] - z_x
             total_message.foot_left[1] = trans_left_foot[1] - z_y
             total_message.foot_left[2] = trans_left_foot[2] - z_z
         except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             pass
         try:
-            (trans_right_foot,rot_right_foot) = listener_trans.lookupTransform('/openni_depth_frame', '/right_foot_1', rospy.Time(0))
+            (trans_right_foot,rot_right_foot) = listener_trans.lookupTransform('/openni_depth_frame', '/left_foot_1', rospy.Time(0))
             total_message.foot_right[0] = trans_right_foot[0] - z_x
             total_message.foot_right[1] = trans_right_foot[1] - z_y
             total_message.foot_right[2] = trans_right_foot[2] - z_z 	
@@ -266,8 +265,6 @@ def send_controls():
         except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             pass
 	
-
-    
         #current kinect values 
         try:
             x_current = ((trans_right_hip[0] + trans_left_hip[0])/2)
@@ -292,6 +289,8 @@ def send_controls():
     	left_pub.publish(send_control_left)
     	right_pub.publish(send_control_right)	
         kin_pub.publish(x_error)
+        total_message.left_command = send_control_left
+        total_message.right_command = send_control_right
         total_message.header.stamp = rospy.get_rostime()
         total_pub.publish(total_message)
 

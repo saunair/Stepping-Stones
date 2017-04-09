@@ -5,7 +5,7 @@
 #ifndef Control_h
 #define Control_h
 
-#define ACCEL_LIMIT 1000.0
+#define ACCEL_LIMIT 500.0
 #define INTEG_LIMIT 2000.0
 
 #define POSN_ERROR_THRESHOLD 70
