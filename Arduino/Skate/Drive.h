@@ -10,8 +10,11 @@
 #define SPEED_LIM_MIN -30.0
 #define SPEED_LIM_MAX 30.0
 #define KP 10.0
-#define KI 200.0
-
+//#define KI 200.0
+//#define KI 100.0
+//#define KI 50.0
+//#define KI 20.0
+#define KI 2.0
 #include "Arduino.h"
 
 // Communication commands
@@ -66,6 +69,7 @@ class Drive {
     void resetTimeout();
     float getPosition();
     float getVelocity();
+    float getVelocityEncoder();
     long updateTimeDelta;
     long lastUpdateTime;
 
@@ -79,7 +83,10 @@ class Drive {
     volatile long encCount;
     boolean A_set;
     boolean B_set;
+    float wheelPositionEncoder;
+    float wheelPositionEncoderPrev;
     float wheelPositionEstimate;
+    float wheelVelocityEncoder;
     float wheelVelocityInteg; 
     float wheelVelocityEstimate;
     int commandLim;
