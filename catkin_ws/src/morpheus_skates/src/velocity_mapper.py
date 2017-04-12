@@ -1,3 +1,6 @@
+###Author: Saurabh Nair
+### Code to map velocity using force and imu data from the skates
+
 import numpy as np
 import pandas as pd
 from keras.models import Sequential
