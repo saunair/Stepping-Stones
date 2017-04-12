@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 # dataset
-dataframe = pd.read_csv("/home/saurabh/Stepping-Stones/Matlab/Mat Files/kinect_velocity/velocity_saurabh_200_2017-04-09-00-34-12.csv")
+dataframe = pd.read_csv("/home/saurabh/Stepping-Stones/Matlab/Mat Files/kinect_velocity/velocity_saurabh_2017-04-09-00-22-46.csv")
 
 #print dataframe
 dataset = dataframe.values
@@ -45,7 +45,7 @@ def larger_model():
     model = Sequential()
     model.add(Dense(no_features, input_dim=no_features, kernel_initializer='normal', activation='sigmoid'))
     model.add(Dense(6, kernel_initializer='normal', activation='sigmoid'))
-    model.add(Dense(1, kernel_initializer='normal'))
+    model.add(Dense(1, kernel_initializer='normal', activation= 'linear'))
     # Compile model
     model.compile(loss='mean_squared_error', optimizer='adam')
     return model
