@@ -17,11 +17,29 @@ Double_Stance = 1
 Single_Stance_Left = 2 
 Single_Stance_Right = 3
 
+current_state = 1
+state_queue = [1,1,1]
+
+no_states = 6
+SSPL = 0 
+SSPR = 1 
+SSML = 2 
+SSMR = 3 
+DSP  = 4 
+DSM  = 5
+markov_matrix =[[0.40, 0.05, 0.25, 0.05, 0.10, 0.15], 
+               [0.05, 0.40, 0.05, 0.25, 0.10, 0.15],
+               [0.05, 0.10, 0.40, 0.05, 0.15, 0.25],
+               [0.10, 0.05, 0.05, 0.40, 0.15, 0.25],
+               [0.20, 0.20, 0.125,0.125,0.30, 0.05],
+               [0.20, 0.20, 0.125,0.125,0.05, 0.30]]
+
+
 
 ## copied one from double stance to initialize`
 force_values = [0.0568256229, 0.1217591166, 0.3135216534, 0.0094473129, 0.1839496493, 0.3274969757, 0.5208939314, 0.4921063781, 1.0130003691]
 
-imu_data_left = 0 
+imu_data_left  = 0 
 imu_data_right = 0
 foot_positions = 0
 
@@ -84,6 +102,13 @@ def update_vector(msg):
 
     foot_positions = [msg.foot_left, msg.foot_right]
  
+def markov_decision():
+    score_list = no_states*[0] 
+    for i in range(0,len(state_queue)):
+        score_list[state_queue[i]] += makov_matrix[current_state][state_queue[i]];
+
+    decision = score_list.index(max(score_list))
+    return decision
 
 def check_polygon(state):   
     global force_values, imu_data_left, imu_data_right, foot_positions
@@ -111,15 +136,32 @@ def state_machine(stance_classifier):
         feature_temp = np.asarray(np.asarray(force_values))
 	feature_temp = feature_temp.reshape(1,-1)
         static_state = stance_classifier.predict(feature_temp)
-        print static_state 
+        ##append the state and also delete the oldest state
+
         if static_state[0] == Double_Stance:
-            motion = check_polygon(static_state) 
- 
+            if(check_polygon(static_state)):
+                state = DSM 
+            else: 
+                state = DSP
+
         elif static_state[0] == Single_Stance_Left:
-            motion = check_polygon(static_state)
-    
+            if(check_polygon(static_state)):
+                state = SSML
+            else:
+                state = SSPL
+
         elif static_state[0] == Single_Stance_Right:
-            motion = check_polygon(static_state)
+            if(check_polygon(static_state)):
+                state =  SSMR
+            else:
+                state = SSPR
+        
+        current_state = markov_decision()
+        del state_queue[0]
+
+        ## append the latest prediction
+        state_queue = state_queue.append(state) 
+        
 
 
 if __name__=='__main__':
