@@ -1,4 +1,4 @@
-//Revision 4/8/2017-2
+//Revision 4/11/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -54,31 +54,28 @@ long startTime = 0;
 //float posnGainsRear[] = {0.3,0,0};
 float posnGainsFront[] = {0,0,0};
 float posnGainsRear[] = {0,0,0};
-//float velGainsFront[] = {0,0.0006,0};
-//float velGainsRear[] = {0,0.0006,0};
-//float velGainsFront[] = {0.0007,0,0};
-//float velGainsRear[] = {0.0007,0,0};
-//float velGainsFront[] = {0.002,0,0.00004};
-//float velGainsRear[] = {0.002,0,0.00004};
 
 //float velGainsFront[] = {0,0,0};
 //float velGainsRear[] = {0,0,0};
+//float velGainsFront[] = {0.001,0.000008,0};
+//float velGainsRear[] = {0.001,0.000008,0};
 
-//float velGainsFront[] = {0.00125,0,0.0};
-//float velGainsRear[] = {0.00125,0,0.0};
-//float velGainsFront[] = {0.00125,0.00006,0};
-//float velGainsRear[] = {0.00125,0.00006,0};
+//Critically damped
+//float velGainsFront[] = {0.0005,0,0};
+//float velGainsRear[] = {0.0005,0,0};
+//float velGainsFront[] = {0.0006,0,0};
+//float velGainsRear[] = {0.0006,0,0};
 
-//float velGainsFront[] = {0.0005,0.000005,0};
+//Underdamped
+//float velGainsFront[] = {0.001,0,0};
+//float velGainsRear[] = {0.001,0,0};
 
-//Previous Left Gains
-//float velGainsFront[] = {0,0,0};
-//float velGainsRear[] = {0.001,0.00001,0};
+//Unstable
+//float velGainsFront[] = {0.002,0,0};
+//float velGainsRear[] = {0.002,0,0};
 
-//float velGainsFront[] = {0.001,0.00001,0};
-//float velGainsRear[] = {0.001,0.00001,0};
-float velGainsFront[] = {0.001,0.000008,0};
-float velGainsRear[] = {0.001,0.000008,0};
+float velGainsFront[] = {0.0006,0.000005,0};
+float velGainsRear[] = {0.0006,0.000005,0};
 
 float frontVelCmd;
 float frontVelCmdPrev = 0;
@@ -217,6 +214,9 @@ void loop(){
       skate_fault |= (timeOverrunCnt & 0xF) << 4;
     }
     else {
+      frontVelCmd = frontControl.computeCommand(0,frontDrive.getPosition(),frontDrive.getVelocity());
+      rearVelCmd = rearControl.computeCommand(0,rearDrive.getPosition(),rearDrive.getVelocity());
+
       if(target == 0) {
         if(prevFreeWheel == true) {
           frontDrive.setDutyCycle(0.0001);
@@ -313,9 +313,12 @@ void formPacket() {
 
     feedback.debug_float1 = rearControl.getVelocityErrorSum();
     feedback.debug_float2 = frontControl.getVelocityErrorSum();
+
+    //feedback.debug_float1 = rearDrive.getVelocityEncoder();
+    //feedback.debug_float2 = frontDrive.getVelocityEncoder();
 }
 
-void check_reset_system() 
+void check_reset_system()
 {
   if(millis() - master_time > TIMEOUT_MS) {
     global_set_point = 0;

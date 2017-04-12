@@ -228,7 +228,7 @@ def send_controls():
         
         #invert the frames for left and right
         try:
-            (trans_left_hip,rot_left_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
+            (trans_left_hip,rot_left_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
             total_message.hip_left[0] = trans_left_hip[0] - z_x 
             total_message.hip_left[1] = trans_left_hip[1] - z_y
             total_message.hip_left[2] = trans_left_hip[2] - z_z
@@ -236,7 +236,7 @@ def send_controls():
 	    	pass
     
         try:
-            (trans_right_hip,rot_right_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
+            (trans_right_hip,rot_right_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
             total_message.hip_right[0] = trans_right_hip[0] - z_x
             total_message.hip_right[1] = trans_right_hip[1] - z_y
             total_message.hip_right[2] = trans_right_hip[2] - z_z 
@@ -244,14 +244,14 @@ def send_controls():
             pass
 
         try:
-            (trans_left_foot,rot_left_foot)  = listener_trans.lookupTransform('/openni_depth_frame', '/right_foot_1', rospy.Time(0))
+            (trans_left_foot,rot_left_foot)  = listener_trans.lookupTransform('/openni_depth_frame', '/left_foot_1', rospy.Time(0))
             total_message.foot_left[0] = trans_left_foot[0] - z_x
             total_message.foot_left[1] = trans_left_foot[1] - z_y
             total_message.foot_left[2] = trans_left_foot[2] - z_z
         except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             pass
         try:
-            (trans_right_foot,rot_right_foot) = listener_trans.lookupTransform('/openni_depth_frame', '/left_foot_1', rospy.Time(0))
+            (trans_right_foot,rot_right_foot) = listener_trans.lookupTransform('/openni_depth_frame', '/right_foot_1', rospy.Time(0))
             total_message.foot_right[0] = trans_right_foot[0] - z_x
             total_message.foot_right[1] = trans_right_foot[1] - z_y
             total_message.foot_right[2] = trans_right_foot[2] - z_z 	

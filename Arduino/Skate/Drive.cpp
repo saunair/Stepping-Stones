@@ -48,9 +48,11 @@ void Drive::updateState(){
   updateTimeDelta = micros() - lastUpdateTime;
   lastUpdateTime = micros();
 
-  float dt, wheelPositionEncoder, wheelPositionError;
+  float dt, wheelPositionError;
   dt = (float)updateTimeDelta/(1000000);
+  wheelPositionEncoderPrev = wheelPositionEncoder;
   wheelPositionEncoder = (float(encCount) / PPR) * ONE_REV_DIST_MM;
+  wheelVelocityEncoder = (wheelPositionEncoder - wheelPositionEncoderPrev)/dt;
   
   wheelPositionEstimate = wheelPositionEstimate + wheelVelocityEstimate*dt;
   wheelPositionError = wheelPositionEncoder - wheelPositionEstimate;
@@ -61,7 +63,10 @@ void Drive::updateState(){
 
 void Drive::resetState() {
   encCount = 0;
+  wheelPositionEncoder = 0;
+  wheelPositionEncoderPrev = 0;
   wheelPositionEstimate = 0;
+  wheelVelocityEncoder = 0;
   wheelVelocityInteg = 0;
   wheelVelocityEstimate = 0; 
 }
@@ -74,6 +79,10 @@ float Drive::getPosition() {
 
 float Drive::getVelocity() {
   return wheelVelocityEstimate;
+}
+
+float Drive::getVelocityEncoder() {
+  return wheelVelocityEncoder;
 }
 
 

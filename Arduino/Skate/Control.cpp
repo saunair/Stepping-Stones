@@ -91,7 +91,7 @@ float Control::computeVelocityCommand(float target,float wheelVelocity) {
   velocityErrorSum = constrain(velocityErrorSum + velocityError,-INTEG_LIMIT,INTEG_LIMIT);
   velocityErrorDiff = velocityError - velocityErrorPrev;
 
-  command = constrain(((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00038*velocityTargetLim + 0.0065)),-1,1);
+  command = constrain(((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00037*velocityTargetLim)),-1,1);
       
   return command;
 }
