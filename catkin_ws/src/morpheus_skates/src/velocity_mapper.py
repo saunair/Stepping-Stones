@@ -14,13 +14,13 @@ dataframe = pd.read_csv("/home/saurabh/Stepping-Stones/Matlab/Mat Files/kinect_v
 #print dataframe
 dataset = dataframe.values
 # split into input (X) and output (Y) variables
-features_names = ['LeftFeedback_ImuQuatX', 'LeftFeedback_ImuQuatY', 'LeftFeedback_ImuQuatZ', 'LeftFeedback_ImuQuatW', 'LeftFeedback_ImuAccelX', 'LeftFeedback_ImuAccelY' , 'LeftFeedback_ImuAccelZ' , 'LeftFeedback_ImuRateX' , 'LeftFeedback_ImuRateY', 'LeftFeedback_ImuRateZ ', 'RightFeedback_ImuQuatX', 'RightFeedback_ImuQuatY', 'RightFeedback_ImuQuatZ', 'RightFeedback_ImuQuatW', 'RightFeedback_ImuAccelX', 'RightFeedback_ImuAccelY', 'RightFeedback_ImuAccelZ', 'RightFeedback_ImuRateX', 'RightFeedback_ImuRateY', 'RightFeedback_ImuRateZ', 'NormalizedForce_LeftNormalFrontOuter', 'NormalizedForce_LeftNormalFrontInner', 'NormalizedForce_LeftNormalRear', 'NormalizedForce_RightNormalFrontOuter', 'NormalizedForce_RightNormalFrontInner',   'NormalizedForce_RightNormalRear', 'NormalizedForce_RightNormalTotal', 'NormalizedForce_LeftNormalTotal', 'NormalizedForce_NormalTotal']
+feature_names = ['LeftFeedback_ImuQuatX', 'LeftFeedback_ImuQuatY', 'LeftFeedback_ImuQuatZ', 'LeftFeedback_ImuQuatW', 'LeftFeedback_ImuAccelX', 'LeftFeedback_ImuAccelY' , 'LeftFeedback_ImuAccelZ' , 'LeftFeedback_ImuRateX' , 'LeftFeedback_ImuRateY', 'LeftFeedback_ImuRateZ', 'RightFeedback_ImuQuatX', 'RightFeedback_ImuQuatY', 'RightFeedback_ImuQuatZ', 'RightFeedback_ImuQuatW', 'RightFeedback_ImuAccelX', 'RightFeedback_ImuAccelY', 'RightFeedback_ImuAccelZ', 'RightFeedback_ImuRateX', 'RightFeedback_ImuRateY', 'RightFeedback_ImuRateZ', 'NormalizedForce_LeftNormalFrontOuter', 'NormalizedForce_LeftNormalFrontInner', 'NormalizedForce_LeftNormalRear', 'NormalizedForce_RightNormalFrontOuter', 'NormalizedForce_RightNormalFrontInner',   'NormalizedForce_RightNormalRear', 'NormalizedForce_RightNormalTotal', 'NormalizedForce_LeftNormalTotal', 'NormalizedForce_NormalTotal']
 
 
-no_features = len(features_names)
+no_features = len(feature_names)
 
 target_velocities = 'RightCommand_CommandTarget'
-X = dataset[:,no_features-1]
+X = dataframe[feature_names]
 Y = dataframe[target_velocities]
 
 # define base model
@@ -59,5 +59,4 @@ pipeline = Pipeline(estimators)
 kfold = KFold(n_splits=10, random_state=seed)
 results = cross_val_score(pipeline, X, Y, cv=kfold)
 print("Larger: %.2f (%.2f) MSE" % (results.mean(), results.std()))
-
 
