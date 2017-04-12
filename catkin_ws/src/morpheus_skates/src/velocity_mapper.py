@@ -9,17 +9,26 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 # dataset
-dataframe = pd.read_csv("housing.data", delim_whitespace=True, header=None)
+dataframe = pd.read_csv("/home/saurabh/Stepping-Stones/Matlab/Mat Files/kinect_velocity/velocity_saurabh_200_2017-04-09-00-34-12.csv")
+
+#print dataframe
 dataset = dataframe.values
 # split into input (X) and output (Y) variables
-X = dataset[:,0:13]
-Y = dataset[:,13]
+features_names = ['LeftFeedback_ImuQuatX', 'LeftFeedback_ImuQuatY', 'LeftFeedback_ImuQuatZ', 'LeftFeedback_ImuQuatW', 'LeftFeedback_ImuAccelX', 'LeftFeedback_ImuAccelY' , 'LeftFeedback_ImuAccelZ' , 'LeftFeedback_ImuRateX' , 'LeftFeedback_ImuRateY', 'LeftFeedback_ImuRateZ ', 'RightFeedback_ImuQuatX', 'RightFeedback_ImuQuatY', 'RightFeedback_ImuQuatZ', 'RightFeedback_ImuQuatW', 'RightFeedback_ImuAccelX', 'RightFeedback_ImuAccelY', 'RightFeedback_ImuAccelZ', 'RightFeedback_ImuRateX', 'RightFeedback_ImuRateY', 'RightFeedback_ImuRateZ', 'NormalizedForce_LeftNormalFrontOuter', 'NormalizedForce_LeftNormalFrontInner', 'NormalizedForce_LeftNormalRear', 'NormalizedForce_RightNormalFrontOuter', 'NormalizedForce_RightNormalFrontInner',   'NormalizedForce_RightNormalRear', 'NormalizedForce_RightNormalTotal', 'NormalizedForce_LeftNormalTotal', 'NormalizedForce_NormalTotal']
+
+
+no_features = len(features_names)
+
+target_velocities = 'RightCommand_CommandTarget'
+X = dataset[:,no_features-1]
+Y = dataframe[target_velocities]
 
 # define base model
 def baseline_model():
 # create model
+    global no_features
     model = Sequential()
-    model.add(Dense(13, input_dim=13, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(no_features, input_dim=no_features, kernel_initializer='normal', activation='sigmoid'))
     model.add(Dense(1, kernel_initializer='normal'))
     # Compile model
     model.compile(loss='mean_squared_error', optimizer='adam')
@@ -32,9 +41,10 @@ seed = 7
 
 def larger_model():
     # create model
+    global no_features
     model = Sequential()
-    model.add(Dense(13, input_dim=13, kernel_initializer='normal', activation='relu'))
-    model.add(Dense(6, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(no_features, input_dim=no_features, kernel_initializer='normal', activation='sigmoid'))
+    model.add(Dense(6, kernel_initializer='normal', activation='sigmoid'))
     model.add(Dense(1, kernel_initializer='normal'))
     # Compile model
     model.compile(loss='mean_squared_error', optimizer='adam')
