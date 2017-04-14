@@ -31,6 +31,11 @@ SSML = 2
 SSMR = 3 
 DSP  = 4 
 DSM  = 5
+
+DSM_B = 6
+SSMR_B = 7
+SSML_B = 8
+
 markov_matrix =[[0.40, 0.05, 0.25, 0.05, 0.10, 0.15], 
                 [0.05, 0.40, 0.05, 0.25, 0.10, 0.15],
                 [0.05, 0.10, 0.40, 0.05, 0.15, 0.25],
@@ -155,6 +160,7 @@ def check_polygon(state):
         else:
             motion = 0
 
+
     except:
         rospy.logwarn('division by zero')
     return motion
@@ -172,18 +178,24 @@ def state_machine(stance_classifier):
                 state = DSM 
             elif(check_polygon(static_state) == stance): 
                 state = DSP
+            elif(check_polygon(static_state) == back_stepping):
+                state = DSM_B
 
         elif static_state[0] == Single_Stance_Left:
             if(check_polygon(static_state) == front_stepping):
                 state = SSML
             elif(check_polygon(static_state) == stance):
                 state = SSPL
+            elif(check_polygon(static_state) == back_stepping):
+                state = SSML_B
 
         elif static_state[0] == Single_Stance_Right:
             if(check_polygon(static_state) == front_stepping):
                 state =  SSMR
             elif(check_polygon(static_state) == stance):
                 state = SSPR
+            elif(check_polygon(static_state) == back_stepping):
+                state = SSMR_B
         
         current_state = markov_decision()
         del state_queue[0]
