@@ -147,7 +147,7 @@ def check_polygon(state):
              
             dist = np.linalg.norm(foot_positions[0], foot_positions[1])
             
-            COM = float((force_lead_front*(dist_front) +
+            COM = (float(force_lead_front*(dist_front) +
                    force_lead_back*(dist_rear) +
                    force_lag_front*(dist_front - dist) +
                    force_lag_back*(dist_rear - dist))/(force_lead_front + front_lead_rear + 
