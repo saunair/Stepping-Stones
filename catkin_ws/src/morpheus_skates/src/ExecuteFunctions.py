@@ -1,3 +1,5 @@
+## Author: Aditya Ghadiali
+## Edited by Saurabh Nair
 import warnings
 from time import clock
 import numpy
@@ -79,7 +81,7 @@ class SingleStanceInMotionLeft(State):
     def Execute(self, feature_vector):
         #print "Single stance in Motion"
         #Do Controls Stuff
-        velocity_l = model.predict
+        velocity_l = model.predict(feature_vector)
         velocity_r = -1
 
     def Exit(self):
@@ -100,7 +102,7 @@ class SingleStanceInMotionRight(State):
         #print "Single stance in Motion"
         #Do Controls Stuff
         velocity_l = -1
-        velocity_r = model.predict
+        velocity_r = model.predict(feature_vector)
 
     def Exit(self):
         #print 'Leaving single stance in motion'
@@ -201,7 +203,7 @@ class SingleStanceInMotionRightBackward(State):
         #Do Controls Stuff
         velocity_l = -1
         velocity_r = -1
-
+        #return velocity_l, velocity_r
     def Exit(self):
         #print 'Leaving single stance in motion'
 
@@ -228,8 +230,8 @@ class ControlsStateMachine:
         self.transitions[TransitionName] = newtransition
 
     #Add new states if needed
-    def AddState(self, StateName, newstate):
-        self.states[StateName] = newstate
+    def AddState(self, ID, newstate):
+        self.states[ID] = newstate
 
     #State setting function
     def SetState(self, StateID):
@@ -248,7 +250,7 @@ class ControlsStateMachine:
             self.SetState(self.trans.toState) #Transition to the new state
             self.CurrentState.Enter() #Enter the new state
             self.trans = None #Reset transition variable
-        self.CurrentState.Execute() #Execute the new state
+        self.CurrentState.Execute(feature_vector) #Execute the new state
 
 ###Use imported as parent class/character in place of class below
 class ControlSkate(object):
