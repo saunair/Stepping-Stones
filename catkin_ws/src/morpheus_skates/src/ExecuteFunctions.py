@@ -4,6 +4,8 @@ import warnings
 from time import clock
 import numpy
 
+#State IDs:
+
 SSPL = 0
 SSPR = 1
 SSML = 2
@@ -14,175 +16,155 @@ DSM_B = 6
 SSMR_B = 7
 SSML_B = 8
 
+#Control Variables:
+
+freewheeling = -1
+brake = 0
+
+#States:
+
 class SingleStanceInPlaceLeft(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(SingleStanceInPlace,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ID):
         self.name = 'SingleStanceInPlaceLeft'
-        self.ID = 0
+        self.ID = SSPL
 
     def Enter(self):
-        #print 'Entering single stance in place...'
-        super(SingleStanceInPlace, self).Enter()
+        print 'Entering single stance in place...'
+        
 
-    def Execute(self, feature_vector):
-        #print "Single stance in Place"
+    def Execute(self):
         #Do Controls Stuff
-        velocity_l =  model.predict
-        velocity_r = -1
+        velocity_l = model.predict
+        velocity_r = freewheeling
     
     def Exit(self):
-        #print 'Leaving single stance in place'
+        print 'Leaving single stance in place'
 
 class SingleStanceInPlaceRight(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(SingleStanceInPlace,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ID):
         self.name = 'SingleStanceInPlaceRight'
-        self.ID = 1
+        self.ID = SSPR
     
     def Enter(self):
-        #print 'Entering single stance in place...'
-        super(SingleStanceInPlace, self).Enter()
+        print 'Entering single stance in place...'
 
-    def Execute(self, feature_vector):
-        #print "Single stance in Place"
+    def Execute(self):
         #Do Controls Stuff
-        velocity_l =  -1
+        velocity_l =  freewheeling
         velocity_r =  model.predict
 
     def Exit(self):
-        #print 'Leaving single stance in place'
+        print 'Leaving single stance in place'
 
 
 class SingleStanceInMotionLeft(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(SingleStanceInMotion,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionLeft'
-        self.ID = 2
+        self.ID = SSML
 
     def Enter(self):
-        #print 'Entering single stance in motion...'
-        super(SingleStanceInMotion, self).Enter()
-
-    def Execute(self, feature_vector):
-        #print "Single stance in Motion"
+        print 'Entering single stance in motion...'
+        
+    def Execute(self):
         #Do Controls Stuff
-        velocity_l = model.predict(feature_vector)
-        velocity_r = -1
+        velocity_l = model.predict
+        velocity_r = freewheeling
 
     def Exit(self):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
 
 class SingleStanceInMotionRight(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(SingleStanceInMotion,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionRight'
-        self.ID = 3
+        self.ID = SSMR
 
     def Enter(self):
-        #print 'Entering single stance in motion...'
-        super(SingleStanceInMotion, self).Enter()
-
-    def Execute(self, feature_vector):
-        #print "Single stance in Motion"
+        print 'Entering single stance in motion...'
+        
+    def Execute(self):
         #Do Controls Stuff
-        velocity_l = -1
-        velocity_r = model.predict(feature_vector)
+        velocity_l = freewheeling
+        velocity_r = model.predict
 
     def Exit(self):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
 
 class DoubleStanceInPlace(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(DoubleStanceInPlace,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ID):
         self.name = 'DoubleStanceInPlace'
-        self.ID = 4
+        self.ID = DSP
 
     def Enter(self):
-        #print 'Entering double stance in place...'
-        super(DoubleStanceInPlace, self).Enter()
-
-    def Execute(self, feature_vector):
-        #print "Double stance in place"
+        print 'Entering double stance in place...'
+        
+    def Execute(self):
         #Do Controls Stuff
-        velocity_l = 0
-        velocity_r = 0
+        velocity_l = brake
+        velocity_r = brake
 
     def Exit(self):
-        #print 'Leaving double stance in place'
+        print 'Leaving double stance in place'
 
 class DoubleStanceInMotion(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(DoubleStanceInMotion,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ID):
         self.name = 'DoubleStanceInMotion'
-    	self.ID = 5
+        self.ID = DSM
 
     def Enter(self):
-        #print 'Entering double stance in motion...'
-        super(DoubleStanceInMotionLeft, self).Enter()
-
-    def Execute(self, feature_vector):
-        #print "Double stance in motion"
+        print 'Entering double stance in motion...'
+        
+    def Execute(self):
         #Do Controls Stuff
-        vel = model.predict(feature_vector)
-        velocity_l = vel
-        velocity_r = vel
+        velocity_l = model.predict
+        velocity_r = model.predict
 
     def Exit(self):
-        #print 'Leaving double stance in motion'
+        print 'Leaving double stance in motion'
 
 class DoubleStanceInMotionBackward(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(DoubleStanceInMotionRight,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ID):
         self.name = 'DoubleStanceInMotionBackward'
-    	self.ID = 6
+        self.ID = DSM_B
 
     def Enter(self):
-        #print 'Entering double stance in motion...'
-        super(DoubleStanceInMotionBackward, self).Enter()
-
-    def Execute(self, feature_vector):
-        #print "Double stance in motion"
+        print 'Entering double stance in motion...'
+        
+    def Execute(self):
         #Do Controls Stuff
-        velocity_l = -1
-        velocity_r = -1
+        velocity_l = freewheeling
+        velocity_r = freewheeling
 
     def Exit(self):
-        #print 'Leaving double stance in motion'
+        print 'Leaving double stance in motion'
 
 class SingleStanceInMotionLeftBackward(State):
-    def __init__(self,ControlsStateMachine):
+    def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionLeftBackward'
-        self.ID = 7
+        self.ID = SSML_B
 
     def Enter(self):
-        super(SingleStanceInMotion, self).Enter()
-
+        print 'Entering single stance in motion...'
+        
     def Execute(self):
-        velocity_l = -1
-        velocity_r = -1
+        #Do Controls Stuff
+        velocity_l = freewheeling
+        velocity_r = freewheeling
 
     def Exit(self):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
 
 class SingleStanceInMotionRightBackward(State):
-    def __init__(self, name, ):
+    def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionRightBackward'
-        self.ID = 8
+        self.ID = SSMR_B
 
     def Enter(self):
-        #print 'enter state'
-    def Execute(self, feature_vector):
-        #print "Single stance in Motion"
+        print 'Entering single stance in motion...'
+        
+    def Execute(self):
         #Do Controls Stuff
-        velocity_l = -1
-        velocity_r = -1
-        return velocity_l, velocity_r
+        velocity_l = freewheeling
+        velocity_r = freewheeling
+
     def Exit(self):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
