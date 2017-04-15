@@ -8,6 +8,7 @@ import pandas as pd
 import sys
 import pickle
 import rospkg
+import StateMachineSkeleton.py as state_obj
 from std_msgs.msg import *
 from morpheus_skates.msg import *
 from morpheus_skates.srv import *
@@ -53,8 +54,11 @@ imu_data_right = 0
 foot_positions = 0
 
 ## used for COM calculations
-dist_rear  = -0.25*10 
-dist_front = 0.75*10
+dist_rear  = -0.25*8.5
+dist_front = 0.75*8.5
+
+#COM list
+COM = [0, 0, 0];
 
 #ask for user foot size
 def ask_foot_size():
@@ -75,6 +79,7 @@ def calculate_foot_points(foot_length):
     dist_rear  = -0.25*foot_length 
     dist_front = 0.75*foot_length
 
+##Populator function 
 def update_vector(msg):
     global force_values, imu_data_left, imu_data_right, foot_positions
     force_values = [msg.normalized_force.left_normal_front_outer, 
@@ -110,7 +115,16 @@ def update_vector(msg):
                       msg.right_feedback.imu_rate_z]
 
     foot_positions = [[msg.foot_left[0], msg.foot_left[1],msg.foot_left[2]], [msg.foot_right[0], msg.foot_right[1], msg.foot_right[2]]]
- 
+
+## execute current state
+def state_machine_execute(state):
+    state_machine = state_obj.ControlSkate()
+     if not(state == statemachine.ControlsStateMachine.CurrentState.ID):
+        statemachine.ControlsStateMachine.SetTransition(state)
+     statemachine.Execute()
+
+
+
 def markov_decision():
     score_list = no_states*[0] 
     for i in range(0,len(state_queue)):
@@ -119,53 +133,55 @@ def markov_decision():
     decision = score_list.index(max(score_list))
     return decision
 
-def check_polygon(state):   
+def centre_of_mass(state):   
     global force_values, imu_data_left, imu_data_right, foot_positions
     global dist_rear, dist_front
-    try:
-        if state==Single_Stance_Left:
-            force_front = (force_values[0] + force_values[1])
-            force_rear = force_values[2]
-            COM = float(force_front*dist_front + force_rear*dist_rear)/(force_front + force_rear)
+    if state==Single_Stance_Left:
+        force_front = (force_values[0] + force_values[1])
+        force_rear = force_values[2]
+        COM = float(force_front*dist_front + force_rear*dist_rear)/(force_front + force_rear)
     
-        elif state==Single_Stance_Right:
-            force_front = (force_values[2] + force_values[3])
-            force_rear = force_values[4]
-            COM = float(force_front*dist_front + force_rear*dist_rear)/(force_front + force_rear)
+    elif state==Single_Stance_Right:
+        force_front = (force_values[2] + force_values[3])
+        force_rear = force_values[4]
+        COM = float(force_front*dist_front + force_rear*dist_rear)/(force_front + force_rear)
 
-        elif state==Double_Stance:
-            if(foot_positions[0][0] > foot_positions[1][0]):
-                force_lead_front =  force_values[0] + force_values[1]
-                force_lead_back  =  force_values[2]
-                force_lag_front  =  force_values[3] + force_values[4]
-                force_lag_rear   =  force_values[5]
-            else:
-                force_lag_front  =  force_values[0] + force_values[1]
-                force_lag_back   =  force_values[2]
-                force_lead_front =  force_values[3] + force_values[4]
-                force_lead_rear  =  force_values[5]
-             
-            dist = np.linalg.norm(foot_positions[0], foot_positions[1])
-            
-            COM = (float(force_lead_front*(dist_front) +
-                   force_lead_back*(dist_rear) +
-                   force_lag_front*(dist_front - dist) +
-                   force_lag_back*(dist_rear - dist))/(force_lead_front + front_lead_rear + 
-                   force_lag_front + force_lag_rear))
-
-        if COM > (dist_front + eps):    #tolerance
-            motion = front_stepping
-        elif COM < (dist_rear - eps):   #tolerance
-            motion = back_stepping
+    elif state==Double_Stance:
+        if(foot_positions[0][0] > foot_positions[1][0]):
+            force_lead_front =  force_values[0] + force_values[1]
+            force_lead_back  =  force_values[2]
+            force_lag_front  =  force_values[3] + force_values[4]
+            force_lag_rear   =  force_values[5]
         else:
-            motion = 0
+            force_lag_front  =  force_values[0] + force_values[1]
+            force_lag_back   =  force_values[2]
+            force_lead_front =  force_values[3] + force_values[4]
+            force_lead_rear  =  force_values[5]
+         
+        dist = np.linalg.norm(foot_positions[0], foot_positions[1])
+        
+        COM = (float(force_lead_front*(dist_front) +
+               force_lead_back*(dist_rear) +
+               force_lag_front*(dist_front - dist) +
+               force_lag_back*(dist_rear - dist))/(force_lead_front + front_lead_rear + 
+               force_lag_front + force_lag_rear))
 
+    del user_com[0]
+    user_com.append(COM)
 
-    except:
-        rospy.logwarn('division by zero')
+def check_polygon():
+    average_COM = float(user_com[0] + user_com[1] + user_com[2])/3
+    global dist_rear, dist_front
+    
+    if average_COM > (dist_front + eps):    #tolerance
+        motion = front_stepping
+    elif average_COM < (dist_rear - eps):   #tolerance
+        motion = back_stepping
+    else:
+        motion = 0
     return motion
 
-def state_machine(stance_classifier):
+def state_machine_update(stance_classifier):
     global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping. back_stepping, stance
     while not rospy.is_shutdown():
         feature_temp = np.asarray(np.asarray(force_values))
@@ -174,34 +190,38 @@ def state_machine(stance_classifier):
         ##append the state and also delete the oldest state
 
         if static_state[0] == Double_Stance:
-            if(check_polygon(static_state) == front_stepping):
+            centre_of_mass(static_state[0])
+            if(check_polygon() == front_stepping):
                 state = DSM 
-            elif(check_polygon(static_state) == stance): 
+            elif(check_polygon() == stance): 
                 state = DSP
-            elif(check_polygon(static_state) == back_stepping):
+            elif(check_polygon() == back_stepping):
                 state = DSM_B
 
         elif static_state[0] == Single_Stance_Left:
-            if(check_polygon(static_state) == front_stepping):
+            centre_of_mass(static_state[0])
+            if(check_polygon() == front_stepping):
                 state = SSML
-            elif(check_polygon(static_state) == stance):
+            elif(check_polygon() == stance):
                 state = SSPL
-            elif(check_polygon(static_state) == back_stepping):
+            elif(check_polygon() == back_stepping):
                 state = SSML_B
 
         elif static_state[0] == Single_Stance_Right:
-            if(check_polygon(static_state) == front_stepping):
+            centre_of_mass(static_state[0])
+            if(check_polygon() == front_stepping):
                 state =  SSMR
-            elif(check_polygon(static_state) == stance):
+            elif(check_polygon() == stance):
                 state = SSPR
-            elif(check_polygon(static_state) == back_stepping):
+            elif(check_polygon() == back_stepping):
                 state = SSMR_B
         
         current_state = markov_decision()
         del state_queue[0]
 
         ## append the latest prediction
-        state_queue = state_queue.append(state) 
+        state_machine_execute(state)
+        state_queue = state_queue.append(state)
         
 
 if __name__=='__main__':

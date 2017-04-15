@@ -39,9 +39,8 @@ def baseline_model():
 
 # fix random seed for reproducibility
 seed = 7
+
 # evaluate model with standardized dataset
-
-
 def larger_model():
     # create model
     global no_features
@@ -58,8 +57,14 @@ np.random.seed(seed)
 estimators = []
 estimators.append(('standardize', StandardScaler()))
 estimators.append(('mlp', KerasRegressor(build_fn=larger_model, epochs=50, batch_size=5, verbose=0)))
+
+#print estimators[1][1].predict(X.iloc[[2]])
+#print build_fn.predict(X[1,:])
 pipeline = Pipeline(estimators)
 kfold = KFold(n_splits=10, random_state=seed)
 results = cross_val_score(pipeline, X, Y, cv=kfold)
+f = X.values
+
 print("Larger: %.2f (%.2f) MSE" % (results.mean(), results.std()))
+pipeline.predict(f[2,:])
 
