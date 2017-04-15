@@ -1,7 +1,8 @@
 <launch>
 <rosparam command="load" file="$(find morpheus_skates)/config/calibration_values.yaml" />
 <param name="publish_rate" type="int" value="100" />
-<param name="skip_kinect" type="int" value="0" />
+<param name="skip_kinect" type="int" value="1" />
+<param name="vr_refresh_rate" type="int" value="30" />
 <node pkg="morpheus_skates" type="kinect_zero.py" name="kinect_zero" output="screen"/>
 <node pkg="morpheus_skates" type="stepping_stones.py" name="stepping_stones" output="screen"/>
 <node pkg="morpheus_skates" type="yaml_serv.py" name="yaml_serv" output="screen"/>
