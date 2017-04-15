@@ -14,18 +14,6 @@ DSM_B = 6
 SSMR_B = 7
 SSML_B = 8
 
-#Declare each State class:
-class State(object): #State base class
-    def __init__(self, ControlsStateMachine):
-        self.ControlsStateMachine = ControlsStateMachine
-        
-    def Enter(self):
-        pass
-    def Execute(self, feature_vector):
-        pass
-    def Exit(self):
-        pass
-
 class SingleStanceInPlaceLeft(State):
     def __init__(self,ControlsStateMachine):
         #super().__init__(ControlsStateMachine) in python 3
@@ -141,8 +129,9 @@ class DoubleStanceInMotion(State):
     def Execute(self, feature_vector):
         #print "Double stance in motion"
         #Do Controls Stuff
-        velocity_l = model.predict
-        velocity_r = model.predict
+        vel = model.predict(feature_vector)
+        velocity_l = vel
+        velocity_r = vel
 
     def Exit(self):
         #print 'Leaving double stance in motion'
@@ -169,18 +158,13 @@ class DoubleStanceInMotionBackward(State):
 
 class SingleStanceInMotionLeftBackward(State):
     def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(SingleStanceInMotion,self).__init__(ControlsStateMachine)
         self.name = 'SingleStanceInMotionLeftBackward'
         self.ID = 7
 
     def Enter(self):
-        #print 'Entering single stance in motion...'
         super(SingleStanceInMotion, self).Enter()
 
     def Execute(self):
-        #print "Single stance in Motion"
-        #Do Controls Stuff
         velocity_l = -1
         velocity_r = -1
 
@@ -188,114 +172,17 @@ class SingleStanceInMotionLeftBackward(State):
         #print 'Leaving single stance in motion'
 
 class SingleStanceInMotionRightBackward(State):
-    def __init__(self,ControlsStateMachine):
-        #super().__init__(ControlsStateMachine) in python 3
-        super(SingleStanceInMotion,self).__init__(ControlsStateMachine)
+    def __init__(self, name, ):
         self.name = 'SingleStanceInMotionRightBackward'
         self.ID = 8
 
     def Enter(self):
-        #print 'Entering single stance in motion...'
-        super(SingleStanceInMotion, self).Enter()
-
+        #print 'enter state'
     def Execute(self, feature_vector):
         #print "Single stance in Motion"
         #Do Controls Stuff
         velocity_l = -1
         velocity_r = -1
-        #return velocity_l, velocity_r
+        return velocity_l, velocity_r
     def Exit(self):
         #print 'Leaving single stance in motion'
-
-###Transitions
-class Transition(object):
-    def __init__(self, toState):
-        self.toState = toState
-    def Execute(self):
-        #print "Transitioning"
-
-
-###State Machine
-class ControlsStateMachine:
-    def __init__(self, char):
-        self.char = char
-        self.states = {} #Dictionary for states
-        self.transitions = {} #Dictionary for transitions
-        self.CurrentState = None #Current State
-        self.PreviousState = None #Previous State, duh.
-        self.trans = None #Current transition
-
-    #Add new transitions if needed
-    def AddTransition(self, TransitionName, newtransition):
-        self.transitions[TransitionName] = newtransition
-
-    #Add new states if needed
-    def AddState(self, ID, newstate):
-        self.states[ID] = newstate
-
-    #State setting function
-    def SetState(self, StateID):
-        self.PreviousState = self.CurrentState
-        self.CurrentState = self.states[StateID] #Look for the passed state in the states dictionary
-    
-    #Sets the Transition state
-    def SetTransition(self, SetTransitionID):
-        self.trans = self.transitions[SetTransitionID] 
-        #print self.trans
-
-    def Execute(self, feature_vector):
-        if (self.trans): #If there is a transition
-            self.CurrentState.Exit() #Exit the current state
-            self.trans.Execute() #Execute transition
-            self.SetState(self.trans.toState) #Transition to the new state
-            self.CurrentState.Enter() #Enter the new state
-            self.trans = None #Reset transition variable
-        self.CurrentState.Execute(feature_vector) #Execute the new state
-
-###Use imported as parent class/character in place of class below
-class ControlSkate(object):
-    def __init__(self):
-        self.ControlsStateMachine = ControlsStateMachine(self)
-
-        ### Add all states to the dictionary for states:
-        self.ControlsStateMachine.AddState(SSPL,   SingleStanceInPlaceLeft(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(SSPR,   SingleStanceInPlaceRight(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(SSML,   SingleStanceInMotionLeft(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(SSMR,   SingleStanceInMotionRight(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(DSP,    DoubleStanceInPlace(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(DSM,    DoubleStanceInMotion(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(DSM_B,  DoubleStanceInMotionBackward(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(SSML_B, SingleStanceInMotionLeftBackward(self.ControlsStateMachine))
-        self.ControlsStateMachine.AddState(SSMR_B, SingleStanceInMotionRightBackward(self.ControlsStateMachine))
-
-        ###Add all transitions to the dictionary for transitions:
-        self.ControlsStateMachine.AddTransition("SingleStanceInPlaceLeft", Transition("SingleStanceInPlaceLeft"))
-        self.ControlsStateMachine.AddTransition("SingleStanceInPlaceRight", Transition("SingleStanceInPlaceRight"))
-        self.ControlsStateMachine.AddTransition("SingleStanceInMotionLeft", Transition("SingleStanceInMotionLeft"))
-        self.ControlsStateMachine.AddTransition("SingleStanceInMotionRight", Transition("SingleStanceInMotionRight"))
-        self.ControlsStateMachine.AddTransition("DoubleStanceInMotion", Transition("DoubleStanceInMotion"))
-        self.ControlsStateMachine.AddTransition("DoubleStanceInPlace", Transition("DoubleStanceInPlace"))
-	self.ControlsStateMachine.AddTransition("SingleStanceInMotionLeftBackward", Transition("SingleStanceInMotionLeftBackward"))
-        self.ControlsStateMachine.AddTransition("SingleStanceInMotionRightBackward", Transition("SingleStanceInMotionRightBackward"))
-        self.ControlsStateMachine.AddTransition("DoubleStanceInMotionBackward", Transition("DoubleStanceInMotionBackward"))
-
-        ###Default State: Double Stance in Place
-        self.ControlsStateMachine.SetState("DoubleStanceInPlace") #Always start in double stance in place
-
-    def Execute(self, feature_vector):
-        self.ControlsStateMachine.Execute(feature_vector)
-
-
-###Test:
-'''
-if __name__=='__main__':
-	statemachine = ControlSkate()
-	while 1:
-		State = input('Enter the state:')
-		#1: DoubleStanceInPlace
-		#2: SingleStanceInPlace
-		#3: SingleStanceInMotion
-		#4: DoubleStanceInMotion
-		if not(State == statemachine.ControlsStateMachine.CurrentState.name):
-			statemachine.ControlsStateMachine.SetTransition(State)
-		statemachine.Execute()'''
