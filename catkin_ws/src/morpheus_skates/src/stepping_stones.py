@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # license removed for brevity
+#Author: Saurabh Nair
+# Edited BY Brad Factor
+
 import rospy
 import time
 import copy
