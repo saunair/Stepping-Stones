@@ -21,9 +21,9 @@ INPUT ip;
 
 void str_callback(const std_msgs::Float32 & num)
 {
-	printf("Received number %d\n", num.data);
+	printf("Received number %f\n", num.data);
 	int discreteSpeed = 0;
-	discreteSpeed = max(DISCRETE_STEPS, int((num.data / TOP_VELOCITY)*DISCRETE_STEPS));
+	discreteSpeed = min(DISCRETE_STEPS, int((num.data / TOP_VELOCITY)*DISCRETE_STEPS));
 	
 	switch (discreteSpeed)
 	{
@@ -152,7 +152,7 @@ void str_callback(const std_msgs::Float32 & num)
 int _tmain(int argc, _TCHAR * argv[])
 {
 	ros::NodeHandle nh;
-	char *ros_master = "128.237.220.201";
+	char *ros_master = "128.237.187.168";
 
 	printf("Connecting to server at %s\n", ros_master);
 	nh.initNode(ros_master);
