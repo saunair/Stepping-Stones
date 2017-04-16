@@ -186,6 +186,8 @@ def check_polygon():
 
 def state_machine_update(stance_classifier):
     global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping. back_stepping, stance
+    
+    StateMachine = state_obj.SkateControls()
     while not rospy.is_shutdown():
         feature_temp = np.asarray(np.asarray(force_values))
 	feature_temp = feature_temp.reshape(1,-1)
@@ -223,9 +225,14 @@ def state_machine_update(stance_classifier):
         del state_queue[0]
 
         ## append the latest prediction
-        state_machine_execute(state)
         state_queue = state_queue.append(state)
         
+        if state != StateMachine.CurrentStateID:
+            StateMachine.Exit(state)
+            StateMachine.CurrentStateID = state
+            StateMachine.Enter(state_queue[2])
+        
+        StateMachine.Execute()
 
 if __name__=='__main__':
     #rospack = rospkg.RosPack()
