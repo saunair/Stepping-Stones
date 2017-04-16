@@ -32,7 +32,7 @@ def zero_point_server():
     listener_trans = tf.TransformListener() 
     #rate = rospy.Rate(10.0)
     #waiting for transform!!!!
-    listener_trans.waitForTransform("/openni_depth_frame", "/left_hip_1", rospy.Time(), rospy.Duration(0))
+    listener_trans.waitForTransform("/openni_depth_frame", "/left_hip_1", rospy.Time(), rospy.Duration(200))
     while count<11:
 
         try:

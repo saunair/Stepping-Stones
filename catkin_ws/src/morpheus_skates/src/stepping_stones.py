@@ -71,7 +71,7 @@ right_preload_front_inner = rospy.get_param('right_preload_front_inner')
 right_preload_rear = rospy.get_param('right_preload_rear')
 
 #Kinect-based controller values
-kp = 100 # mm/s / m
+kp = 150 # mm/s / m
 
 def process_input(data):
     global user_input
@@ -273,7 +273,7 @@ def send_controls():
                                               
             x_error = z_x - x_current
             if user_input.command_target > 100:
-                send_control.command_target = user_input.command_target + kp*x_error
+                send_control.command_target = user_input.command_target - kp*x_error
             else:
                 send_control.command_target = user_input.command_target
         except:
