@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 ##Author: Saurabh Nair
+##Edited by: Aditya Ghadiali
+
 import numpy as np
 import rospy
 from sklearn.externals import joblib
@@ -8,7 +10,7 @@ import pandas as pd
 import sys
 import pickle
 import rospkg
-import StateMachineSkeleton.py as state_obj
+import ExecuteFunctions.py as state_obj
 from std_msgs.msg import *
 from morpheus_skates.msg import *
 from morpheus_skates.srv import *
@@ -25,14 +27,14 @@ stance = 0
 current_state = 1
 state_queue = [1,1,1]
 
-no_states = 6
-SSPL = 0 
-SSPR = 1 
-SSML = 2 
-SSMR = 3 
-DSP  = 4 
-DSM  = 5
+no_states = 9
 
+SSPL = 0
+SSPR = 1
+SSML = 2
+SSMR = 3
+DSP  = 4
+DSM  = 5
 DSM_B = 6
 SSMR_B = 7
 SSML_B = 8
@@ -116,6 +118,7 @@ def update_vector(msg):
 
     foot_positions = [[msg.foot_left[0], msg.foot_left[1],msg.foot_left[2]], [msg.foot_right[0], msg.foot_right[1], msg.foot_right[2]]]
 
+
 ## execute current state
 def state_machine_execute(state):
     state_machine = state_obj.ControlSkate()
@@ -183,6 +186,8 @@ def check_polygon():
 
 def state_machine_update(stance_classifier):
     global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping. back_stepping, stance
+    
+    StateMachine = state_obj.SkateControls()
     while not rospy.is_shutdown():
         feature_temp = np.asarray(np.asarray(force_values))
 	feature_temp = feature_temp.reshape(1,-1)
@@ -220,9 +225,14 @@ def state_machine_update(stance_classifier):
         del state_queue[0]
 
         ## append the latest prediction
-        state_machine_execute(state)
         state_queue = state_queue.append(state)
         
+        if state != StateMachine.CurrentStateID:
+            StateMachine.Exit(state)
+            StateMachine.CurrentStateID = state
+            StateMachine.Enter(state_queue[2])
+        
+        StateMachine.Execute()
 
 if __name__=='__main__':
     #rospack = rospkg.RosPack()
