@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 ##Author: Saurabh Nair
+##Edited by: Aditya Ghadiali
+
 import numpy as np
 import rospy
 from sklearn.externals import joblib
@@ -8,7 +10,7 @@ import pandas as pd
 import sys
 import pickle
 import rospkg
-import StateMachineSkeleton.py as state_obj
+import ExecuteFunctions.py as state_obj
 from std_msgs.msg import *
 from morpheus_skates.msg import *
 from morpheus_skates.srv import *
@@ -25,14 +27,14 @@ stance = 0
 current_state = 1
 state_queue = [1,1,1]
 
-no_states = 6
-SSPL = 0 
-SSPR = 1 
-SSML = 2 
-SSMR = 3 
-DSP  = 4 
-DSM  = 5
+no_states = 9
 
+SSPL = 0
+SSPR = 1
+SSML = 2
+SSMR = 3
+DSP  = 4
+DSM  = 5
 DSM_B = 6
 SSMR_B = 7
 SSML_B = 8
@@ -115,6 +117,7 @@ def update_vector(msg):
                       msg.right_feedback.imu_rate_z]
 
     foot_positions = [[msg.foot_left[0], msg.foot_left[1],msg.foot_left[2]], [msg.foot_right[0], msg.foot_right[1], msg.foot_right[2]]]
+
 
 ## execute current state
 def state_machine_execute(state):

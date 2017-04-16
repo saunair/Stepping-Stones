@@ -23,12 +23,12 @@ brake = 0
 
 #States:
 
-class SingleStanceInPlaceLeft(State):
+class SingleStanceInPlaceLeft(object):
     def __init__(self, name, ID):
         self.name = 'SingleStanceInPlaceLeft'
         self.ID = SSPL
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering single stance in place...'
         
 
@@ -37,15 +37,15 @@ class SingleStanceInPlaceLeft(State):
         velocity_l = model.predict
         velocity_r = freewheeling
     
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving single stance in place'
 
-class SingleStanceInPlaceRight(State):
+class SingleStanceInPlaceRight(object):
     def __init__(self, name, ID):
         self.name = 'SingleStanceInPlaceRight'
         self.ID = SSPR
     
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering single stance in place...'
 
     def Execute(self):
@@ -53,16 +53,16 @@ class SingleStanceInPlaceRight(State):
         velocity_l =  freewheeling
         velocity_r =  model.predict
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving single stance in place'
 
 
-class SingleStanceInMotionLeft(State):
+class SingleStanceInMotionLeft(object):
     def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionLeft'
         self.ID = SSML
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering single stance in motion...'
         
     def Execute(self):
@@ -70,15 +70,15 @@ class SingleStanceInMotionLeft(State):
         velocity_l = model.predict
         velocity_r = freewheeling
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving single stance in motion'
 
-class SingleStanceInMotionRight(State):
+class SingleStanceInMotionRight(object):
     def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionRight'
         self.ID = SSMR
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering single stance in motion...'
         
     def Execute(self):
@@ -86,15 +86,15 @@ class SingleStanceInMotionRight(State):
         velocity_l = freewheeling
         velocity_r = model.predict
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving single stance in motion'
 
-class DoubleStanceInPlace(State):
+class DoubleStanceInPlace(object):
     def __init__(self, name, ID):
         self.name = 'DoubleStanceInPlace'
         self.ID = DSP
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering double stance in place...'
         
     def Execute(self):
@@ -102,15 +102,15 @@ class DoubleStanceInPlace(State):
         velocity_l = brake
         velocity_r = brake
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving double stance in place'
 
-class DoubleStanceInMotion(State):
+class DoubleStanceInMotion(object):
     def __init__(self, name, ID):
         self.name = 'DoubleStanceInMotion'
         self.ID = DSM
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering double stance in motion...'
         
     def Execute(self):
@@ -118,15 +118,15 @@ class DoubleStanceInMotion(State):
         velocity_l = model.predict
         velocity_r = model.predict
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving double stance in motion'
 
-class DoubleStanceInMotionBackward(State):
+class DoubleStanceInMotionBackward(object):
     def __init__(self, name, ID):
         self.name = 'DoubleStanceInMotionBackward'
         self.ID = DSM_B
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering double stance in motion...'
         
     def Execute(self):
@@ -134,15 +134,15 @@ class DoubleStanceInMotionBackward(State):
         velocity_l = freewheeling
         velocity_r = freewheeling
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving double stance in motion'
 
-class SingleStanceInMotionLeftBackward(State):
+class SingleStanceInMotionLeftBackward(object):
     def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionLeftBackward'
         self.ID = SSML_B
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering single stance in motion...'
         
     def Execute(self):
@@ -150,15 +150,15 @@ class SingleStanceInMotionLeftBackward(State):
         velocity_l = freewheeling
         velocity_r = freewheeling
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving single stance in motion'
 
-class SingleStanceInMotionRightBackward(State):
+class SingleStanceInMotionRightBackward(object):
     def __init__(self, name, ID):
         self.name = 'SingleStanceInMotionRightBackward'
         self.ID = SSMR_B
 
-    def Enter(self):
+    def Enter(self, PrevID):
         print 'Entering single stance in motion...'
         
     def Execute(self):
@@ -166,5 +166,29 @@ class SingleStanceInMotionRightBackward(State):
         velocity_l = freewheeling
         velocity_r = freewheeling
 
-    def Exit(self):
+    def Exit(self, NextID):
         print 'Leaving single stance in motion'
+
+class SkateControls(object):
+    def __init__(self):
+        self.states = {}
+        states[SSPL] = SingleStanceInPlaceLeft()
+        states[SSPR] = SingleStanceInPlaceRight()
+        states[SSML] = SingleStanceInMotionLeft()
+        states[SSMR] = SingleStanceInMotionRight()
+        states[DSP] = DoubleStanceInPlace()
+        states[DSM] = DoubleStanceInMotion()
+        states[DSM_B] = DoubleStanceInMotionBackward()
+        states[SSML_B] = SingleStanceInMotionLeftBackward()
+        states[SSMR_B] = SingleStanceInMotionRightBackward()
+        self.CurrentStateID = DSP
+        self.PreviousStateID = DSP
+    
+    def Enter(self, PrevID):
+        states[self.CurrentStateID].Enter(PrevID)
+
+    def Exit(self, NextID):
+        states[self.CurrentStateID].Exit(NextID)
+
+    def Execute(self):    
+        states[self.CurrentStateID].Execute()
