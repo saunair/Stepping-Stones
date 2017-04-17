@@ -44,8 +44,7 @@ def talker():
     a = 0
     while not rospy.is_shutdown():
         a = max(left_skate_velocity, right_skate_velocity)
-        rospy.loginfo(a)
-        #b = ceil(a/100.0)
+        #rospy.loginfo(a)
         pub.publish(a)
         rate.sleep()
 
