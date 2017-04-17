@@ -172,15 +172,15 @@ class SingleStanceInMotionRightBackward(object):
 class SkateControls(object):
     def __init__(self):
         self.states = {}
-        states[SSPL] = SingleStanceInPlaceLeft()
-        states[SSPR] = SingleStanceInPlaceRight()
-        states[SSML] = SingleStanceInMotionLeft()
-        states[SSMR] = SingleStanceInMotionRight()
-        states[DSP] = DoubleStanceInPlace()
-        states[DSM] = DoubleStanceInMotion()
-        states[DSM_B] = DoubleStanceInMotionBackward()
-        states[SSML_B] = SingleStanceInMotionLeftBackward()
-        states[SSMR_B] = SingleStanceInMotionRightBackward()
+        self.tates[SSPL] = SingleStanceInPlaceLeft(name = 'SingleSTanceInPlace_left', ID = SSPL)
+        self.states[SSPR] = SingleStanceInPlaceRight(name = 'SingleSTanceInPlace_right', ID = SSPR)
+        self.states[SSML] = SingleStanceInMotionLeft(name = 'SingleStanceInmotion_left', ID = SSML)
+        self.states[SSMR] = SingleStanceInMotionRight(name = 'SingleStanceInmotion_right', ID = SSMR)
+        self.states[DSP] = DoubleStanceInPlace(name = 'DoubleStanceInPlace', ID = DSP)
+        self.states[DSM] = DoubleStanceInMotion(name = 'DoubleStanceInMotion', ID = DSM)
+        self.states[DSM_B] = DoubleStanceInMotionBackward(name = 'DoubleStanceInMotionBackward', ID = DSM_B)
+        self.states[SSML_B] = SingleStanceInMotionLeftBackward(name = 'SingleStanceInMotionLeftBackward', ID = SSML_B)
+        self.states[SSMR_B] = SingleStanceInMotionRightBackward(name = 'SingleStanceInMotionRightBackward', ID = SSMR_B)
         self.CurrentStateID = DSP
         self.PreviousStateID = DSP
     

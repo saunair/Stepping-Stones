@@ -2,6 +2,7 @@
 ##Author: Saurabh Nair
 ##Edited by: Aditya Ghadiali
 
+
 import numpy as np
 import rospy
 from sklearn.externals import joblib
@@ -10,7 +11,11 @@ import pandas as pd
 import sys
 import pickle
 import rospkg
-import ExecuteFunctions.py as state_obj
+import sys
+
+sys.path.append('/home/stepping/mrsd_team_H/Stepping-Stones/catkin_ws/src/morpheus_skates/src/')
+
+import ExecuteFunctions as state_obj
 from std_msgs.msg import *
 from morpheus_skates.msg import *
 from morpheus_skates.srv import *
@@ -122,9 +127,9 @@ def update_vector(msg):
 ## execute current state
 def state_machine_execute(state):
     state_machine = state_obj.ControlSkate()
-     if not(state == statemachine.ControlsStateMachine.CurrentState.ID):
+    if not(state == statemachine.ControlsStateMachine.CurrentState.ID):
         statemachine.ControlsStateMachine.SetTransition(state)
-     statemachine.Execute()
+    statemachine.Execute()
 
 
 
@@ -185,13 +190,14 @@ def check_polygon():
     return motion
 
 def state_machine_update(stance_classifier):
-    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping. back_stepping, stance
+    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance
     
     StateMachine = state_obj.SkateControls()
     while not rospy.is_shutdown():
         feature_temp = np.asarray(np.asarray(force_values))
 	feature_temp = feature_temp.reshape(1,-1)
         static_state = stance_classifier.predict(feature_temp)
+        print static_state[0]
         ##append the state and also delete the oldest state
 
         if static_state[0] == Double_Stance:
@@ -240,7 +246,7 @@ if __name__=='__main__':
     #model_file = morpheus_path + '/src/svm.pkl'
     
     rospy.init_node('state_machine', anonymous=True)
-    model_file = '/home/saurabh/Stepping-Stones/catkin_ws/src/morpheus_skates/src/svm.pkl'
+    model_file = '/home/stepping/mrsd_team_H/Stepping-Stones/catkin_ws/src/morpheus_skates/src/svm.pkl'
     
     file = open(model_file, 'rb')
     stance_classifier = pickle.load(file)
@@ -249,4 +255,4 @@ if __name__=='__main__':
     rospy.Subscriber("total_message", integrated_message, update_vector)
     foot_length = ask_foot_size()
     calculate_foot_points(foot_length)
-    state_machine(stance_classifier)
+    state_machine_update(stance_classifier)
