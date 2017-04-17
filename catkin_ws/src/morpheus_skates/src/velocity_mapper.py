@@ -56,7 +56,7 @@ def larger_model():
 np.random.seed(seed)
 estimators = []
 estimators.append(('standardize', StandardScaler()))
-estimators.append(('mlp', KerasRegressor(build_fn=larger_model, epochs=50, batch_size=5, verbose=0)))
+estimators.append(('mlp', KerasRegressor(build_fn=larger_model, epochs=500, batch_size=5, verbose=0)))
 
 #print estimators[1][1].predict(X.iloc[[2]])
 #print build_fn.predict(X[1,:])
