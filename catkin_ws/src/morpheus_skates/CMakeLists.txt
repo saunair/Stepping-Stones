@@ -155,6 +155,8 @@ catkin_install_python(PROGRAMS src/yaml_serv.py
 catkin_install_python(PROGRAMS src/take_user_input.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+catkin_install_python(PROGRAMS src/state_machine.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 ## Declare a C++ library
 ##add_library(morpheus
 ##    src/${morpheus_skate}/imu_integrator.cpp
