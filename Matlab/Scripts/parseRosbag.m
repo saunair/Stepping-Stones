@@ -1,10 +1,14 @@
 function parseRosbag(filename)
     % Get rosbag
-    bag = rosbag(strcat('..\rosbags\',filename,'.bag'));  
-%     bagSelect = select(bag,'Topic','/total_message','Time',...
-%         [bag.StartTime bag.StartTime + 1]);
+    bag = rosbag(strcat('..\rosbags\',filename,'.bag'));
     bagSelect = select(bag,'Topic','/total_message');
     bagMsgs = readMessages(bagSelect);
+    
+    %Return early if no total messages in bag
+    if(isempty(bagMsgs))
+        disp(strcat(['No total messages in ',filename]));
+        return
+    end
     
     %Get timestamps
     for msgNum = 1:size(bagMsgs,1)
