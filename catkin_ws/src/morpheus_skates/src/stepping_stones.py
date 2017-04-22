@@ -18,7 +18,7 @@ publish_rate = rospy.get_param("publish_rate")
 skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms without Kinect functionality
 
 left_skate_fault = 0
-right_skate_fault = 0;
+right_skate_fault = 0
 PreloadThreshold = -0.2
 preload_right_loose = 0
 preload_left_loose = 0
@@ -45,6 +45,9 @@ velocity_threshold = 300
 time_threshold = 2
 
 send_control.command_target = 0
+
+#Kinect zero-point error tolerance/deadband:
+tolerance = 0.12
 
 #default zero points
 z_x= 3.45787 
@@ -74,7 +77,9 @@ right_preload_front_inner = rospy.get_param('right_preload_front_inner')
 right_preload_rear = rospy.get_param('right_preload_rear')
 
 #Kinect-based controller values
-kp = 150 # mm/s / m
+kp = 150
+kd = 0 
+ki = 1 
 
 def process_input(data):
     global user_input
@@ -211,10 +216,15 @@ def send_controls():
     global z_x, z_y, z_z
     global total_message
 
+    x_error_previous, x_error_i, x_error_d = 0,0,0
+
+
     previous_left_time  = rospy.get_time()
     previous_right_time  = rospy.get_time()
     listener_trans = tf.TransformListener() 
     x_error = 0
+    x_error_cum = 0
+    count = 0
     rate = rospy.Rate(publish_rate) # 100hz
     left_pub.publish(send_control_left)
     right_pub.publish(send_control_right)
@@ -273,12 +283,34 @@ def send_controls():
             x_current = ((trans_right_hip[0] + trans_left_hip[0])/2)
             y_current = ((trans_right_hip[1] + trans_left_hip[1])/2)
             z_current = ((trans_right_hip[2] + trans_left_hip[2])/2)
-                                              
+            '''                                  
             x_error = z_x - x_current
             if user_input.command_target > 100:
                 send_control.command_target = user_input.command_target - kp*x_error
             else:
                 send_control.command_target = user_input.command_target
+            '''
+
+	    x_error = x_current - z_x
+            x_error_d = x_error - x_error_previous
+	    x_error_cum = x_error_cum + x_error
+            if count<6:
+            	x_error_i = x_error_cum
+		count++
+            else:
+		x_error_i = x_error
+		x_error_cum = 0
+		count = 0
+            if x_error<0
+		x_error_i = 0
+		x_error_cum = 0
+	    if abs(x_error)>tolerance:
+            	velocity = (user_input.command_target>0)*(kp*x_error + kd*x_error_d + ki*x_error_i)
+            	x_error_previous = x_error
+            	send_control.command_target = velocity
+	    else:
+		velocity = 0
+		send_control.command_target = velocity
         except:
             pass
         if skip_kinect==True:
