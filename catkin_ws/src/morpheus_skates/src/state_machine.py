@@ -243,7 +243,6 @@ def state_machine_update(stance_classifier):
 
         ## append the latest prediction
         state_queue.append(state)
-        print state_queue, "this point"
         
         if state != StateMachine.CurrentStateID:
             #StateMachine.Exit(state)

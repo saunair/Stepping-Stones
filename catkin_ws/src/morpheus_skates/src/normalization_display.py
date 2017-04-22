@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# license removed for brevity
+# Author: Saurabh Nair
+# Edited by Koushik Bhavani
 import rospy
 import time
 from std_msgs.msg import UInt16
