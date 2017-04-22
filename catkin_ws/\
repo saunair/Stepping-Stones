@@ -18,7 +18,7 @@ publish_rate = rospy.get_param("publish_rate")
 skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms without Kinect functionality
 
 left_skate_fault = 0
-right_skate_fault = 0
+right_skate_fault = 0;
 PreloadThreshold = -0.2
 preload_right_loose = 0
 preload_left_loose = 0
@@ -45,10 +45,6 @@ velocity_threshold = 300
 time_threshold = 2
 
 send_control.command_target = 0
-
-#Kinect zero-point error tolerance/deadband:
-tolerance = 0.18
-i_tolerance = 0.3
 
 #default zero points
 z_x= 3.45787 
@@ -78,7 +74,7 @@ right_preload_front_inner = rospy.get_param('right_preload_front_inner')
 right_preload_rear = rospy.get_param('right_preload_rear')
 
 #Kinect-based controller values
-kp = 300
+kp = 200
 kd = 0 
 ki = 0 
 
@@ -224,7 +220,6 @@ def send_controls():
     previous_right_time  = rospy.get_time()
     listener_trans = tf.TransformListener() 
     x_error = 0
-    x_error_cum = 0
     rate = rospy.Rate(publish_rate) # 100hz
     left_pub.publish(send_control_left)
     right_pub.publish(send_control_right)
@@ -290,18 +285,12 @@ def send_controls():
             else:
                 send_control.command_target = user_input.command_target
             '''
-
-	    x_error = x_current - z_x
+            x_error = z_x - x_current
             x_error_d = x_error - x_error_previous
-	    x_error_cum = x_error_cum + x_error
-            kp = 315 + 10*x_error
-	    if abs(x_error)>tolerance:
-            	velocity = (user_input.command_target>0)*(kp*x_error + kd*x_error_d + ki*x_error_i)
-            	x_error_previous = x_error
-            	send_control.command_target = velocity
-	    else:
-		velocity = 0
-		send_control.command_target = velocity
+            x_error_i = x_error + x_error_previous
+            velocity = kp*x_error + kd*x_error_d + ki*x_error_i
+            x_error_previous = x_error
+            send_control.command_target = velocity
         except:
             pass
         if skip_kinect==True:
