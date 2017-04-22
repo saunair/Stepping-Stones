@@ -55,6 +55,11 @@ z_x= 3.45787
 z_y=0.0881804
 z_z=0.211088
 
+#e-stop
+estop_samples = [False,False,False,False,False] 
+estop_state = False
+estop_trigger_velocity = 0
+
 
 ### required gains from the rosparam server
 left_bias_front_outer = rospy.get_param('left_bias_front_outer')
@@ -211,11 +216,21 @@ def normalize_update(data1):
     total_message.header.stamp = rospy.get_rostime()	
     total_message.normalized_force = data
 
+
+def check_estop():
+    global total_messsage,estop_samples
+    estop_samples = estop_samples.insert(0,total_message.right_feedback.dead_man_enable)
+    estop_samples.pop()
+    estop_count = estop_samples.count(True)
+    return estop_count >= 3
+
+
 #main higher level control code
 def send_controls():
     global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate
     global z_x, z_y, z_z
     global total_message
+    global estop_state,estop_trigger_velocity
 
     x_error_previous, x_error_i, x_error_d = 0,0,0
 
@@ -306,6 +321,18 @@ def send_controls():
             pass
         if skip_kinect==True:
             send_control.command_target = user_input.command_target
+        
+        if check_estop() and estop_state==False:
+            estop_trigger_velocity = send_control.command_target
+            estop_state = True
+            estop_pub.publish(0)
+
+        if estop_state==True:
+            if send_control.command_target == 0:
+                estop_state = False
+            else:
+                send_control.command_target -= stop_trigger_velocity / (publish_rate * 3)
+
 		
         
         send_control.header.stamp = rospy.Time.now()	
@@ -342,6 +369,7 @@ if __name__ == '__main__':
     left_pub = rospy.Publisher('left_command', skate_command, queue_size=100)
     right_pub = rospy.Publisher('right_command', skate_command, queue_size=100)
     kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
+    estop_pub = rospy.Publisher('user_inputs', skate_command, queue_size=100)
     rospy.init_node('stepping_stones', anonymous=True)
 
     try: 
