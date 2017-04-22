@@ -118,8 +118,8 @@ class DoubleStanceInPlace(object):
 
     def Execute(self):
         #Do Controls Stuff
-        velocity_l = brake
-        velocity_r = brake
+        velocity_l = velocity_predict
+        velocity_r = velocity_predict
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
