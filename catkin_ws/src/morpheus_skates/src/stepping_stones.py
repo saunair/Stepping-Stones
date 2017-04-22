@@ -260,8 +260,8 @@ def send_controls():
     rospy.Subscriber("pounds_per_sensor", pounds_display, pounds_update)
     rospy.Subscriber("normalized_force_per_sensor", user_force_normalized, normalize_update)
     rospy.Subscriber("user_position_offset", Float64, position_offset_update)
-    rospy.Subscriber("left_state" , UInt16, left_state )
-    rospy.Subscriber("right_state", UInt16, right_state)
+    rospy.Subscriber("left_state" , Int16, left_state )
+    rospy.Subscriber("right_state", Int16, right_state)
 
     while not rospy.is_shutdown():
         
@@ -354,8 +354,8 @@ def send_controls():
         send_control_left = send_control
         send_control_right = send_control
     	
-        send_control_right.command_target = send_control_right.command_target*right_vel_state
-    	send_control_left.command_target = send_control_left.command_target*left_vel_state
+        send_control_right.command_target = send_control_right.command_target
+    	send_control_left.command_target = send_control_left.command_target
         
         left_pub.publish(send_control_left)
     	right_pub.publish(send_control_right)	

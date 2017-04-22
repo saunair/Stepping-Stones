@@ -29,17 +29,17 @@ velocity_history = [0, 0, 0, 0]
 #     right_skate_velocity = right.right_command.command_target
 
 def check_stop(target_vel):
-    del velocity[0]
+    del velocity_history[0]
     velocity_history.append(target_vel)
-    d1 = velocity[3] - velocity[2]
-    d2 = velocity[2] - velocity[1]
-    d3 = velocity[1] - velocity[0]
+    d1 = velocity_history[3] - velocity_history[2]
+    d2 = velocity_history[2] - velocity_history[1]
+    d3 = velocity_history[1] - velocity_history[0]
 
     if((d3 < d2) and (d2 < d1) and (d1 < d0)):
        vr_velocity = 0 
-       del velocity[0]
+       del velocity_history[0]
        velocity_history.append(vr_velocity)
-    return np.average(vr_velocity)
+    return np.average(velocity_history)
 
 def update(skate):
     global left_skate_velocity,right_skate_velocity

@@ -12,7 +12,7 @@ import sys
 import pickle
 import rospkg
 import sys
-
+from std_msgs.msg import Int8
 sys.path.append('/home/stepping/mrsd_team_H/Stepping-Stones/catkin_ws/src/morpheus_skates/src/')
 
 import ExecuteFunctions as state_obj
@@ -199,6 +199,9 @@ def check_polygon():
 def state_machine_update(stance_classifier):
     global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     
+    pub_l = rospy.Publisher('left_state', Int8, queue_size=100)
+    pub_r = rospy.Publisher('right_state', Int8, queue_size=100)
+
     StateMachine = state_obj.SkateControls()
     while not rospy.is_shutdown():
         feature_temp = np.asarray(np.asarray(force_values))
@@ -243,11 +246,16 @@ def state_machine_update(stance_classifier):
         print state_queue, "this point"
         
         if state != StateMachine.CurrentStateID:
-            StateMachine.Exit(state)
+            #StateMachine.Exit(state)
             StateMachine.CurrentStateID = state
-            StateMachine.Enter(state_queue[2])
+            control_left, control_right = StateMachine.Enter(state_queue[2])
+            pub_l.publish(control_left)
+            pub_r.publish(control_right)
         
-        StateMachine.Execute()
+        control_left, control_right = StateMachine.Execute()
+        pub_l.publish(control_left)
+        pub_r.publish(control_right)
+        
 
 if __name__=='__main__':
     #rospack = rospkg.RosPack()
