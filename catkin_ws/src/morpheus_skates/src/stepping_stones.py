@@ -60,7 +60,7 @@ z_z=0.211088
 #e-stop
 estop_samples = [False,False,False,False,False] 
 estop_state = False
-estop_trigger_velocity = 0
+estop_trigger_velocity = 0.0
 
 
 ### required gains from the rosparam server
@@ -221,7 +221,7 @@ def normalize_update(data1):
 
 def check_estop():
     global total_messsage,estop_samples
-    estop_samples = estop_samples.insert(0,total_message.right_feedback.dead_man_enable)
+    estop_samples.insert(0,total_message.right_feedback.dead_man_enable)
     estop_samples.pop()
     estop_count = estop_samples.count(True)
     return estop_count >= 3
@@ -336,14 +336,17 @@ def send_controls():
         if check_estop() and estop_state==False:
             estop_trigger_velocity = send_control.command_target
             estop_state = True
-            estop_pub.publish(0)
+            estop_message = skate_command()
+            estop_message.command_target = 0
+            estop_pub.publish(estop_message)
+            estop_count = 0
 
         if estop_state==True:
+            estop_count += 1
+            send_control.command_target = estop_trigger_velocity - \
+                float(estop_count)*(estop_trigger_velocity/ (float(publish_rate) * 3.0))
             if send_control.command_target == 0:
                 estop_state = False
-            else:
-                send_control.command_target -= stop_trigger_velocity / (publish_rate * 3)
-
 		
         
         send_control.header.stamp = rospy.Time.now()	
