@@ -88,6 +88,7 @@ bool rightSkate = false;
 
 bool timeoutState = false;
 float timeoutVelocity = 0;
+bool oneFreeTimeout = true;
 
 //UM7
 const byte allRequests[] = {115,110,112,72,109,2,6,115,110,112,76,101,2,2,115,110,112,76,97,1,254};
@@ -265,6 +266,10 @@ void loop(){
 
 void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
   //global_set_point = cmd_msg.command_target*(skate_fault==0);
+  if(oneFreeTimeout == true) {
+    oneFreeTimeout == false;
+    timeoutState = false;
+  }
   if(timeoutState == false) {
     global_set_point = cmd_msg.command_target;
   }
