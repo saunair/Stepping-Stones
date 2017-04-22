@@ -1,4 +1,4 @@
-//Revision 4/11/2017
+//Revision 4/22/2017
 #define LEFT_SKATE_IND_PIN 52
 #define RIGHT_SKATE_IND_PIN 53
 
@@ -85,6 +85,9 @@ bool prevFreeWheel = false;
 
 bool leftSkate = false;
 bool rightSkate = false;
+
+bool timeoutState = false;
+float timeoutVelocity = 0;
 
 //UM7
 const byte allRequests[] = {115,110,112,72,109,2,6,115,110,112,76,101,2,2,115,110,112,76,97,1,254};
@@ -262,7 +265,9 @@ void loop(){
 
 void ros_sub_cb(const morpheus_skates::skate_command& cmd_msg){
   //global_set_point = cmd_msg.command_target*(skate_fault==0);
-  global_set_point = cmd_msg.command_target;
+  if(timeoutState == false) {
+    global_set_point = cmd_msg.command_target;
+  }
   master_time = millis();
 }
 
@@ -321,7 +326,13 @@ void formPacket() {
 void check_reset_system()
 {
   if(millis() - master_time > TIMEOUT_MS) {
-    global_set_point = 0;
+    //global_set_point = 0;
+    timeoutState = true;
+    timeoutVelocity = global_set_point;
+  }
+
+  if(timeoutState == true) {
+    global_set_point = constrain(global_set_point - timeoutVelocity*(float(CTRL_PERIOD_MS)/(3*1000.0)),0,1000);
   }
 }
 
