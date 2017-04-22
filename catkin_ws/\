@@ -18,7 +18,7 @@ publish_rate = rospy.get_param("publish_rate")
 skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms without Kinect functionality
 
 left_skate_fault = 0
-right_skate_fault = 0
+right_skate_fault = 0;
 PreloadThreshold = -0.2
 preload_right_loose = 0
 preload_left_loose = 0
@@ -46,19 +46,10 @@ time_threshold = 2
 
 send_control.command_target = 0
 
-#Kinect zero-point error tolerance/deadband:
-tolerance = 0.18
-i_tolerance = 0.3
-
 #default zero points
 z_x= 3.45787 
 z_y=0.0881804
 z_z=0.211088
-
-#e-stop
-estop_samples = [False,False,False,False,False] 
-estop_state = False
-estop_trigger_velocity = 0
 
 
 ### required gains from the rosparam server
@@ -83,7 +74,7 @@ right_preload_front_inner = rospy.get_param('right_preload_front_inner')
 right_preload_rear = rospy.get_param('right_preload_rear')
 
 #Kinect-based controller values
-kp = 300
+kp = 200
 kd = 0 
 ki = 0 
 
@@ -216,21 +207,11 @@ def normalize_update(data1):
     total_message.header.stamp = rospy.get_rostime()	
     total_message.normalized_force = data
 
-
-def check_estop():
-    global total_messsage,estop_samples
-    estop_samples = estop_samples.insert(0,total_message.right_feedback.dead_man_enable)
-    estop_samples.pop()
-    estop_count = estop_samples.count(True)
-    return estop_count >= 3
-
-
 #main higher level control code
 def send_controls():
     global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate
     global z_x, z_y, z_z
     global total_message
-    global estop_state,estop_trigger_velocity
 
     x_error_previous, x_error_i, x_error_d = 0,0,0
 
@@ -239,7 +220,6 @@ def send_controls():
     previous_right_time  = rospy.get_time()
     listener_trans = tf.TransformListener() 
     x_error = 0
-    x_error_cum = 0
     rate = rospy.Rate(publish_rate) # 100hz
     left_pub.publish(send_control_left)
     right_pub.publish(send_control_right)
@@ -305,34 +285,16 @@ def send_controls():
             else:
                 send_control.command_target = user_input.command_target
             '''
-
-	    x_error = x_current - z_x
+            x_error = z_x - x_current
             x_error_d = x_error - x_error_previous
-	    x_error_cum = x_error_cum + x_error
-            kp = 315 + 10*x_error
-	    if abs(x_error)>tolerance:
-            	velocity = (user_input.command_target>0)*(kp*x_error + kd*x_error_d + ki*x_error_i)
-            	x_error_previous = x_error
-            	send_control.command_target = velocity
-	    else:
-		velocity = 0
-		send_control.command_target = velocity
+            x_error_i = x_error + x_error_previous
+            velocity = kp*x_error + kd*x_error_d + ki*x_error_i
+            x_error_previous = x_error
+            send_control.command_target = velocity
         except:
             pass
         if skip_kinect==True:
             send_control.command_target = user_input.command_target
-        
-        if check_estop() and estop_state==False:
-            estop_trigger_velocity = send_control.command_target
-            estop_state = True
-            estop_pub.publish(0)
-
-        if estop_state==True:
-            if send_control.command_target == 0:
-                estop_state = False
-            else:
-                send_control.command_target -= stop_trigger_velocity / (publish_rate * 3)
-
 		
         
         send_control.header.stamp = rospy.Time.now()	
@@ -369,7 +331,6 @@ if __name__ == '__main__':
     left_pub = rospy.Publisher('left_command', skate_command, queue_size=100)
     right_pub = rospy.Publisher('right_command', skate_command, queue_size=100)
     kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
-    estop_pub = rospy.Publisher('user_inputs', skate_command, queue_size=100)
     rospy.init_node('stepping_stones', anonymous=True)
 
     try: 

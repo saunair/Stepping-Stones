@@ -20,6 +20,8 @@ from std_msgs.msg import *
 from morpheus_skates.msg import *
 from morpheus_skates.srv import *
 
+eps = 0.1
+
 ### check this out properly
 Double_Stance = 1 
 Single_Stance_Left = 2 
@@ -65,7 +67,7 @@ dist_rear  = -0.25*8.5
 dist_front = 0.75*8.5
 
 #COM list
-COM = [0, 0, 0];
+user_com = [0, 0, 0];
 
 #ask for user foot size
 def ask_foot_size():
@@ -126,6 +128,7 @@ def update_vector(msg):
 
 ## execute current state
 def state_machine_execute(state):
+    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     state_machine = state_obj.ControlSkate()
     if not(state == statemachine.ControlsStateMachine.CurrentState.ID):
         statemachine.ControlsStateMachine.SetTransition(state)
@@ -134,15 +137,16 @@ def state_machine_execute(state):
 
 
 def markov_decision():
+    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     score_list = no_states*[0] 
     for i in range(0,len(state_queue)):
-        score_list[state_queue[i]] += makov_matrix[current_state][state_queue[i]];
+        score_list[state_queue[i]] += markov_matrix[current_state][state_queue[i]];
 
     decision = score_list.index(max(score_list))
     return decision
 
 def centre_of_mass(state):   
-    global force_values, imu_data_left, imu_data_right, foot_positions
+    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     global dist_rear, dist_front
     if state==Single_Stance_Left:
         force_front = (force_values[0] + force_values[1])
@@ -157,27 +161,30 @@ def centre_of_mass(state):
     elif state==Double_Stance:
         if(foot_positions[0][0] > foot_positions[1][0]):
             force_lead_front =  force_values[0] + force_values[1]
-            force_lead_back  =  force_values[2]
+            force_lead_rear  =  force_values[2]
             force_lag_front  =  force_values[3] + force_values[4]
             force_lag_rear   =  force_values[5]
         else:
             force_lag_front  =  force_values[0] + force_values[1]
-            force_lag_back   =  force_values[2]
+            force_lag_rear   =  force_values[2]
             force_lead_front =  force_values[3] + force_values[4]
             force_lead_rear  =  force_values[5]
-         
-        dist = np.linalg.norm(foot_positions[0], foot_positions[1])
+        
+        #print foot_positions[0], foot_positions[1] 
+        diff = np.subtract(foot_positions[0], foot_positions[1])
+        dist = np.linalg.norm(diff)
         
         COM = (float(force_lead_front*(dist_front) +
-               force_lead_back*(dist_rear) +
+               force_lead_rear*(dist_rear) +
                force_lag_front*(dist_front - dist) +
-               force_lag_back*(dist_rear - dist))/(force_lead_front + front_lead_rear + 
+               force_lag_rear*(dist_rear - dist))/(force_lead_front + force_lead_rear + 
                force_lag_front + force_lag_rear))
 
     del user_com[0]
     user_com.append(COM)
 
 def check_polygon():
+    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     average_COM = float(user_com[0] + user_com[1] + user_com[2])/3
     global dist_rear, dist_front
     
@@ -190,14 +197,13 @@ def check_polygon():
     return motion
 
 def state_machine_update(stance_classifier):
-    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance
+    global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     
     StateMachine = state_obj.SkateControls()
     while not rospy.is_shutdown():
         feature_temp = np.asarray(np.asarray(force_values))
 	feature_temp = feature_temp.reshape(1,-1)
         static_state = stance_classifier.predict(feature_temp)
-        print static_state[0]
         ##append the state and also delete the oldest state
 
         if static_state[0] == Double_Stance:
@@ -226,12 +232,15 @@ def state_machine_update(stance_classifier):
                 state = SSPR
             elif(check_polygon() == back_stepping):
                 state = SSMR_B
-        
+       
+	else:
+            state = DSP 
         current_state = markov_decision()
         del state_queue[0]
 
         ## append the latest prediction
-        state_queue = state_queue.append(state)
+        state_queue.append(state)
+        print state_queue, "this point"
         
         if state != StateMachine.CurrentStateID:
             StateMachine.Exit(state)

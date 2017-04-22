@@ -20,6 +20,7 @@ SSML_B = 8
 
 freewheeling = -1
 brake = 0
+velocity_predict = 1
 
 #States:
 
@@ -34,7 +35,7 @@ class SingleStanceInPlaceLeft(object):
 
     def Execute(self):
         #Do Controls Stuff
-        velocity_l = model.predict
+        velocity_l = velocity_predict
         velocity_r = freewheeling
     
     def Exit(self, NextID):
@@ -51,7 +52,7 @@ class SingleStanceInPlaceRight(object):
     def Execute(self):
         #Do Controls Stuff
         velocity_l =  freewheeling
-        velocity_r =  model.predict
+        velocity_r = velocity_predict
 
     def Exit(self, NextID):
         print 'Leaving single stance in place'
@@ -67,7 +68,7 @@ class SingleStanceInMotionLeft(object):
         
     def Execute(self):
         #Do Controls Stuff
-        velocity_l = model.predict
+        velocity_l = velocity_predict
         velocity_r = freewheeling
 
     def Exit(self, NextID):
@@ -84,7 +85,7 @@ class SingleStanceInMotionRight(object):
     def Execute(self):
         #Do Controls Stuff
         velocity_l = freewheeling
-        velocity_r = model.predict
+        velocity_r = velocity_predict
 
     def Exit(self, NextID):
         print 'Leaving single stance in motion'
@@ -115,8 +116,8 @@ class DoubleStanceInMotion(object):
         
     def Execute(self):
         #Do Controls Stuff
-        velocity_l = model.predict
-        velocity_r = model.predict
+        velocity_l = velocity_predict
+        velocity_r = velocity_predict
 
     def Exit(self, NextID):
         print 'Leaving double stance in motion'
@@ -172,7 +173,7 @@ class SingleStanceInMotionRightBackward(object):
 class SkateControls(object):
     def __init__(self):
         self.states = {}
-        self.tates[SSPL] = SingleStanceInPlaceLeft(name = 'SingleSTanceInPlace_left', ID = SSPL)
+        self.states[SSPL] = SingleStanceInPlaceLeft(name = 'SingleSTanceInPlace_left', ID = SSPL)
         self.states[SSPR] = SingleStanceInPlaceRight(name = 'SingleSTanceInPlace_right', ID = SSPR)
         self.states[SSML] = SingleStanceInMotionLeft(name = 'SingleStanceInmotion_left', ID = SSML)
         self.states[SSMR] = SingleStanceInMotionRight(name = 'SingleStanceInmotion_right', ID = SSMR)
@@ -185,10 +186,10 @@ class SkateControls(object):
         self.PreviousStateID = DSP
     
     def Enter(self, PrevID):
-        states[self.CurrentStateID].Enter(PrevID)
+        self.states[self.CurrentStateID].Enter(PrevID)
 
     def Exit(self, NextID):
-        states[self.CurrentStateID].Exit(NextID)
+        self.states[self.CurrentStateID].Exit(NextID)
 
     def Execute(self):    
-        states[self.CurrentStateID].Execute()
+        self.states[self.CurrentStateID].Execute()
