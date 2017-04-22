@@ -367,8 +367,8 @@ def send_controls():
         send_control_left = send_control
         send_control_right = send_control
     	
-        send_control_right.command_target = send_control_right.command_target
-    	send_control_left.command_target = send_control_left.command_target
+        send_control_right.command_target = send_control_right.command_target*right_vel_state
+    	send_control_left.command_target  = send_control_left.command_target*left_vel_state
         
         left_pub.publish(send_control_left)
     	right_pub.publish(send_control_right)	
