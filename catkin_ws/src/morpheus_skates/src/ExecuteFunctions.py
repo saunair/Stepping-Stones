@@ -42,7 +42,7 @@ class SingleStanceInPlaceLeft(object):
         return velocity_l, velocity_r
     
     def Exit(self, NextID):
-        #print 'Leaving single stance in place'
+        print 'Leaving single stance in place'
 
 class SingleStanceInPlaceRight(object):
     def __init__(self, name, ID):
@@ -62,7 +62,7 @@ class SingleStanceInPlaceRight(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving single stance in place'
+        print 'Leaving single stance in place'
 
 
 class SingleStanceInMotionLeft(object):
@@ -83,7 +83,7 @@ class SingleStanceInMotionLeft(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
 
 class SingleStanceInMotionRight(object):
     def __init__(self, name, ID):
@@ -103,7 +103,7 @@ class SingleStanceInMotionRight(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
 
 class DoubleStanceInPlace(object):
     def __init__(self, name, ID):
@@ -123,7 +123,7 @@ class DoubleStanceInPlace(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving double stance in place'
+        print 'Leaving double stance in place'
 
 class DoubleStanceInMotion(object):
     def __init__(self, name, ID):
@@ -143,7 +143,7 @@ class DoubleStanceInMotion(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving double stance in motion'
+        print 'Leaving double stance in motion'
 
 class DoubleStanceInMotionBackward(object):
     def __init__(self, name, ID):
@@ -163,7 +163,7 @@ class DoubleStanceInMotionBackward(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving double stance in motion'
+        print 'Leaving double stance in motion'
 
 class SingleStanceInMotionLeftBackward(object):
     def __init__(self, name, ID):
@@ -183,7 +183,7 @@ class SingleStanceInMotionLeftBackward(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
 
 class SingleStanceInMotionRightBackward(object):
     def __init__(self, name, ID):
@@ -203,7 +203,7 @@ class SingleStanceInMotionRightBackward(object):
         return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        #print 'Leaving single stance in motion'
+        print 'Leaving single stance in motion'
 
 class SkateControls(object):
     def __init__(self):

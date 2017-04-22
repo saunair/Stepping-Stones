@@ -17,6 +17,9 @@ from morpheus_skates.srv import *
 publish_rate = rospy.get_param("publish_rate")
 skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms without Kinect functionality
 
+history_positions = 10
+
+kinect_position_list = history_positions*[0]
 left_skate_fault = 0
 right_skate_fault = 0
 PreloadThreshold = -0.2
@@ -127,13 +130,13 @@ def check_timeout(current_time):
     global skate_fault_annun, skate_power_annun
     if ((current_time - previous_left_time)>time_threshold ) or ((current_time - previous_right_time)>time_threshold):
         #print current_time, previous_left_time
-        send_control.command_target = 0
+        #send_control.command_target = 0
 	if not(skate_power_annun):
             print "One of the skates has timed out!"
  	    skate_power_annun = True
     #fault detected
     if (left_skate_fault or right_skate_fault):
-        send_control.command_target = 0
+        #send_control.command_target = 0
 	if not(skate_fault_annun):
             print "Internal skate fault detected!"
 	    skate_fault_annun = True
@@ -238,10 +241,10 @@ def right_state(right_state):
 #main higher level control code
 def send_controls():
     global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate, right_vel_state, left_vel_state
-    global z_x, z_y, z_z
+    global z_x, z_y, z_z, history_positions
     global total_message
     global estop_state,estop_trigger_velocity
-
+    fault_count  = 0
     x_error_previous, x_error_i, x_error_d = 0,0,0
 
     previous_left_time  = rospy.get_time()
@@ -316,8 +319,10 @@ def send_controls():
             else:
                 send_control.command_target = user_input.command_target
             '''
-
-	    x_error = x_current - z_x
+            del history_positions[0]
+            history_positions.append(x_current)
+            x_average = np.mean(history_positions)
+	    x_error = x_average - z_x
             x_error_d = x_error - x_error_previous
 	    x_error_cum = x_error_cum + x_error
             kp = 315 + 10*x_error
@@ -350,7 +355,15 @@ def send_controls():
 		
         
         send_control.header.stamp = rospy.Time.now()	
-        check_timeout(rospy.get_time()) 
+        check_timeout(rospy.get_time())
+        
+	if (skate_fault_annun or skate_power_annun):
+	    if not(fault_count):
+                fault_trigger_velocity = send_control.command_target
+            fault_count += 1
+	    send_control.command_target = fault_trigger_velocity - \
+	        float(fault_count)*(fault_trigger_velocity/ (float(publish_rate) * 3.0))
+ 
         send_control_left = send_control
         send_control_right = send_control
     	

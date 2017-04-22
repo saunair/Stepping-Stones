@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# license removed for brevity
+# Author: Saurabh Nair
 import rospy
 from std_msgs.msg import Float32
 
@@ -17,9 +17,21 @@ import numpy as np
 
 publish_rate = rospy.get_param("vr_refresh_rate")
 left_skate_velocity, right_skate_velocity = 0,0
+number_samples = 20
 
-velocity_history = [0, 0, 0, 0] 
+SPL = 0
+SSPR = 1
+SSML = 2
+SSMR = 3
+DSP  = 4
+DSM  = 5
+DSM_B = 6
+SSMR_B = 7
+SSML_B = 8
+DoubleStance = 100
 
+velocity_history = number_samples*[0]
+state_history = number_samples*[DSP]
 # def left_update(left):
 #     global left_skate_velocity
 #     left_skate_velocity = left.left_command.command_target
@@ -28,14 +40,27 @@ velocity_history = [0, 0, 0, 0]
 #     global right_skate_velocity
 #     right_skate_velocity = right.right_command.command_target
 
+def state_update(current_state):
+    global state_history
+    del state_history[0]
+    state_history.append(current_state.data)
+
+def static_stance_check():
+    global state_history
+
+
 def check_stop(target_vel):
+    global velocity_history, state_historyi, DSP
     del velocity_history[0]
     velocity_history.append(target_vel)
+    '''
     d1 = velocity_history[3] - velocity_history[2]
     d2 = velocity_history[2] - velocity_history[1]
     d3 = velocity_history[1] - velocity_history[0]
-
-    if((d3 < d2) and (d2 < d1) and (d1 < d0)):
+    deceleration_check = (d3 < d2) and (d2 < d1) and (d1 < d0)
+    '''
+    static_stance_check = all(x==DSP for x in state_history)
+    if(static_stance_check):
        vr_velocity = 0 
        del velocity_history[0]
        velocity_history.append(vr_velocity)
@@ -50,15 +75,15 @@ def update(skate):
 def talker():
     global left_skate_velocity,right_skate_velocity
     rospy.Subscriber("total_message", integrated_message, update)
-    # rospy.Subscriber("total_message", skate_command, left_update)
+    rospy.Subscriber("user_gait", Int16, state_update)
     
     rospy.init_node('vr_talker', anonymous=True)
     pub = rospy.Publisher('walking_speed', Float32, queue_size=10)
     rate = rospy.Rate(publish_rate) # 10hz
-    a = 0
+    drag_velocity = 0
     while not rospy.is_shutdown():
-        a = max(left_skate_velocity, right_skate_velocity)
-        velocity = check_stop(a)
+        drag_velocity = max(left_skate_velocity, right_skate_velocity)
+        velocity = check_stop(drag_velocity)
 
         #rospy.loginfo(a)
         pub.publish(velocity)
