@@ -30,16 +30,19 @@ class SingleStanceInPlaceLeft(object):
         self.ID = SSPL
 
     def Enter(self, PrevID):
-        print 'Entering single stance in place...'
-        
+        #print 'Entering single stance in place...'
+        velocity_l = 0.9*velocity_predict
+        velocity_r = freewheeling
+        return velocity_l, velocity_r        
 
     def Execute(self):
         #Do Controls Stuff
         velocity_l = velocity_predict
         velocity_r = freewheeling
+        return velocity_l, velocity_r
     
     def Exit(self, NextID):
-        print 'Leaving single stance in place'
+        #print 'Leaving single stance in place'
 
 class SingleStanceInPlaceRight(object):
     def __init__(self, name, ID):
@@ -47,15 +50,19 @@ class SingleStanceInPlaceRight(object):
         self.ID = SSPR
     
     def Enter(self, PrevID):
-        print 'Entering single stance in place...'
+        #print 'Entering single stance in place...'
+        velocity_l =  freewheeling
+        velocity_r = 0.9*velocity_predict
+        return velocity_l, velocity_r
 
     def Execute(self):
         #Do Controls Stuff
         velocity_l =  freewheeling
         velocity_r = velocity_predict
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving single stance in place'
+        #print 'Leaving single stance in place'
 
 
 class SingleStanceInMotionLeft(object):
@@ -64,15 +71,19 @@ class SingleStanceInMotionLeft(object):
         self.ID = SSML
 
     def Enter(self, PrevID):
-        print 'Entering single stance in motion...'
+        #print 'Entering single stance in motion...'
+        velocity_l = 0.9*velocity_predict
+        velocity_r = freewheeling
+        return velocity_l, velocity_r
         
     def Execute(self):
         #Do Controls Stuff
         velocity_l = velocity_predict
         velocity_r = freewheeling
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving single stance in motion'
+        #print 'Leaving single stance in motion'
 
 class SingleStanceInMotionRight(object):
     def __init__(self, name, ID):
@@ -80,15 +91,19 @@ class SingleStanceInMotionRight(object):
         self.ID = SSMR
 
     def Enter(self, PrevID):
-        print 'Entering single stance in motion...'
+        #print 'Entering single stance in motion...'
+        velocity_l = freewheeling
+        velocity_r = 0.9*velocity_predict
+        return velocity_l, velocity_r
         
     def Execute(self):
         #Do Controls Stuff
         velocity_l = freewheeling
         velocity_r = velocity_predict
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving single stance in motion'
+        #print 'Leaving single stance in motion'
 
 class DoubleStanceInPlace(object):
     def __init__(self, name, ID):
@@ -96,15 +111,19 @@ class DoubleStanceInPlace(object):
         self.ID = DSP
 
     def Enter(self, PrevID):
-        print 'Entering double stance in place...'
-        
+        #print 'Entering double stance in place...'
+        velocity_l = freewheeling
+        velocity_r = freewheeling
+        return velocity_l, velocity_r
+
     def Execute(self):
         #Do Controls Stuff
         velocity_l = brake
         velocity_r = brake
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving double stance in place'
+        #print 'Leaving double stance in place'
 
 class DoubleStanceInMotion(object):
     def __init__(self, name, ID):
@@ -112,15 +131,19 @@ class DoubleStanceInMotion(object):
         self.ID = DSM
 
     def Enter(self, PrevID):
-        print 'Entering double stance in motion...'
-        
+        #print 'Entering double stance in motion...'
+        velocity_l = 0.9*velocity_predict
+        velocity_r = 0.9*velocity_predict
+        return velocity_l, velocity_r
+
     def Execute(self):
         #Do Controls Stuff
         velocity_l = velocity_predict
         velocity_r = velocity_predict
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving double stance in motion'
+        #print 'Leaving double stance in motion'
 
 class DoubleStanceInMotionBackward(object):
     def __init__(self, name, ID):
@@ -128,15 +151,19 @@ class DoubleStanceInMotionBackward(object):
         self.ID = DSM_B
 
     def Enter(self, PrevID):
-        print 'Entering double stance in motion...'
-        
+        #print 'Entering double stance in motion...'
+        velocity_l = freewheeling
+        velocity_r = freewheeling
+        return velocity_l, velocity_r
+
     def Execute(self):
         #Do Controls Stuff
         velocity_l = freewheeling
         velocity_r = freewheeling
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving double stance in motion'
+        #print 'Leaving double stance in motion'
 
 class SingleStanceInMotionLeftBackward(object):
     def __init__(self, name, ID):
@@ -144,15 +171,19 @@ class SingleStanceInMotionLeftBackward(object):
         self.ID = SSML_B
 
     def Enter(self, PrevID):
-        print 'Entering single stance in motion...'
-        
+        #print 'Entering single stance in motion...'
+        velocity_l = freewheeling
+        velocity_r = freewheeling
+        return velocity_l, velocity_r
+
     def Execute(self):
         #Do Controls Stuff
         velocity_l = freewheeling
         velocity_r = freewheeling
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving single stance in motion'
+        #print 'Leaving single stance in motion'
 
 class SingleStanceInMotionRightBackward(object):
     def __init__(self, name, ID):
@@ -160,15 +191,19 @@ class SingleStanceInMotionRightBackward(object):
         self.ID = SSMR_B
 
     def Enter(self, PrevID):
-        print 'Entering single stance in motion...'
-        
+        #print 'Entering single stance in motion...'
+        velocity_l = freewheeling
+        velocity_r = freewheeling
+        return velocity_l, velocity_r
+
     def Execute(self):
         #Do Controls Stuff
         velocity_l = freewheeling
         velocity_r = freewheeling
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
-        print 'Leaving single stance in motion'
+        #print 'Leaving single stance in motion'
 
 class SkateControls(object):
     def __init__(self):
