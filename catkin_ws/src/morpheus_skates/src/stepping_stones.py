@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # license removed for brevity
 #Author: Saurabh Nair
-# Edited BY Brad Factor
+#Edited By Aditya Ghadiali, Brad Factor
 
 import rospy
 import time
@@ -26,6 +26,8 @@ announce_right_loose = 0
 announce_left_loose = 0
 skate_fault_annun = False
 skate_power_annun = False
+left_vel_state = 1
+right_vel_state = 1
 
 user_input = skate_command()
 send_control = skate_command()
@@ -83,7 +85,7 @@ right_preload_front_inner = rospy.get_param('right_preload_front_inner')
 right_preload_rear = rospy.get_param('right_preload_rear')
 
 #Kinect-based controller values
-kp = 300
+kp = 315
 kd = 0 
 ki = 0 
 
@@ -215,7 +217,7 @@ def normalize_update(data1):
 
     total_message.header.stamp = rospy.get_rostime()	
     total_message.normalized_force = data
-
+    
 
 def check_estop():
     global total_messsage,estop_samples
@@ -225,15 +227,22 @@ def check_estop():
     return estop_count >= 3
 
 
+def left_state(left_state):
+    global left_vel_state
+    left_vel_state = left_state.data
+
+def right_state(right_state):
+    global right_vel_state
+    right_vel_state = right_state.data
+
 #main higher level control code
 def send_controls():
-    global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate
+    global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate, right_vel_state, left_vel_state
     global z_x, z_y, z_z
     global total_message
     global estop_state,estop_trigger_velocity
 
     x_error_previous, x_error_i, x_error_d = 0,0,0
-
 
     previous_left_time  = rospy.get_time()
     previous_right_time  = rospy.get_time()
@@ -251,7 +260,9 @@ def send_controls():
     rospy.Subscriber("pounds_per_sensor", pounds_display, pounds_update)
     rospy.Subscriber("normalized_force_per_sensor", user_force_normalized, normalize_update)
     rospy.Subscriber("user_position_offset", Float64, position_offset_update)
-    
+    rospy.Subscriber("left_state" , UInt16, left_state )
+    rospy.Subscriber("right_state", UInt16, right_state)
+
     while not rospy.is_shutdown():
         
         #invert the frames for left and right
@@ -339,7 +350,11 @@ def send_controls():
         check_timeout(rospy.get_time()) 
         send_control_left = send_control
         send_control_right = send_control
-    	left_pub.publish(send_control_left)
+    	
+        send_control_right.command_target = send_control_right.command_target*right_vel_state
+    	send_control_left.command_target = send_control_left.command_target*left_vel_state
+        
+        left_pub.publish(send_control_left)
     	right_pub.publish(send_control_right)	
         kin_pub.publish(x_error)
         total_message.left_command = send_control_left
