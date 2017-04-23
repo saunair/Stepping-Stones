@@ -78,17 +78,6 @@ def update(skate):
 publish_rate = 30
 
 def talker():
-<<<<<<< HEAD
-    a = 0
-    pub = rospy.Publisher('chatter', Int32, queue_size=10)
-    rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(publish_rate) # 100hz
-    while not rospy.is_shutdown():
-        #hello_str = "hello world %s" % rospy.get_time()
-        a += 1
-        rospy.loginfo(a)
-        pub.publish(a)
-=======
     global left_skate_velocity,right_skate_velocity
     rospy.Subscriber("total_message", integrated_message, update)
     rospy.Subscriber("user_gait", Int16, state_update)
@@ -103,7 +92,6 @@ def talker():
 
         #rospy.loginfo(a)
         pub.publish(velocity)
->>>>>>> test
         rate.sleep()
 
 if __name__ == '__main__':

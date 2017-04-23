@@ -128,12 +128,6 @@ include_directories(
 )
 
 
-<<<<<<< HEAD
-=======
-#catkin_install_python(PROGRAMS src/calibration_arduino.py
-#  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
->>>>>>> test
 catkin_install_python(PROGRAMS src/calibration_force.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 

@@ -9,13 +9,6 @@ from morpheus_skates.msg import skate_feedback
 import os
 import roslib; roslib.load_manifest('morpheus_skates')
 
-<<<<<<< HEAD
-config_file = '../config/calibration_values.yaml'
-=======
-#config_file = '~/catkin_ws/src/motor/config/calibration_values.yaml'
-
-#config_file = '/home/stepping/mrsd_team_H/Stepping-Stones/catkin_ws/src/morpheus_skates/config/calibration_values.yaml'
->>>>>>> test
 total_weight = 0
 total_weight_left = 0
 total_weight_right = 0
@@ -95,21 +88,7 @@ def normalize_calculation(right_skate, left_skate):
 	global right_gain_front_outer,right_gain_front_inner,right_gain_rear
 	global right_preload_front_outer,right_preload_front_inner,right_preload_rear
 	rospy.init_node('normalization')
-
 	while(right_skate.counter <= 51 and left_skate.counter <= 51):
-<<<<<<< HEAD
-		if(right_skate.counter == 51 and left_skate.counter==51):
-			right_skate.counter = 52
-			left_skate.counter = 52
-			with open(config_file, 'r') as stream:
-				try:
-					calibration_data = yaml.load(stream)
-					print"yaml file loaded"
-					
-					print calibration_data['left_gain_front_outer'] 
-				except yaml.YAMLError as exc:
-					print(exc)
-=======
 
 		if(right_skate.counter == 51 and left_skate.counter==51):
 			right_skate.counter = 52
@@ -124,7 +103,6 @@ def normalize_calculation(right_skate, left_skate):
 			#		print calibration_data['left_gain_front_outer'] 
 			#	except yaml.YAMLError as exc:
 			#		print(exc)
->>>>>>> test
 			#####use calibrated values for calculation########
 			left_skate_force_front_outer = float(float(left_skate.force_front_outer - left_bias_front_outer)/left_gain_front_outer) - left_preload_front_outer
 			left_skate_force_front_inner = float(float(left_skate.force_front_inner - left_bias_front_inner)/left_gain_front_inner) - left_preload_front_inner
@@ -146,6 +124,8 @@ def normalize_calculation(right_skate, left_skate):
 			rospy.set_param("total_weight",total_weight)
 			s = rospy.Service('sensors_normalized', sensors_normalized, handle_norm_service)
 			rospy.spin()
+			 
+# return None
 			 
 	
 
