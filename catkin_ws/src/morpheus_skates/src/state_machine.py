@@ -20,6 +20,7 @@ from std_msgs.msg import *
 from morpheus_skates.msg import *
 from morpheus_skates.srv import *
 
+publish_rate = rospy.get_param("publish_rate")
 eps = 0.1
 
 ### check this out properly
@@ -199,6 +200,7 @@ def check_polygon():
 def state_machine_update(stance_classifier):
     global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     
+    rate = rospy.Rate(publish_rate) # 100hz
     pub_l = rospy.Publisher('left_state', Int16, queue_size=100)
     pub_r = rospy.Publisher('right_state', Int16, queue_size=100)
     pub_gait = rospy.Publisher('user_gait', Int16, queue_size=100)

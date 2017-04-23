@@ -11,9 +11,10 @@ def keyboard_input():
     return set_point
 
 def state_publisher():
+    publish_rate = rospy.get_param("publish_rate")
     pub = rospy.Publisher('user_inputs', skate_command, queue_size=10)
     rospy.init_node('user_input', anonymous=True)
-    rate = rospy.Rate(100) # 100hz
+    rate = rospy.Rate(publish_rate) # 100hz
     message = skate_command()
     while not rospy.is_shutdown():
         value = keyboard_input()
