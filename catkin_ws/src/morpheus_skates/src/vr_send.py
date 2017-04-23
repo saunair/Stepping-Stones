@@ -17,7 +17,7 @@ import numpy as np
 
 publish_rate = rospy.get_param("vr_refresh_rate")
 left_skate_velocity, right_skate_velocity = 0,0
-number_samples = 20
+number_samples = 100
 
 SPL = 0
 SSPR = 1
@@ -52,7 +52,6 @@ def static_stance_check():
 def check_stop(target_vel):
     global velocity_history, state_historyi, DSP
     del velocity_history[0]
-    velocity_history.append(target_vel)
     '''
     d1 = velocity_history[3] - velocity_history[2]
     d2 = velocity_history[2] - velocity_history[1]
@@ -60,10 +59,13 @@ def check_stop(target_vel):
     deceleration_check = (d3 < d2) and (d2 < d1) and (d1 < d0)
     '''
     static_stance_check = all(x==DSP for x in state_history)
-    if(static_stance_check):
+    dynamic_stance_check = all(x==DSM for x in state_history)
+    if(static_stance_check or dynamic_stance_check):
        vr_velocity = 0 
        del velocity_history[0]
        velocity_history.append(vr_velocity)
+    else:
+    	velocity_history.append(target_vel)
     return np.average(velocity_history)
 
 def update(skate):
