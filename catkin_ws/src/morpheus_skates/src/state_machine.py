@@ -139,7 +139,7 @@ def state_machine_execute(state):
 def markov_decision():
     global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     score_list = no_states*[0] 
-    for i in range(0,len(state_queue)):
+    for i in range(0,len(state_queue)-1):
         score_list[state_queue[i]] += markov_matrix[current_state][state_queue[i]];
 
     decision = score_list.index(max(score_list))
@@ -239,7 +239,7 @@ def state_machine_update(stance_classifier):
        
 	else:
             state = DSP 
-        current_state = markov_decision()
+        #current_state = markov_decision()
         del state_queue[0]
 
         ## append the latest prediction
@@ -247,7 +247,7 @@ def state_machine_update(stance_classifier):
         
         if state != StateMachine.CurrentStateID:
             #StateMachine.Exit(state)
-            StateMachine.CurrentStateID = current_state
+            StateMachine.CurrentStateID = state
             control_left, control_right = StateMachine.Enter(state_queue[2])
             pub_l.publish(control_left)
             pub_r.publish(control_right)
@@ -255,7 +255,7 @@ def state_machine_update(stance_classifier):
         control_left, control_right = StateMachine.Execute()
         pub_l.publish(control_left)
         pub_r.publish(control_right)
-        pub_gait.publish(current_state)
+        pub_gait.publish(state)
         
 
 if __name__=='__main__':

@@ -47,7 +47,7 @@ total_weight = 0
 velocity_threshold = 300
 
 #time threshold
-time_threshold = 2
+time_threshold = 0.5
 
 send_control.command_target = 0
 
@@ -341,7 +341,7 @@ def send_controls():
 		velocity = 0
 		send_control.command_target = velocity
         except:
-            print 'not found sanjay'
+            print 'Not found user'
             pass
         if skip_kinect==True:
             send_control.command_target = user_input.command_target
@@ -357,10 +357,10 @@ def send_controls():
         if estop_state==True:
             estop_count += 1
             send_control.command_target = estop_trigger_velocity - \
-                float(estop_count)*(estop_trigger_velocity/ (float(publish_rate) * 3.0))
-            if send_control.command_target == 0:
+                float(estop_count)*(estop_trigger_velocity/ (float(publish_rate) * 1.0))
+            if send_control.command_target <= 0:
                 estop_state = False
-		
+		send_control.command_target = 0
         
         send_control.header.stamp = rospy.Time.now()	
         check_timeout(rospy.get_time())
@@ -370,13 +370,15 @@ def send_controls():
                 fault_trigger_velocity = send_control.command_target
             fault_count += 1
 	    send_control.command_target = fault_trigger_velocity - \
-	        float(fault_count)*(fault_trigger_velocity/ (float(publish_rate) * 3.0))
+	        float(fault_count)*(fault_trigger_velocity/ (float(publish_rate) * 1.0))
+            if send_control.command_target <= 0:
+		send_control.command_target = 0
         
         send_control_left = send_control
         send_control_right = send_control
     	
-        send_control_right.command_target = send_control_right.command_target*right_vel_state
-    	send_control_left.command_target  = send_control_left.command_target*left_vel_state
+        #send_control_right.command_target = send_control_right.command_target*right_vel_state
+    	#send_control_left.command_target  = send_control_left.command_target*left_vel_state
         
         left_pub.publish(send_control_left)
     	right_pub.publish(send_control_right)	
