@@ -254,7 +254,7 @@ def send_controls():
     listener_trans = tf.TransformListener() 
     x_error = 0
     x_error_cum = 0
-    rate = rospy.Rate(publish_rate) # 100hz
+    rate = rospy.Rate(publish_rate) 
     left_pub.publish(send_control_left)
     right_pub.publish(send_control_right)
     total_pub = rospy.Publisher('total_message', integrated_message, queue_size=10)
