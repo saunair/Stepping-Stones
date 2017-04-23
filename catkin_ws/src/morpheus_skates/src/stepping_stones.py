@@ -1,56 +1,69 @@
 #!/usr/bin/env python
 # license removed for brevity
-#MRSD TEAM-H; Morpheus Skates
 #Author: Saurabh Nair
-#Edited By Brad Factor
+#Edited By Aditya Ghadiali, Brad Factor
 
 import rospy
 import time
-from std_msgs.msg import UInt16
-from std_msgs.msg import Float64
-
-from morpheus_skates.msg import skate_command
-from morpheus_skates.msg import skate_feedback
+import copy
 import numpy
-from morpheus_skates.srv import *
 import tf
-
 import roslib; roslib.load_manifest('morpheus_skates')
 
-skip_kinect = False; #Used for debugging controls/comms without Kinect functionality
+from std_msgs.msg import *
+from morpheus_skates.msg import *
+from morpheus_skates.srv import *
 
 publish_rate = rospy.get_param("publish_rate")
+skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms without Kinect functionality
 
-##### This node is the main master node that uses every service and controls most of the data flow. The command of the speed to the motor nodes is given by this file
+history_positions = 10
 
+kinect_position_list = history_positions*[0]
 left_skate_fault = 0
-right_skate_fault = 0;
+right_skate_fault = 0
+PreloadThreshold = -0.2
+preload_right_loose = 0
+preload_left_loose = 0
+announce_right_loose = 0
+announce_left_loose = 0
+skate_fault_annun = False
+skate_power_annun = False
+left_vel_state = 1
+right_vel_state = 1
 
-
-#state values
 user_input = skate_command()
 send_control = skate_command()
-calibration = 0
-user_input.calibration_enable = 0
+send_control_left = skate_command()
+send_control_right = skate_command()
+total_message = integrated_message()
 user_input.command_target = 0
-position_control = 1
-velocity_control = 2
 total_weight = 0
 
+#previous_left_time  = rospy.Time.now() 
+#previous_right_time = rospy.Time.now()
 
 #velocity threshold! please decide!
 velocity_threshold = 300
 
 #time threshold
-time_threshold = 20
+time_threshold = 0.5
 
-send_control.calibration_enable = 0
 send_control.command_target = 0
+
+#Kinect zero-point error tolerance/deadband:
+tolerance = 0.18
+i_tolerance = 0.3
 
 #default zero points
 z_x= 3.45787 
 z_y=0.0881804
 z_z=0.211088
+
+#e-stop
+estop_samples = [False,False,False,False,False] 
+estop_state = False
+estop_trigger_velocity = 0.0
 
 
 ### required gains from the rosparam server
@@ -75,157 +88,334 @@ right_preload_front_inner = rospy.get_param('right_preload_front_inner')
 right_preload_rear = rospy.get_param('right_preload_rear')
 
 #Kinect-based controller values
-kp = 50 # mm/s / m
+kp = 315
+kd = 0 
+ki = 0 
 
 def process_input(data):
     global user_input
     try:
-        user_input.calibration_enable = data.calibration_enable
         user_input.command_target = data.command_target
     except:
-        user_input.calibration_enable = 0
         user_input.command_target = 0
+        #print user_input.set_point
 
-## The next teo methods check for the time of the latest message from the skates for stopping if timed out
-def stop_system_right(right):
-    global send_control, previous_right_time, right_skate_fault
-    right_skate_fault = right.skate_fault
-    previous_right_time = rospy.get_time()
 
-def stop_system_left(left):
-    global send_control, previous_left_time, left_skate_fault
+def left_update(left):
+    global total_message, previous_left_time, left_skate_fault
     left_skate_fault = left.skate_fault
     previous_left_time = rospy.get_time()
+    total_message.left_feedback = left
 
-## Check if the skate times out
+
+def right_update(right):
+    global total_message, previous_right_time, right_skate_fault
+    right_skate_fault = right.skate_fault
+    previous_right_time = rospy.get_time()
+    total_message.right_feedback = right
+
+
+def pounds_update(data):
+    global total_message
+    total_message.pounds_values = data
+
+
+def position_offset_update(data):
+    global total_message
+    total_message.user_position_offset = data.data
+
+
 def check_timeout(current_time):
     global send_control, time_threshold, previous_left_time, previous_right_time, right_skate_fault, left_skate_fault
-    if ((current_time - previous_left_time)>time_threshold ):
-        print current_time, previous_left_time
-        send_control.command_target = 0
-        print "One of the skates has timed out"
+    global skate_fault_annun, skate_power_annun
+    if ((current_time - previous_left_time)>time_threshold ) or ((current_time - previous_right_time)>time_threshold):
+        #print current_time, previous_left_time
+        #send_control.command_target = 0
+	if not(skate_power_annun):
+            print "One of the skates has timed out!"
+ 	    skate_power_annun = True
     #fault detected
-    if not(left_skate_fault or right_skate_fault):
-        send_control.command_target = 0
-        print "fault detected"
+    if (left_skate_fault or right_skate_fault):
+        #send_control.command_target = 0
+	if not(skate_fault_annun):
+            print "Internal skate fault detected!"
+	    skate_fault_annun = True
 
 
-#Ask for the zero point from the kinect
+#ask for the zero point from the kinect
 def ask_zero_point():
     #not waiting for 2 secs!!
     rospy.wait_for_service('zero_point')
     try:
         resp1 = rospy.ServiceProxy('zero_point', zero_point)
+        #not passing one anymore to  move on from empty
         resp1 = resp1()
         print "zero_point =" ,resp1
         return resp1.zero_x, resp1.zero_y, resp1.zero_z
+        #return resp1
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
 
-## Ask for total weight of the user
 def run_normalization_routine():
+   
     rospy.wait_for_service('sensors_normalized')
     try:
         response = rospy.ServiceProxy('sensors_normalized', sensors_normalized)
+        #not passing one anymore to  move on from empty
         response = response()
         print "total_weight", response.total_weight
         return response.total_weight
+        #return resp1
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
+def normalize_update(data1):  
+    data = copy.deepcopy(data1)
+    global total_message, preload_left_loose, preload_right_loose, announce_left_loose, announce_right_loose
+   
+    if data.left_normal_front_outer<=0:
+    	if data.left_normal_front_outer<PreloadThreshold:
+    	   preload_left_loose = True
+    	data.left_normal_front_outer=0
 
-## Ask for total weight of the user
-def ask_shoe_size():
-    rospy.wait_for_service('shoe_size')
-    try:
-        response = rospy.ServiceProxy('user_shoe_size', user_shoe_size)
-        response = response()
-        print "shoe_size", response.user_shoe_size
-        return response.user_shoe_size
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+    if data.left_normal_front_inner<=0:
+	if data.left_normal_front_inner<PreloadThreshold:
+            preload_left_loose = True
+        data.left_normal_front_inner=0
 
+    if data.left_normal_rear<=0:
+	if data.left_normal_rear<PreloadThreshold:
+    	    preload_left_loose = True	
+    	data.left_normal_rear=0
+	
+    if data.right_normal_front_outer<=0:
+	if data.right_normal_front_outer<PreloadThreshold:
+    	    preload_right_loose = True
+	data.right_normal_front_outer=0
+	
+    if data.right_normal_front_inner<=0:
+        if data.right_normal_front_inner<PreloadThreshold:
+    	    preload_right_loose = True
+    	data.right_normal_front_inner=0
+	
+    if data.right_normal_rear<=0:
+        if data.right_normal_rear<PreloadThreshold:
+    	    preload_right_loose = True
+    	data.right_normal_rear=0
+    
+    data.left_normal_total = data.left_normal_rear + data.left_normal_front_inner + data.left_normal_front_outer
+    
+    data.right_normal_total = data.right_normal_rear + data.right_normal_front_inner + data.right_normal_front_outer
+     
+    data.normal_total = data.left_normal_total + data.right_normal_total 
+     
+    if preload_right_loose and not(announce_right_loose):
+        rospy.logwarn("Fix preload for right")
+	announce_right_loose = 1
+    
+    if preload_left_loose and not(announce_left_loose):
+        rospy.logwarn("Fix preload for left")
+	announce_left_loose = 1
+
+    total_message.header.stamp = rospy.get_rostime()	
+    total_message.normalized_force = data
+    
+
+def check_estop():
+    global total_messsage,estop_samples
+    estop_samples.insert(0,total_message.right_feedback.dead_man_enable)
+    estop_samples.pop()
+    estop_count = estop_samples.count(True)
+    return estop_count >= 3
+
+
+def left_state(left_state):
+    global left_vel_state
+    left_vel_state = left_state.data
+
+def right_state(right_state):
+    global right_vel_state
+    right_vel_state = right_state.data
 
 #main higher level control code
 def send_controls():
-    global send_control, previous_left_time, previous_right_time
-    global z_x, z_y, z_z
-    left_pub = rospy.Publisher('command_left', skate_command, queue_size=100)
-    right_pub = rospy.Publisher('command_right', skate_command, queue_size=100)
-    kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
-    
-    rospy.init_node('stepping_stones', anonymous=True)
-    previous_left_time  = rospy.get_time()
-    previous_right_time  = rospy.Time.now()
-    listener_trans = tf.TransformListener() 
-    i = 0
-    rate = rospy.Rate(publish_rate) # 100hz
-    left_pub.publish(send_control)
-    right_pub.publish(send_control)
+    global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate
+    global z_x, z_y, z_z, history_positions
+    global total_message
+    global estop_state,estop_trigger_velocity
+   
 
-    hello_str = "%d" % 50
-    rospy.loginfo(hello_str)
-    
+    fault_count = 0
+    x_error_previous, x_error_i, x_error_d = 0,0,0
+
+    previous_left_time  = rospy.get_time()
+    previous_right_time  = rospy.get_time()
+    listener_trans = tf.TransformListener() 
+    x_error = 0
+    x_error_cum = 0
+    rate = rospy.Rate(publish_rate) # 100hz
+    left_pub.publish(send_control_left)
+    right_pub.publish(send_control_right)
+    total_pub = rospy.Publisher('total_message', integrated_message, queue_size=10)
     #subscribe to user inputs
+    rospy.Subscriber("left_state", Int16, left_state)
+    rospy.Subscriber("right_state", Int16, right_state)
     rospy.Subscriber("user_inputs", skate_command, process_input)
-    rospy.Subscriber("right", skate_feedback, stop_system_right)
-    rospy.Subscriber("left", skate_feedback, stop_system_left)
-    
+    rospy.Subscriber("left_feedback", skate_feedback, left_update)
+    rospy.Subscriber("right_feedback", skate_feedback, right_update)
+    rospy.Subscriber("pounds_per_sensor", pounds_display, pounds_update)
+    rospy.Subscriber("normalized_force_per_sensor", user_force_normalized, normalize_update)
+    rospy.Subscriber("user_position_offset", Float64, position_offset_update)
+    #rospy.Subscriber("left_state" , Int16, left_state )
+    #rospy.Subscriber("right_state", Int16, right_state)
+
     while not rospy.is_shutdown():
         
-        if not(user_input.calibration_enable):
-            try:
-                (trans1,rot1) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-		pass
+        #invert the frames for left and right
+        try:
+            (trans_left_hip,rot_left_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/left_hip_1', rospy.Time(0))
+            total_message.hip_left[0] = trans_left_hip[0] - z_x 
+            total_message.hip_left[1] = trans_left_hip[1] - z_y
+            total_message.hip_left[2] = trans_left_hip[2] - z_z
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+	    	pass
     
-            try:
-                (trans2,rot2) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                pass
-    
-            #current kinect values 
-            try:
-                x_current = ((trans2[0] + trans1[0])/2)
-                y_current = ((trans2[1] + trans1[1])/2)
-                z_current = ((trans2[2] + trans1[2])/2)
-                                                  
-                x_error = z_x - x_current
-                if user_input.command_target > 100:
-                    send_control.command_target = user_input.command_target + kp*x_error
-                else:
-                    send_control.command_target = user_input.command_target
-            except:
+        try:
+            (trans_right_hip,rot_right_hip) = listener_trans.lookupTransform('/openni_depth_frame', '/right_hip_1', rospy.Time(0))
+            total_message.hip_right[0] = trans_right_hip[0] - z_x
+            total_message.hip_right[1] = trans_right_hip[1] - z_y
+            total_message.hip_right[2] = trans_right_hip[2] - z_z 
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+
+        try:
+            (trans_left_foot,rot_left_foot)  = listener_trans.lookupTransform('/openni_depth_frame', '/left_foot_1', rospy.Time(0))
+            total_message.foot_left[0] = trans_left_foot[0] - z_x
+            total_message.foot_left[1] = trans_left_foot[1] - z_y
+            total_message.foot_left[2] = trans_left_foot[2] - z_z
+        except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+        try:
+            (trans_right_foot,rot_right_foot) = listener_trans.lookupTransform('/openni_depth_frame', '/right_foot_1', rospy.Time(0))
+            total_message.foot_right[0] = trans_right_foot[0] - z_x
+            total_message.foot_right[1] = trans_right_foot[1] - z_y
+            total_message.foot_right[2] = trans_right_foot[2] - z_z 	
+        except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+        try:
+            (trans_COM,rot_COM)        = listener_trans.lookupTransform('/openni_depth_frame', '/centre_mass', rospy.Time(0))
+            total_message.centre_of_mass_kinect[0] = trans_COM[0] - z_x
+            total_message.centre_of_mass_kinect[1] = trans_COM[1] - z_y
+            total_message.centre_of_mass_kinect[2] = trans_COM[2] - z_z
+        except(tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+	
+        #current kinect values 
+        try:
+            x_current = ((trans_right_hip[0] + trans_left_hip[0])/2)
+            y_current = ((trans_right_hip[1] + trans_left_hip[1])/2)
+            z_current = ((trans_right_hip[2] + trans_left_hip[2])/2)
+            '''                                  
+            x_error = z_x - x_current
+            if user_input.command_target > 100:
+                send_control.command_target = user_input.command_target - kp*x_error
+            else:
                 send_control.command_target = user_input.command_target
-		x_error = 0
-                pass
+            '''
+            '''
+            del kinect_position_list[0]
+            kinect_position_list.append(x_current)
+            x_average = np.mean(kinect_position_list)
+            '''
+	    x_error = x_current - z_x
+            #print x_error
+            x_error_d = x_error - x_error_previous
+	    x_error_cum = x_error_cum + x_error
+            kp = 315 + 10*x_error
+	    if abs(x_error)>tolerance:
+            	velocity = (user_input.command_target>0)*(kp*x_error + kd*x_error_d + ki*x_error_i)
+            	x_error_previous = x_error
+            	send_control.command_target = velocity
+	    else:
+		velocity = 0
+		send_control.command_target = velocity
+        except:
+            print 'Not found user'
+            pass
+        if skip_kinect==True:
+            send_control.command_target = user_input.command_target
+        
+        if check_estop() and estop_state==False:
+            estop_trigger_velocity = send_control.command_target
+            estop_state = True
+            estop_message = skate_command()
+            estop_message.command_target = 0
+            estop_pub.publish(estop_message)
+            estop_count = 0
+
+        if estop_state==True:
+            estop_count += 1
+            send_control.command_target = estop_trigger_velocity - \
+                float(estop_count)*(estop_trigger_velocity/ (float(publish_rate) * 1.0))
+            if send_control.command_target <= 0:
+                estop_state = False
+		send_control.command_target = 0
         
         send_control.header.stamp = rospy.Time.now()	
+        check_timeout(rospy.get_time())
         
-        left_pub.publish(send_control)
-        right_pub.publish(send_control)
+	if (skate_fault_annun or skate_power_annun):
+	    if not(fault_count):
+                fault_trigger_velocity = send_control.command_target
+            fault_count += 1
+	    send_control.command_target = fault_trigger_velocity - \
+	        float(fault_count)*(fault_trigger_velocity/ (float(publish_rate) * 1.0))
+            if send_control.command_target <= 0:
+		send_control.command_target = 0
+        
+        send_control_left = send_control
+        send_control_right = send_control
+    	
+        #send_control_right.command_target = send_control_right.command_target*right_vel_state
+    	#send_control_left.command_target  = send_control_left.command_target*left_vel_state
+        
+        left_pub.publish(send_control_left)
+    	right_pub.publish(send_control_right)	
         kin_pub.publish(x_error)
+        total_message.left_command = send_control_left
+        total_message.right_command = send_control_right
+        total_message.header.stamp = rospy.get_rostime()
+        total_pub.publish(total_message)
+
         rate.sleep()
 
+
+
 if __name__ == '__main__':
-    global total_weight, shoe_size
+    global total_weight
     if skip_kinect == False:
 	    try:
 		z_x, z_y, z_z = ask_zero_point()
-		print "acquired zero point"
+		print "Acquired zero point"
 	    except rospy.ROSInterruptException:
-		print "Sorry didn't acquire the zero position"
+		print "Zero point not acquired!"
 		pass
 	    except:
-		print "Sorry didn't acquire the zero position, going with default"
+		print "Zero point not acquired! Using default values"
 		z_x = 3.45787 
 		z_y = 0.0881804
 		z_z = 0.21108
 
-    try:
-        total_weight = run_normalization_routine() 
-        shoe_size =  ask_shoe_size()
+    left_pub = rospy.Publisher('left_command', skate_command, queue_size=100)
+    right_pub = rospy.Publisher('right_command', skate_command, queue_size=100)
+    kin_pub = rospy.Publisher('user_position_offset', Float64, queue_size=100)
+    estop_pub = rospy.Publisher('user_inputs', skate_command, queue_size=100)
+    rospy.init_node('stepping_stones', anonymous=True)
+
+    try: 
         send_controls()
+
     except rospy.ROSInterruptException:
         pass
+

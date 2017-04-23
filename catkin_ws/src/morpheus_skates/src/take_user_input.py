@@ -6,12 +6,10 @@ publish_rate = rospy.get_param("publish_rate")
 
 def keyboard_input():
     try:
-        state = input("Please input the state")
         set_point = input("please input the set_point")
     except:
-        state = 0
         set_point = 0
-    return state, set_point
+    return set_point
 
 def state_publisher():
     pub = rospy.Publisher('user_inputs', skate_command, queue_size=10)
@@ -19,8 +17,7 @@ def state_publisher():
     rate = rospy.Rate(publish_rate) # 100hz
     message = skate_command()
     while not rospy.is_shutdown():
-        state, value = keyboard_input()
-        message.calibration_enable = state
+        value = keyboard_input()
         message.command_target = value
         #rospy.loginfo(message)
         pub.publish(message)

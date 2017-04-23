@@ -50,9 +50,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
    FILES
-   skate_feedback.msg
-   skate_command.msg
+   integrated_message.msg
    pounds_display.msg
+   skate_command.msg
+   skate_feedback.msg
    user_force_normalized.msg
    integrated_message.msg
  )
@@ -61,9 +62,9 @@ add_message_files(
 add_service_files(
     FILES
     sensors_normalized.srv
-    zero_point.srv
-    yaml_values.srv
     user_shoe_size.srv
+    yaml_values.srv
+    zero_point.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -127,6 +128,12 @@ include_directories(
 )
 
 
+<<<<<<< HEAD
+=======
+#catkin_install_python(PROGRAMS src/calibration_arduino.py
+#  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+>>>>>>> test
 catkin_install_python(PROGRAMS src/calibration_force.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
@@ -157,6 +164,7 @@ catkin_install_python(PROGRAMS src/message_integrate.py
 
 catkin_install_python(PROGRAMS src/shoe_size_input.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+catkin_install_python(PROGRAMS src/state_machine.py
 ## Declare a C++ library
 ##add_library(morpheus
 ##    src/${morpheus_skate}/imu_integrator.cpp

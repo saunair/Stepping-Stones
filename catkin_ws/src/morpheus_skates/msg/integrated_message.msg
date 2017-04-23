@@ -1,0 +1,14 @@
+Header header
+skate_feedback left_feedback
+skate_feedback right_feedback
+skate_command left_command
+skate_command right_command
+user_force_normalized normalized_force
+pounds_display pounds_values
+float64[3] centre_of_mass_kinect
+float64[3] hip_left
+float64[3] hip_right
+float64[3] foot_left
+float64[3] foot_right
+float64[3] kinect_zero
+float64 user_position_offset

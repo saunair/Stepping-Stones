@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# license removed for brevity
+# Author: Saurabh Nair
 import rospy
 import time
 from std_msgs.msg import UInt16
@@ -73,15 +73,10 @@ def update_system_left(left):
 if __name__ == '__main__':
     global  display_weight
     rospy.init_node('pounds_display', anonymous=True)
-    # total_weight = run_normalization_routine()
-    #print total_weight
-    #a = input('check')
     r = rospy.Rate(publish_rate)
     rospy.Subscriber("right", skate_feedback, update_system_right)
     rospy.Subscriber("left", skate_feedback, update_system_left)
     pub = rospy.Publisher('pounds_per_sensor', pounds_display, queue_size=100)
     while not rospy.is_shutdown():
     	pub.publish(display_weight)
-        # print "rospy spin"
 	r.sleep()
-        # print "rospy not spinning"

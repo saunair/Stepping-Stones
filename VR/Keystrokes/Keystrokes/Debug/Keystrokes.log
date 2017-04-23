@@ -1,0 +1,5 @@
+﻿  Keystrokes.cpp
+c:\users\morpheus\documents\visual studio 2017\projects\keystrokes\keystrokes\keystrokes.cpp(12): warning C4005: 'WINVER': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.14393.0\shared\sdkddkver.h(224): note: see previous definition of 'WINVER'
+  Keystrokes.vcxproj -> C:\Users\Morpheus\Documents\Visual Studio 2017\Projects\Keystrokes\Debug\Keystrokes.exe
+  Keystrokes.vcxproj -> C:\Users\Morpheus\Documents\Visual Studio 2017\Projects\Keystrokes\Debug\Keystrokes.pdb (Partial PDB)

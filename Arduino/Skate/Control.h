@@ -5,10 +5,11 @@
 #ifndef Control_h
 #define Control_h
 
-#define ACCEL_LIMIT 40.0
+#define ACCEL_LIMIT 5000.0
+#define INTEG_LIMIT 2000.0
 
 #define POSN_ERROR_THRESHOLD 70
-#define VEL_ERROR_THRESHOLD 21000
+#define VEL_ERROR_THRESHOLD 10000
 
 #include "Arduino.h"
 
@@ -30,6 +31,7 @@ class Control {
     int getMode();
     bool checkModeTransition();
     float getControllerTarget();
+    float getVelocityErrorSum();
     long lastControlTime;
     long controlTimeDelta;
   private:
@@ -61,6 +63,7 @@ class Control {
     float motorCommand;
 
     bool modeTransitionFlag;
+    int skate_fault;
 };
 
 #endif

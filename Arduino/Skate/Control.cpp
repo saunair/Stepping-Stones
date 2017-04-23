@@ -15,6 +15,7 @@ Control::Control(float *posnGains,float *velGains,int controlPeriod) {
   controlPeriodMs = controlPeriod;
   modeTransitionFlag = false;
   lastControlTime = millis();
+  skate_fault = 0;
 
   resetIntegrators();
 }
@@ -44,6 +45,7 @@ float Control::computeCommand(float target,float wheelPosition,float wheelVeloci
   }
 
   if(controlMode == Position_Mode) {
+    resetIntegrators();
     return computePositionCommand(target,wheelPosition);
   }
 
@@ -55,10 +57,12 @@ float Control::computeCommand(float target,float wheelPosition,float wheelVeloci
 
 float Control::computePositionCommand(float target,float wheelPosition) {
   positionTarget = target;
+  velocityTarget = 0;
+  velocityTargetLim = 0;
   positionErrorPrev = positionError;
   positionError = positionTarget - wheelPosition;
 
-  if(invertFlag == false) {
+  /*if(invertFlag == false) {
     positionError = constrain(positionError,0,abs(positionError));
   }
   else {  
@@ -68,22 +72,28 @@ float Control::computePositionCommand(float target,float wheelPosition) {
   positionErrorSum = positionErrorSum + positionError;
   positionErrorDiff = positionError - positionErrorPrev;
      
-  return posn_Kp*positionError + posn_Ki*positionErrorSum + posn_Kd*positionErrorDiff;
+  return posn_Kp*positionError + posn_Ki*positionErrorSum + posn_Kd*positionErrorDiff;*/
+  return 0; //Just apply brake
 }
 
 
 float Control::computeVelocityCommand(float target,float wheelVelocity) {
+  float command;
+  
   //Apply acceleration  limit
-  velocityTarget = target;      
+  velocityTarget = target;  
+  if(invertFlag == true) velocityTarget = velocityTarget * -1;    
   velocityTargetLimPrev = velocityTargetLim;
   velocityTargetLim = constrain(velocityTarget,velocityTargetLimPrev-ACCEL_LIMIT*(controlPeriodMs/1000.0),velocityTargetLimPrev+ACCEL_LIMIT*(controlPeriodMs/1000.0));
 
   velocityErrorPrev = velocityError;   
   velocityError = velocityTargetLim - wheelVelocity;
-  velocityErrorSum = velocityErrorSum + velocityError;
+  velocityErrorSum = constrain(velocityErrorSum + velocityError,-INTEG_LIMIT,INTEG_LIMIT);
   velocityErrorDiff = velocityError - velocityErrorPrev;
+
+  command = constrain(((vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff) + (0.00037*velocityTargetLim)),-1,1);
       
-  return vel_Kp*velocityError + vel_Ki*velocityErrorSum + vel_Kd*velocityErrorDiff;
+  return command;
 }
 
 
@@ -94,9 +104,8 @@ void Control::resetIntegrators() {
 
     
 int Control::checkErrors() {
-  int skate_fault = 0;
-  if (positionError > POSN_ERROR_THRESHOLD) skate_fault |= 1<<0;   
-  if (velocityErrorSum > VEL_ERROR_THRESHOLD) skate_fault |= 1<<1;
+  //if (positionError > POSN_ERROR_THRESHOLD) skate_fault |= 1<<0;   
+ // if (velocityErrorSum > VEL_ERROR_THRESHOLD) skate_fault |= 1<<1;
 
   return skate_fault;  
 }
@@ -116,9 +125,15 @@ bool Control::checkModeTransition() {
 float Control::getControllerTarget() {
   if(controlMode == Position_Mode){
     return positionTarget;
+    //return 0;
   }
   else {
     return velocityTargetLim;
   }
+}
+
+
+float Control::getVelocityErrorSum() {
+  return velocityErrorSum;
 }
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#Author Saurabh Nair
 import time
 from morpheus_skates.srv import *
 import rospy
@@ -17,6 +18,9 @@ def handle_zero_point(req):
     global z_x, z_y, z_z 
     #print "Returning [%s + %s = %s]"%(z_x, z_y, z_z)
     print "Returning [%s, %s, %s]" % (z_x, z_y, z_z)
+    rospy.set_param('z_x', z_x)
+    rospy.set_param('z_y', z_y)
+    rospy.set_param('z_z', z_z)
     #return {"zero_x":z_x, "zero_y":z_y, "zero_z":z_z}
     return zero_pointResponse(z_x, z_y, z_z)
 
@@ -29,7 +33,7 @@ def zero_point_server():
     listener_trans = tf.TransformListener() 
     #rate = rospy.Rate(10.0)
     #waiting for transform!!!!
-    listener_trans.waitForTransform("/openni_depth_frame", "/left_hip_1", rospy.Time(), rospy.Duration(4000.0))
+    listener_trans.waitForTransform("/openni_depth_frame", "/left_hip_1", rospy.Time(), rospy.Duration(200))
     while count<11:
 
         try:

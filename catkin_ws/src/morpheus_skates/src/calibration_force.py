@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # license removed for brevity
+
+##Author: Saurabh Nair
+# Edited by Koushik Bhavani
 import rospy
 import time
 from std_msgs.msg import UInt16
@@ -31,8 +34,8 @@ class skate(object):
 	self.name = name
         
         ########### set appropriate values ########
-	self.MAX_preload_F1 = 50
-        self.MAX_preload_F2 = 50
+	self.MAX_preload_F1 = 75
+        self.MAX_preload_F2 = 75
         self.MAX_preload_F3 = 100
     	
 	########### initialize variables ##########
@@ -293,10 +296,10 @@ def start(left_skate_start, right_skate_start, skate_side):
     rospy.init_node('bias', anonymous=True)
     
     if(skate_side == 1):
-        rospy.Subscriber("left" , skate_feedback, left_skate_start.update_values)
+        rospy.Subscriber("left_feedback" , skate_feedback, left_skate_start.update_values)
         left_skate_start.run()
     elif(skate_side == 2):
-        rospy.Subscriber("right", skate_feedback, right_skate_start.update_values)
+        rospy.Subscriber("right_feedback", skate_feedback, right_skate_start.update_values)
         right_skate_start.run()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
