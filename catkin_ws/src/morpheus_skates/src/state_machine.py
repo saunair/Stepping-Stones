@@ -199,8 +199,9 @@ def check_polygon():
 def state_machine_update(stance_classifier):
     global force_values, imu_data_left, imu_data_right, foot_positions, front_stepping, back_stepping, stance, state_queue
     
-    pub_l = rospy.Publisher('left_state', Int8, queue_size=100)
-    pub_r = rospy.Publisher('right_state', Int8, queue_size=100)
+    pub_l = rospy.Publisher('left_state', Int16, queue_size=100)
+    pub_r = rospy.Publisher('right_state', Int16, queue_size=100)
+    pub_gait = rospy.Publisher('user_gait', Int16, queue_size=100)
 
     StateMachine = state_obj.SkateControls()
     while not rospy.is_shutdown():
@@ -246,7 +247,7 @@ def state_machine_update(stance_classifier):
         
         if state != StateMachine.CurrentStateID:
             #StateMachine.Exit(state)
-            StateMachine.CurrentStateID = state
+            StateMachine.CurrentStateID = current_state
             control_left, control_right = StateMachine.Enter(state_queue[2])
             pub_l.publish(control_left)
             pub_r.publish(control_right)
@@ -254,6 +255,7 @@ def state_machine_update(stance_classifier):
         control_left, control_right = StateMachine.Execute()
         pub_l.publish(control_left)
         pub_r.publish(control_right)
+        pub_gait.publish(current_state)
         
 
 if __name__=='__main__':

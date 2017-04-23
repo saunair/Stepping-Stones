@@ -240,11 +240,13 @@ def right_state(right_state):
 
 #main higher level control code
 def send_controls():
-    global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate, right_vel_state, left_vel_state
+    global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate
     global z_x, z_y, z_z, history_positions
     global total_message
     global estop_state,estop_trigger_velocity
-    fault_count  = 0
+   
+
+    fault_count = 0
     x_error_previous, x_error_i, x_error_d = 0,0,0
 
     previous_left_time  = rospy.get_time()
@@ -257,14 +259,16 @@ def send_controls():
     right_pub.publish(send_control_right)
     total_pub = rospy.Publisher('total_message', integrated_message, queue_size=10)
     #subscribe to user inputs
+    rospy.Subscriber("left_state", Int16, left_state)
+    rospy.Subscriber("right_state", Int16, right_state)
     rospy.Subscriber("user_inputs", skate_command, process_input)
     rospy.Subscriber("left_feedback", skate_feedback, left_update)
     rospy.Subscriber("right_feedback", skate_feedback, right_update)
     rospy.Subscriber("pounds_per_sensor", pounds_display, pounds_update)
     rospy.Subscriber("normalized_force_per_sensor", user_force_normalized, normalize_update)
     rospy.Subscriber("user_position_offset", Float64, position_offset_update)
-    rospy.Subscriber("left_state" , Int16, left_state )
-    rospy.Subscriber("right_state", Int16, right_state)
+    #rospy.Subscriber("left_state" , Int16, left_state )
+    #rospy.Subscriber("right_state", Int16, right_state)
 
     while not rospy.is_shutdown():
         
@@ -319,10 +323,13 @@ def send_controls():
             else:
                 send_control.command_target = user_input.command_target
             '''
-            del history_positions[0]
-            history_positions.append(x_current)
-            x_average = np.mean(history_positions)
-	    x_error = x_average - z_x
+            '''
+            del kinect_position_list[0]
+            kinect_position_list.append(x_current)
+            x_average = np.mean(kinect_position_list)
+            '''
+	    x_error = x_current - z_x
+            #print x_error
             x_error_d = x_error - x_error_previous
 	    x_error_cum = x_error_cum + x_error
             kp = 315 + 10*x_error
@@ -334,6 +341,7 @@ def send_controls():
 		velocity = 0
 		send_control.command_target = velocity
         except:
+            print 'not found sanjay'
             pass
         if skip_kinect==True:
             send_control.command_target = user_input.command_target
@@ -363,7 +371,7 @@ def send_controls():
             fault_count += 1
 	    send_control.command_target = fault_trigger_velocity - \
 	        float(fault_count)*(fault_trigger_velocity/ (float(publish_rate) * 3.0))
- 
+        
         send_control_left = send_control
         send_control_right = send_control
     	

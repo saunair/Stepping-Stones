@@ -21,6 +21,7 @@ SSML_B = 8
 freewheeling = -1
 brake = 0
 velocity_predict = 1
+   
 
 #States:
 
@@ -31,9 +32,10 @@ class SingleStanceInPlaceLeft(object):
 
     def Enter(self, PrevID):
         #print 'Entering single stance in place...'
-        velocity_l = 0.9*velocity_predict
+        velocity_l = velocity_predict
+        #velocity_l = 0.9*velocity_predict
         velocity_r = freewheeling
-        return velocity_l, velocity_r        
+        return velocity_l, velocity_r
 
     def Execute(self):
         #Do Controls Stuff
@@ -52,7 +54,8 @@ class SingleStanceInPlaceRight(object):
     def Enter(self, PrevID):
         #print 'Entering single stance in place...'
         velocity_l =  freewheeling
-        velocity_r = 0.9*velocity_predict
+        #velocity_l = 0.9*velocity_predict
+        velocity_r = velocity_predict
         return velocity_l, velocity_r
 
     def Execute(self):
@@ -72,7 +75,8 @@ class SingleStanceInMotionLeft(object):
 
     def Enter(self, PrevID):
         #print 'Entering single stance in motion...'
-        velocity_l = 0.9*velocity_predict
+        #velocity_l = 0.9*velocity_predict
+        velocity_l = velocity_predict
         velocity_r = freewheeling
         return velocity_l, velocity_r
         
@@ -93,7 +97,8 @@ class SingleStanceInMotionRight(object):
     def Enter(self, PrevID):
         #print 'Entering single stance in motion...'
         velocity_l = freewheeling
-        velocity_r = 0.9*velocity_predict
+        velocity_r = velocity_predict
+        #velocity_r = 0.9*velocity_predict
         return velocity_l, velocity_r
         
     def Execute(self):
@@ -132,8 +137,10 @@ class DoubleStanceInMotion(object):
 
     def Enter(self, PrevID):
         #print 'Entering double stance in motion...'
-        velocity_l = 0.9*velocity_predict
-        velocity_r = 0.9*velocity_predict
+        #velocity_l = 0.9*velocity_predict
+        #velocity_r = 0.9*velocity_predict
+        velocity_l = velocity_predict
+        velocity_r = velocity_predict
         return velocity_l, velocity_r
 
     def Execute(self):
@@ -221,10 +228,12 @@ class SkateControls(object):
         self.PreviousStateID = DSP
     
     def Enter(self, PrevID):
-        self.states[self.CurrentStateID].Enter(PrevID)
+        velocity_l, velocity_r = self.states[self.CurrentStateID].Enter(PrevID)
+        return velocity_l, velocity_r
 
     def Exit(self, NextID):
         self.states[self.CurrentStateID].Exit(NextID)
 
     def Execute(self):    
-        self.states[self.CurrentStateID].Execute()
+        velocity_l, velocity_r = self.states[self.CurrentStateID].Execute()
+        return velocity_l, velocity_r
