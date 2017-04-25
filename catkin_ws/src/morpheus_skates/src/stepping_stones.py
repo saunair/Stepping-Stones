@@ -53,7 +53,7 @@ send_control.command_target = 0
 
 #Kinect zero-point error tolerance/deadband:
 epsi_1 = 0.15
-epsi_2 = 0.21
+epsi_2 = 0.195
 tolerance = epsi_1
 i_tolerance = 0.3
 
@@ -243,11 +243,11 @@ def right_state(right_state):
 #main higher level control code
 def send_controls():
     global send_control, previous_left_time, previous_right_time, send_control_left, send_control_right, publish_rate
-    global z_x, z_y, z_z, history_positions
+    global z_x, z_y, z_z, history_positions, epsi_2, epsi_1
     global total_message
     global estop_state,estop_trigger_velocity
    
-
+    velocity = 0
     fault_count = 0
     x_error_previous, x_error_i, x_error_d = 0,0,0
 
@@ -325,9 +325,10 @@ def send_controls():
             else:
                 send_control.command_target = user_input.command_target
             '''
+            
             kinect_position_list.append(x_current)
             del kinect_position_list[0]
-            x_average = np.mean(kinect_position_list)
+            x_average = numpy.mean(kinect_position_list)
 	    
             x_error = x_average - z_x
             
