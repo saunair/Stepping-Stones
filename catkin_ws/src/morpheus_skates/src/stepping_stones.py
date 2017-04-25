@@ -17,7 +17,7 @@ from morpheus_skates.srv import *
 publish_rate = rospy.get_param("publish_rate")
 skip_kinect = rospy.get_param('skip_kinect'); #Used for debugging controls/comms without Kinect functionality
 
-history_positions = 10
+history_positions = 5
 
 kinect_position_list = history_positions*[0]
 left_skate_fault = 0
@@ -52,7 +52,9 @@ time_threshold = 0.5
 send_control.command_target = 0
 
 #Kinect zero-point error tolerance/deadband:
-tolerance = 0.18
+epsi_1 = 0.15
+epsi_2 = 0.21
+tolerance = epsi_1
 i_tolerance = 0.3
 
 #default zero points
@@ -323,23 +325,28 @@ def send_controls():
             else:
                 send_control.command_target = user_input.command_target
             '''
-            '''
-            del kinect_position_list[0]
             kinect_position_list.append(x_current)
+            del kinect_position_list[0]
             x_average = np.mean(kinect_position_list)
-            '''
-	    x_error = x_current - z_x
+	    
+            x_error = x_average - z_x
+            
             #print x_error
             x_error_d = x_error - x_error_previous
 	    x_error_cum = x_error_cum + x_error
             kp = 315 + 10*x_error
-	    if abs(x_error)>tolerance:
+	    
+            #Change tolerance to smoothen the transition
+            tolerance = epsi_1 if (velocity>10) else epsi_2
+
+            if abs(x_error)>tolerance:
             	velocity = (user_input.command_target>0)*(kp*x_error + kd*x_error_d + ki*x_error_i)
             	x_error_previous = x_error
             	send_control.command_target = velocity
 	    else:
 		velocity = 0
 		send_control.command_target = velocity
+
         except:
             print 'Not found user'
             pass
