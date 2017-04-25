@@ -51,7 +51,6 @@ def static_stance_check():
 
 def check_stop(target_vel):
     global velocity_history, state_historyi, DSP
-    del velocity_history[0]
     '''
     d1 = velocity_history[3] - velocity_history[2]
     d2 = velocity_history[2] - velocity_history[1]
@@ -66,6 +65,7 @@ def check_stop(target_vel):
        velocity_history.append(vr_velocity)
     else:
     	velocity_history.append(target_vel)
+        del velocity_history[0]
     return np.average(velocity_history)
 
 def update(skate):
