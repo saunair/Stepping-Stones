@@ -9,7 +9,7 @@ import copy
 import numpy
 import tf
 import roslib; roslib.load_manifest('morpheus_skates')
-
+from copy import deepcopy
 from std_msgs.msg import *
 from morpheus_skates.msg import *
 from morpheus_skates.srv import *
@@ -232,13 +232,13 @@ def check_estop():
     return estop_count >= 3
 
 
-def left_state(left_state):
+def left_state_func(left_state_var):
     global left_vel_state
-    left_vel_state = left_state.data
+    left_vel_state = left_state_var.data
 
-def right_state(right_state):
+def right_state_func(right_state_var):
     global right_vel_state
-    right_vel_state = right_state.data
+    right_vel_state = right_state_var.data
 
 #main higher level control code
 def send_controls():
@@ -261,8 +261,8 @@ def send_controls():
     right_pub.publish(send_control_right)
     total_pub = rospy.Publisher('total_message', integrated_message, queue_size=10)
     #subscribe to user inputs
-    rospy.Subscriber("left_state", Int16, left_state)
-    rospy.Subscriber("right_state", Int16, right_state)
+    rospy.Subscriber("left_state", Int16, left_state_func)
+    rospy.Subscriber("right_state", Int16, right_state_func)
     rospy.Subscriber("user_inputs", skate_command, process_input)
     rospy.Subscriber("left_feedback", skate_feedback, left_update)
     rospy.Subscriber("right_feedback", skate_feedback, right_update)
@@ -382,12 +382,14 @@ def send_controls():
             if send_control.command_target <= 0:
 		send_control.command_target = 0
         
-        send_control_left = send_control
-        send_control_right = send_control
+        send_control_left = deepcopy(send_control)
+        send_control_right = deepcopy(send_control)
     	
-        #send_control_right.command_target = send_control_right.command_target*right_vel_state
-    	#send_control_left.command_target  = send_control_left.command_target*left_vel_state
         
+
+        send_control_right.command_target = send_control_right.command_target*right_vel_state
+    	send_control_left.command_target  = send_control_left.command_target*left_vel_state
+        print right_vel_state, left_vel_state, send_control_right.command_target, send_control_left.command_target
         left_pub.publish(send_control_left)
     	right_pub.publish(send_control_right)	
         kin_pub.publish(x_error)
