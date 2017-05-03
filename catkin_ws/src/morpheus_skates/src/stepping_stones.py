@@ -335,7 +335,7 @@ def send_controls():
             #print x_error
             x_error_d = x_error - x_error_previous
 	    x_error_cum = x_error_cum + x_error
-            kp = 315 + 10*x_error
+            kp = 315 + 12.5*x_error
 	    
             #Change tolerance to smoothen the transition
             tolerance = epsi_1 if (velocity>10) else epsi_2
@@ -389,7 +389,7 @@ def send_controls():
 
         send_control_right.command_target = send_control_right.command_target*right_vel_state
     	send_control_left.command_target  = send_control_left.command_target*left_vel_state
-        print right_vel_state, left_vel_state, send_control_right.command_target, send_control_left.command_target
+        #print right_vel_state, left_vel_state, send_control_right.command_target, send_control_left.command_target
         left_pub.publish(send_control_left)
     	right_pub.publish(send_control_right)	
         kin_pub.publish(x_error)

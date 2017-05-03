@@ -36,7 +36,7 @@ class skate(object):
         ########### set appropriate values ########
 	self.MAX_preload_F1 = 75
         self.MAX_preload_F2 = 75
-        self.MAX_preload_F3 = 100
+        self.MAX_preload_F3 = 75
     	
 	########### initialize variables ##########
 	self.w = -1

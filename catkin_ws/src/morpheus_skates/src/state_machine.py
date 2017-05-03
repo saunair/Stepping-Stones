@@ -33,7 +33,7 @@ back_stepping = -1
 stance = 0
 
 current_state = 1
-state_queue = [1,1,1]
+state_queue = [1,1,1,1,1]
 
 no_states = 9
 
