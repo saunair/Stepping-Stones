@@ -1,0 +1,5 @@
+The folder structure is created in a way that all the components are separate from each other
+Arduino contains all the object oriented code that runs in each skate
+CATKIN workspace contains all the ROS code 
+Matlab contains the ROSBAGs, ROSBAG parsing scripts and some simulation files
+Mechanical/CAD has all the CAD files of the skates 
