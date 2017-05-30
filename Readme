@@ -1,7 +1,7 @@
 The code is launched in the master PC by the following commands in different terminals
 roslaunch morpheus_skates stepping_stones.launch
 rosrun morpheus_skates take_user_input.py
-rosrun morpheus_skates shoe_size_user.py
+rosrun morpheus_skates shoe_size_input.py
 
 Calibration routine:
 roslaunch morpheus_skates calibration_arduino.py
